@@ -19,9 +19,9 @@ function tryNormalizeType(value: string) {
   }
 }
 
-function mimeMatch(expected: string | boolean, actual: string | boolean): boolean {
+function mimeMatch(expected: string | null, actual: string | null): boolean {
   // invalid type
-  if (expected === false) return false
+  if (expected == null) return false
 
   // split types
   const actualParts = (actual as string).split('/')
@@ -46,9 +46,9 @@ function mimeMatch(expected: string | boolean, actual: string | boolean): boolea
   return true
 }
 
-function normalize(type: string) {
+function normalize(type: string): string | null {
   // invalid type
-  if (typeof type !== 'string') return false
+  if (typeof type !== 'string') return null
 
   switch (type) {
     case 'urlencoded':
