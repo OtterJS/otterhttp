@@ -161,40 +161,40 @@ export class Router<App extends Router = any, Req = any, Res = any> {
   parent: App
   apps: Record<string, App> = {}
 
-  acl: RIM<Req, Res, this>
-  bind: RIM<Req, Res, this>
-  checkout: RIM<Req, Res, this>
-  connect: RIM<Req, Res, this>
-  copy: RIM<Req, Res, this>
-  delete: RIM<Req, Res, this>
-  get: RIM<Req, Res, this>
-  head: RIM<Req, Res, this>
-  link: RIM<Req, Res, this>
-  lock: RIM<Req, Res, this>
-  merge: RIM<Req, Res, this>
-  mkactivity: RIM<Req, Res, this>
-  mkcalendar: RIM<Req, Res, this>
-  mkcol: RIM<Req, Res, this>
-  move: RIM<Req, Res, this>
-  notify: RIM<Req, Res, this>
-  options: RIM<Req, Res, this>
-  patch: RIM<Req, Res, this>
-  post: RIM<Req, Res, this>
-  pri: RIM<Req, Res, this>
-  propfind: RIM<Req, Res, this>
-  proppatch: RIM<Req, Res, this>
-  purge: RIM<Req, Res, this>
-  put: RIM<Req, Res, this>
-  rebind: RIM<Req, Res, this>
-  report: RIM<Req, Res, this>
-  search: RIM<Req, Res, this>
-  source: RIM<Req, Res, this>
-  subscribe: RIM<Req, Res, this>
-  trace: RIM<Req, Res, this>
-  unbind: RIM<Req, Res, this>
-  unlink: RIM<Req, Res, this>
-  unlock: RIM<Req, Res, this>
-  unsubscribe: RIM<Req, Res, this>
+  declare acl: RIM<Req, Res, this>
+  declare bind: RIM<Req, Res, this>
+  declare checkout: RIM<Req, Res, this>
+  declare connect: RIM<Req, Res, this>
+  declare copy: RIM<Req, Res, this>
+  declare delete: RIM<Req, Res, this>
+  declare get: RIM<Req, Res, this>
+  declare head: RIM<Req, Res, this>
+  declare link: RIM<Req, Res, this>
+  declare lock: RIM<Req, Res, this>
+  declare merge: RIM<Req, Res, this>
+  declare mkactivity: RIM<Req, Res, this>
+  declare mkcalendar: RIM<Req, Res, this>
+  declare mkcol: RIM<Req, Res, this>
+  declare move: RIM<Req, Res, this>
+  declare notify: RIM<Req, Res, this>
+  declare options: RIM<Req, Res, this>
+  declare patch: RIM<Req, Res, this>
+  declare post: RIM<Req, Res, this>
+  declare pri: RIM<Req, Res, this>
+  declare propfind: RIM<Req, Res, this>
+  declare proppatch: RIM<Req, Res, this>
+  declare purge: RIM<Req, Res, this>
+  declare put: RIM<Req, Res, this>
+  declare rebind: RIM<Req, Res, this>
+  declare report: RIM<Req, Res, this>
+  declare search: RIM<Req, Res, this>
+  declare source: RIM<Req, Res, this>
+  declare subscribe: RIM<Req, Res, this>
+  declare trace: RIM<Req, Res, this>
+  declare unbind: RIM<Req, Res, this>
+  declare unlink: RIM<Req, Res, this>
+  declare unlock: RIM<Req, Res, this>
+  declare unsubscribe: RIM<Req, Res, this>
 
   constructor() {
     for (const m of METHODS) {
