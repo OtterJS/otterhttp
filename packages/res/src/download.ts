@@ -12,45 +12,66 @@ export type DownloadOptions = SendFileOptions &
 
 type Callback = (err?: any) => void
 
-export const download =
-  <Request extends Req = Req, Response extends Res = Res>(req: Request, res: Response) =>
-  (path: string, filename?: string | Callback, options?: DownloadOptions | Callback, cb?: Callback): Response => {
-    let done = cb
-    let name = filename as string
-    let opts = (options || null) as DownloadOptions
+type Download<Response> = {
+  (path: string, cb?: Callback): Response
+  (path: string, filename: string, cb?: Callback): Response
+  (path: string, filename: string, options: DownloadOptions, cb?: Callback): Response
+}
+
+export const download = <Request extends Req = Req, Response extends Res = Res>(
+  req: Request,
+  res: Response
+): Download<Response> => {
+  return (
+    path: string,
+    pFilename?: string | Callback,
+    pOptions?: DownloadOptions | Callback,
+    pDone?: Callback
+  ): Response => {
+    let done: Callback | undefined
+    let filename: string | undefined
+    let options: DownloadOptions | undefined
 
     // support function as second or third arg
-    if (typeof filename === 'function') {
-      done = filename
-      name = null
-    } else if (typeof options === 'function') {
-      done = options
-      opts = null
+    if (typeof pFilename === 'function') {
+      filename = undefined
+      done = pFilename
+    } else if (typeof pOptions === 'function') {
+      filename = pFilename
+      options = undefined
+      done = pOptions
+    } else if (typeof pDone === 'function') {
+      filename = pFilename
+      options = pOptions
+      done = pDone
+    } else {
+      filename = pFilename
+      options = pOptions
     }
 
     // set Content-Disposition when file is sent
     const headers = {
-      'Content-Disposition': contentDisposition(name || basename(path))
+      'Content-Disposition': contentDisposition(filename || basename(path))
     }
 
     // merge user-provided headers
-    if (opts?.headers) {
-      for (const key of Object.keys(opts.headers)) {
-        if (key.toLowerCase() !== 'content-disposition') headers[key] = opts.headers[key]
+    if (options?.headers) {
+      for (const key of Object.keys(options.headers)) {
+        if (key.toLowerCase() !== 'content-disposition') headers[key] = options.headers[key]
       }
     }
 
     // merge user-provided options
-    opts = { ...opts, headers }
+    options = { ...options, headers }
 
     // send file
 
-    return sendFile(req, res)(opts.root ? path : resolve(path), opts, done || (() => undefined))
+    return sendFile(req, res)(options.root ? path : resolve(path), options, done || (() => undefined))
   }
+}
 
-export const attachment =
-  <Response extends Res>(res: Response) =>
-  (filename?: string): Response => {
+export const attachment = <Response extends Res>(res: Response) => {
+  return (filename?: string): Response => {
     if (filename) {
       setContentType(res)(extname(filename))
       filename = basename(filename)
@@ -60,3 +81,4 @@ export const attachment =
 
     return res
   }
+}
