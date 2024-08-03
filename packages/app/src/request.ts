@@ -98,15 +98,17 @@ export const getHost = (req: Request, trust: Trust): Host | undefined => {
 }
 
 export const getIP = (req: Pick<Request, 'headers' | 'connection' | 'socket'>, trust: Trust): string | undefined =>
-  proxyAddr(req, trust).replace(/^.*:/, '') // striping the redundant prefix addeded by OS to IPv4 address
+  proxyAddr(req, trust)?.replace(/^.*:/, '') // stripping the redundant prefix added by OS to IPv4 address
 
-export const getIPs = (req: Pick<Request, 'headers' | 'connection' | 'socket'>, trust: Trust): string[] | undefined =>
-  all(req, trust)
+export const getIPs = (
+  req: Pick<Request, 'headers' | 'connection' | 'socket'>,
+  trust: Trust
+): Array<string | undefined> => all(req, trust)
 
 export const getSubdomains = (req: Request, trust: Trust, subdomainOffset = 2): string[] => {
-  const { hostname } = getHost(req, trust)
-
-  if (!hostname) return []
+  const host = getHost(req, trust)
+  if (host == null) return []
+  const { hostname } = host
 
   const subdomains = isIP(hostname) ? [hostname] : hostname.split('.').reverse()
 
