@@ -144,7 +144,7 @@ export const pushMiddleware =
           handler: handler as Handler,
           method,
           type,
-          fullPath: fullPaths == null ? null : fullPaths[idx++]
+          fullPath: fullPaths == null ? undefined : fullPaths[idx++]
         })
       )
     }
