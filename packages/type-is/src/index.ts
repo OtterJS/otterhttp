@@ -9,7 +9,7 @@ function normalizeType(value: string) {
   return typer.format(type)
 }
 
-function tryNormalizeType(value: string) {
+function tryNormalizeType(value: string | undefined) {
   if (!value) return null
 
   try {
@@ -68,7 +68,7 @@ function normalize(type: string): string | null {
  * a special shortcut like `multipart` or `urlencoded`,
  * or a mime type.
  */
-export const typeIs = (value: string, ...types: string[]) => {
+export const typeIs = (value: string | undefined, ...types: string[]) => {
   let i: number
   // remove parameters and normalize
   const val = tryNormalizeType(value)
