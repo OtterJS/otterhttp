@@ -196,14 +196,14 @@ export class Router<App extends Router = any, Req = any, Res = any> {
   declare unlock: RIM<Req, Res, this>
   declare unsubscribe: RIM<Req, Res, this>
 
-  constructor() {
+  static {
     for (const m of METHODS) {
-      this[m.toLowerCase()] = this.add(m as Method)
+      Router.prototype[m.toLowerCase()] = Router.add(m)
     }
   }
 
-  add(method: Method) {
-    return (...args: RouterMethodParams<Req, Res>): this => {
+  static add<App extends Router = any, Req = any, Res = any>(method: Method) {
+    return function (this: Router<App, Req, Res>, ...args: RouterMethodParams<Req, Res>): Router<App, Req, Res> {
       const handlers = args.slice(1).flat() as Handler<Req, Res>[]
       if (Array.isArray(args[0])) {
         for (const arg of Object.values(args[0])) {
