@@ -10,7 +10,7 @@ export type FormatProps = {
 export type FormatError = Error & {
   status: number
   statusCode: number
-  types: string[]
+  types: Array<string | null>
 }
 
 type next = (err?: FormatError) => void
@@ -33,7 +33,8 @@ export const formatResponse =
     setVaryHeader(res)('Accept')
 
     if (key) {
-      res.setHeader('Content-Type', normalizeType(key).value)
+      const type = normalizeType(key)
+      if (type.value != null) res.setHeader('Content-Type', type.value)
       obj[key](req, res, next)
     } else if (fn) {
       fn()
