@@ -27,10 +27,7 @@ export type DotenvConfigOptions = {
   debug: boolean
 }
 
-export interface DotenvConfigOutput {
-  error?: Error
-  parsed?: DotenvParseOutput
-}
+export type DotenvConfigOutput = { error: unknown } | { parsed: DotenvParseOutput }
 
 export type config = (options?: DotenvConfigOptions) => DotenvConfigOutput
 /* c8 ignore stop */
