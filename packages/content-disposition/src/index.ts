@@ -79,7 +79,7 @@ function format({
   return string
 }
 
-function createParams(filename: string, fallback?: string | boolean): Record<string, string> {
+function createParams(filename?: string, fallback?: string | boolean): Record<string, string> {
   if (filename == null) return {}
 
   const params: Record<string, string> = {}
@@ -123,7 +123,7 @@ const pdecode = (_str: string, hex: string) => String.fromCharCode(Number.parseI
  */
 
 export function contentDisposition(
-  filename: string,
+  filename?: string,
   options: Partial<{
     type: string
     fallback: string | boolean
