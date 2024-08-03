@@ -52,7 +52,10 @@ function ustring(val: unknown): string {
 
 const basename = (str: string) => str.slice(str.lastIndexOf('/') + 1)
 
-function format({
+/**
+ * Format Content-Disposition header string.
+ */
+export function format({
   parameters,
   type
 }: Partial<{
