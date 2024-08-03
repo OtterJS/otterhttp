@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { dirname } from 'dirname-filename-esm'
 import { makeFetch } from 'supertest-fetch'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { Request, Response } from '../../packages/app/src/index.js'
 import {
   append,
@@ -237,13 +237,15 @@ describe('Response extensions', () => {
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.icon"')
     })
     it('should pass the error to a callback', async () => {
+      const done = vi.fn().mockName('done')
       const app = runServer((req, res) => {
-        download(req, res)(path.join(__dirname, '../fixtures'), 'some_file.png', (err) => {
-          expect((err as Error).message).toContain('EISDIR')
-        }).end()
+        download(req, res)(path.join(__dirname, '../fixtures'), 'some_file.png', done).end()
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="some_file.png"')
+      expect(done).toHaveBeenCalled()
+      expect(done.mock.lastCall[0]).toBeInstanceOf(Error)
+      expect(done.mock.lastCall[0].message).toContain('EISDIR')
     })
     it('should set "root" from options', async () => {
       const app = runServer((req, res) => {
