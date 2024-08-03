@@ -49,7 +49,7 @@ export function fresh(reqHeaders: IncomingHttpHeaders, resHeaders: OutgoingHttpH
 
   // if-modified-since
   if (modifiedSince) {
-    const lastModified = resHeaders['last-modified'] as string | undefined
+    const lastModified = resHeaders['last-modified']
 
     if (!lastModified || !(Date.parse(lastModified) <= Date.parse(modifiedSince))) return false
   }
