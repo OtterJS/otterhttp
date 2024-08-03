@@ -63,6 +63,9 @@ jobs:
           version: latest
       - name: Run Biome
         run: biome ci .
+      
+      - name: Run typechecker
+        run: pnpm type-check
 
       - name: run tests
         run: pnpm test
