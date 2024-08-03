@@ -247,7 +247,7 @@ describe('Response extensions', () => {
     })
     it('should set "root" from options', async () => {
       const app = runServer((req, res) => {
-        download(req, res)('favicon.ico', () => void 0, {
+        download(req, res)('favicon.ico', 'favicon.ico', {
           root: path.join(__dirname, '../fixtures')
         }).end()
       })
@@ -256,7 +256,7 @@ describe('Response extensions', () => {
     })
     it(`'should pass options to sendFile's ReadStream'`, async () => {
       const app = runServer((req, res) => {
-        download(req, res)(path.join(__dirname, '../fixtures', 'favicon.ico'), () => void 0, {
+        download(req, res)(path.join(__dirname, '../fixtures', 'favicon.ico'), 'favicon.ico', {
           encoding: 'ascii'
         }).end()
       })
@@ -265,7 +265,7 @@ describe('Response extensions', () => {
     })
     it('should set headers from options', async () => {
       const app = runServer((req, res) => {
-        download(req, res)(path.join(__dirname, '../fixtures', 'favicon.ico'), () => void 0, {
+        download(req, res)(path.join(__dirname, '../fixtures', 'favicon.ico'), 'favicon.ico', {
           headers: {
             'X-Custom-Header': 'Value'
           }
