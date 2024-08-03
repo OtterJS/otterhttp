@@ -49,7 +49,7 @@ export const setLocationHeader =
 
 export const getResponseHeader =
   <Response extends Res = Res>(res: Response) =>
-  (field: string): string | number | string[] => {
+  (field: string): string | number | string[] | undefined => {
     return res.getHeader(field)
   }
 
