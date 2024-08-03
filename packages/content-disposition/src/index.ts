@@ -59,7 +59,7 @@ function format({
   parameters: Record<string, unknown>
   type: string | boolean | undefined
 }>) {
-  if (!type || typeof type !== 'string' || !TOKEN_REGEXP.test(type)) {
+  if (type == null || typeof type !== 'string' || !TOKEN_REGEXP.test(type)) {
     throw new TypeError('invalid type')
   }
 
@@ -85,7 +85,7 @@ function createParams(filename: string, fallback?: string | boolean): Record<str
   const params: Record<string, string> = {}
 
   // fallback defaults to true
-  if (!fallback) fallback = true
+  if (fallback == null) fallback = true
   if (typeof fallback === 'string' && NON_LATIN1_REGEXP.test(fallback)) {
     throw new TypeError('fallback must be ISO-8859-1 string')
   }
