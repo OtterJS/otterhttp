@@ -79,17 +79,13 @@ function format({
   return string
 }
 
-function createParams(filename?: string, fallback?: string | boolean) {
-  if (filename === undefined) return
+function createParams(filename: string, fallback?: string | boolean): Record<string, string> {
+  if (filename == null) throw new TypeError('Filename cannot be undefined.')
 
-  const params: Partial<
-    Record<string, string> & {
-      filename: string
-    }
-  > = {}
+  const params: Record<string, string> = {}
 
   // fallback defaults to true
-  if (!fallback) fallback = true
+  if (fallback) fallback = true
   if (typeof fallback === 'string' && NON_LATIN1_REGEXP.test(fallback)) {
     throw new TypeError('fallback must be ISO-8859-1 string')
   }
@@ -127,7 +123,7 @@ const pdecode = (_str: string, hex: string) => String.fromCharCode(Number.parseI
  */
 
 export function contentDisposition(
-  filename?: string,
+  filename: string,
   options: Partial<{
     type: string
     fallback: string | boolean
@@ -176,8 +172,8 @@ export function parse(header: string): ContentDisposition {
   const type = match[1].toLowerCase()
 
   let key: string
-  const names = []
-  const params = {}
+  const names: string[] = []
+  const params: Record<string, string> = {}
   let value: string | string[]
 
   // calculate index to start at
