@@ -8,12 +8,10 @@ const processIpFilters = (ip: string, filter: Filter[], strict: boolean): boolea
 
   if (strict && !ipRegex().test(ip)) throw new Error(`@tinyhttp/ip-filter: Invalid IP: ${ip}`)
 
-  const results = filter.map((f) => {
+  return filter.some((f) => {
     if (typeof f === 'string') return f === ip
     if (f instanceof RegExp) return f.test(ip)
   })
-
-  return results.includes(true)
 }
 
 export type IPFilterOptions = {
