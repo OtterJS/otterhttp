@@ -2,7 +2,7 @@ import { Agent } from 'node:http'
 import { makeFetch } from 'supertest-fetch'
 import { Agent as UndiciAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici'
 import { describe, expect, it, onTestFinished } from 'vitest'
-import { App } from '../../packages/app/src/app'
+import { App, type Request } from '../../packages/app/src/index'
 import { InitAppAndTest, InitSecureAppAndTest } from '../../test_helpers/initAppAndTest'
 
 describe('Request properties', () => {
@@ -75,13 +75,13 @@ describe('Request properties', () => {
     })
     it('should set the correct req.url on middlewares even in a subapp', async () => {
       const echo = (req, res) => res.send({ url: req.url, params: req.params })
-      const mw = (req, res, next) => {
+      const mw = (req, _res, next) => {
         req.urls ||= []
         req.urls.push(req.url)
         next()
       }
       const makeApp = () =>
-        new App()
+        new App<Request & { urls?: string[] }>()
           .get('/', echo)
           .use('/a1/b', echo)
           .use('/a2/b', mw, mw, mw, (req, res) => res.send({ urls: req.urls, params: req.params }))
