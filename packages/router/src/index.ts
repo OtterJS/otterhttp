@@ -158,7 +158,7 @@ export const pushMiddleware =
 export class Router<App extends Router = any, Req = any, Res = any> {
   middleware: Middleware[] = []
   mountpath = '/'
-  parent: App
+  parent?: App
   apps: Record<string, App> = {}
 
   declare acl: RIM<Req, Res, this>
