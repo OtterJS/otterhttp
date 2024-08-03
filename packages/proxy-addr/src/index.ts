@@ -5,7 +5,7 @@ import ipaddr, { type IPv6, type IPv4 } from 'ipaddr.js'
 type Req = Pick<IncomingMessage, 'headers' | 'socket'>
 
 export type TrustParameter = string | number | string[]
-export type TrustFunction = (addr: string, i: number) => boolean
+export type TrustFunction = (addr: string | undefined, i: number) => boolean
 export type Trust = TrustFunction | TrustParameter
 
 type Subnet = {
@@ -46,7 +46,7 @@ const isIPv6 = (val: IPv4 | IPv6): val is IPv6 => val.kind() === 'ipv6'
 /**
  * Static trust function to trust nothing.
  */
-const trustNone = () => false
+const trustNone: TrustFunction = () => false
 
 /**
  * Get all addresses in the request, optionally stopping
@@ -55,7 +55,7 @@ const trustNone = () => false
  * @param req
  * @param trust
  */
-function alladdrs(req: Req, trust?: Trust): string[] {
+function alladdrs(req: Req, trust?: Trust): Array<string | undefined> {
   // get addresses
 
   const addrs = forwarded(req)
@@ -75,7 +75,7 @@ function alladdrs(req: Req, trust?: Trust): string[] {
  *
  * @param  val
  */
-function compile(val: string | number | string[]): (addr: string, i: number) => boolean {
+function compile(val: string | number | string[]): TrustFunction {
   let trust: string[]
   if (typeof val === 'string') trust = [val]
   else if (typeof val === 'number') return compileHopsTrust(val)
@@ -98,7 +98,7 @@ function compile(val: string | number | string[]): (addr: string, i: number) => 
  *
  * @param hops
  */
-function compileHopsTrust(hops: number): (_: string, i: number) => boolean {
+function compileHopsTrust(hops: number): TrustFunction {
   return (_, i) => i < hops
 }
 
@@ -113,7 +113,7 @@ function compileRangeSubnets(arr: string[]) {
  *
  * @param rangeSubnets
  */
-function compileTrust(rangeSubnets: Subnet[]) {
+function compileTrust(rangeSubnets: Subnet[]): TrustFunction {
   // Return optimized function based on length
   const len = rangeSubnets.length
   return len === 0 ? trustNone : len === 1 ? trustSingle(rangeSubnets[0]) : trustMulti(rangeSubnets)
@@ -164,7 +164,7 @@ function parseNetmask(netmask: string) {
  * @param trust
  * @public
  */
-export function proxyaddr(req: Req, trust: Trust): string {
+export function proxyaddr(req: Req, trust: Trust): string | undefined {
   const addrs = alladdrs(req, trust)
 
   return addrs[addrs.length - 1]
@@ -173,8 +173,9 @@ export function proxyaddr(req: Req, trust: Trust): string {
 /**
  * Compile trust function for multiple subnets.
  */
-function trustMulti(subnets: Subnet[]) {
-  return function trust(addr: string) {
+function trustMulti(subnets: Subnet[]): TrustFunction {
+  return function trust(addr: string | undefined) {
+    if (addr == null) return false
     if (!isip(addr)) return false
     const ip = parseip(addr)
     let ipconv: IPv4 | IPv6 | null = null
@@ -200,10 +201,11 @@ function trustMulti(subnets: Subnet[]) {
  *
  * @param subnet
  */
-function trustSingle(subnet: Subnet) {
+function trustSingle(subnet: Subnet): TrustFunction {
   const subnetKind = subnet.ip.kind()
   const subnetIsIPv4 = subnetKind === 'ipv4'
-  return function trust(addr: string) {
+  return function trust(addr: string | undefined) {
+    if (addr == null) return false
     if (!isip(addr)) return false
     let ip = parseip(addr)
     const kind = ip.kind()
