@@ -46,7 +46,7 @@ function mimeMatch(expected: string | boolean, actual: string | boolean): boolea
   return true
 }
 
-function normalize(type: string | unknown) {
+function normalize(type: string) {
   // invalid type
   if (typeof type !== 'string') return false
 
