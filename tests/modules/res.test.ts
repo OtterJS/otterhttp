@@ -243,6 +243,7 @@ describe('Response extensions', () => {
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="some_file.png"')
+      await new Promise((resolve) => setTimeout(resolve, 100))
       expect(done).toHaveBeenCalled()
       expect(done.mock.lastCall[0]).toBeInstanceOf(Error)
       expect(done.mock.lastCall[0].message).toContain('EISDIR')
