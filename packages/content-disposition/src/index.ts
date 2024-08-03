@@ -80,12 +80,12 @@ function format({
 }
 
 function createParams(filename: string, fallback?: string | boolean): Record<string, string> {
-  if (filename == null) throw new TypeError('Filename cannot be undefined.')
+  if (filename == null) return {}
 
   const params: Record<string, string> = {}
 
   // fallback defaults to true
-  if (fallback) fallback = true
+  if (!fallback) fallback = true
   if (typeof fallback === 'string' && NON_LATIN1_REGEXP.test(fallback)) {
     throw new TypeError('fallback must be ISO-8859-1 string')
   }
