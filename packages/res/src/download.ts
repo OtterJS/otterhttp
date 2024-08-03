@@ -40,13 +40,10 @@ export const download = <Request extends Req = Req, Response extends Res = Res>(
       filename = pFilename
       options = undefined
       done = pOptions
-    } else if (typeof pDone === 'function') {
-      filename = pFilename
-      options = pOptions
-      done = pDone
     } else {
       filename = pFilename
       options = pOptions
+      done = pDone
     }
 
     // set Content-Disposition when file is sent
