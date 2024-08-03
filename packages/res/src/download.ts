@@ -10,7 +10,7 @@ export type DownloadOptions = SendFileOptions &
     headers: Record<string, string>
   }>
 
-type Callback = (err?: any) => void
+type Callback = (err?: unknown) => void
 
 type Download<Response> = {
   (path: string, cb?: Callback): Response
