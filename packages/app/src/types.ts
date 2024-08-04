@@ -46,8 +46,8 @@ export type AppRenderOptions<O extends TemplateEngineOptions = TemplateEngineOpt
 
 export type AppConstructor<Req extends Request = Request, Res extends Response = Response> = Partial<{
   noMatchHandler: Handler<Req, Res>
-  onError: ErrorHandler
+  onError: ErrorHandler<Req, Res>
   settings: AppSettings
-  applyExtensions: (req: Request, res: Response, next: NextFunction) => void
+  applyExtensions: Handler<Req, Res>
 }>
 /* c8 ignore stop */

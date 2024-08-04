@@ -23,7 +23,7 @@ const mount = (fn: App | Handler) => (fn instanceof App ? fn.attach : fn)
 
 const applyHandler =
   <Req, Res>(h: Handler<Req, Res>) =>
-  async (req: Req, res: Res, next?: NextFunction) => {
+  async (req: Req, res: Res, next: NextFunction) => {
     try {
       if (h[Symbol.toStringTag] === 'AsyncFunction') {
         await h(req, res, next)
@@ -59,17 +59,17 @@ export class App<Req extends Request = Request, Res extends Response = Response>
   middleware: Middleware<Req, Res>[] = []
   locals: Record<string, unknown> = {}
   noMatchHandler: Handler
-  onError: ErrorHandler
+  onError: ErrorHandler<Req, Res>
   settings: AppSettings
   engines: Record<string, TemplateEngine> = {}
-  applyExtensions: (req: Request, res: Response, next: NextFunction) => void
+  applyExtensions: Handler<Req, Res> | undefined
   attach: (req: Req, res: Res, next?: NextFunction) => void
   cache: Record<string, unknown>
 
   constructor(options: AppConstructor<Req, Res> = {}) {
     super()
     this.onError = options?.onError || onErrorHandler
-    this.noMatchHandler = options?.noMatchHandler || this.onError.bind(this, { code: 404 })
+    this.noMatchHandler = options?.noMatchHandler ?? this.onError.bind(this, { code: 404 })
     this.settings = {
       view: View,
       xPoweredBy: true,

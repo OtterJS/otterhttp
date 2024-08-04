@@ -4,10 +4,22 @@ import type { App } from './app.js'
 import type { Request } from './request.js'
 import type { Response } from './response.js'
 
-export type ErrorHandler = (this: App, err: any, req: Request, res: Response, next?: NextFunction) => void
+export type ErrorHandler<Req extends Request = Request, Res extends Response = Response> = (
+  this: App<Req, Res>,
+  err: any,
+  req: Req,
+  res: Res,
+  next: NextFunction
+) => void
 
-export const onErrorHandler: ErrorHandler = function (this: App, err: any, _req: Request, res: Response) {
-  if (this.onError === onErrorHandler && this.parent) return this.parent.onError(err, _req, res)
+export const onErrorHandler = function <Req extends Request = Request, Res extends Response = Response>(
+  this: App<Req, Res>,
+  err: any,
+  _req: Req,
+  res: Res,
+  next: NextFunction
+) {
+  if (this.onError === onErrorHandler && this.parent) return this.parent.onError(err, _req, res, next)
 
   if (err instanceof Error) console.error(err)
 
