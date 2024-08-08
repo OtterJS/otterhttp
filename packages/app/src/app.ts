@@ -186,19 +186,13 @@ export class App<Req extends Request = Request, Res extends Response = Response>
     if (!view) {
       const View = this.settings.view
       if (View == null) throw new TypeError(`No app-wide default view engine is configured, cannot render '${name}'`)
-      view = new View(name, {
-        defaultEngine: this.settings['view engine'],
-        root: this.settings.views,
-        engines: this.engines
-      })
-
-      if (!view.path) {
-        const dirs =
-          Array.isArray(view.root) && view.root.length > 1
-            ? `directories "${view.root.slice(0, -1).join('", "')}" or "${view.root[view.root.length - 1]}"`
-            : `directory "${view.root}"`
-        const err = new Error(`Failed to lookup view "${name}" in views ${dirs}`)
-
+      try {
+        view = new View(name, {
+          defaultEngine: this.settings['view engine'],
+          root: this.settings.views,
+          engines: this.engines
+        })
+      } catch (err) {
         return cb(err)
       }
 
