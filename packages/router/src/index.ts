@@ -71,7 +71,7 @@ export interface Middleware<Req = unknown, Res = unknown, App extends Router<App
 }
 
 export type MethodHandler<Req = unknown, Res = unknown, App extends Router<App, Req, Res> = never> = {
-  path?: string | string[] | Handler<Req, Res> | App
+  path?: string | Handler<Req, Res> | App
   handler?: Handler<Req, Res> | App
   type: MiddlewareType
   regex?: RegexParams
@@ -253,7 +253,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
       const [path, ...restArgs] = args
       const handlers: Handler<Req, Res>[] = restArgs.flat()
 
-      if (isString(path) || isStringArray(path)) {
+      if (isString(path)) {
         const handler = handlers.splice(0, 1)[0]
         pushMiddleware<Req, Res>(this.middleware)({
           path: path,
@@ -262,6 +262,20 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
           method,
           type: 'route'
         })
+        return this
+      }
+
+      if (isStringArray(path)) {
+        const handler = handlers.splice(0, 1)[0]
+        for (const eachPath of path) {
+          pushMiddleware<Req, Res>(this.middleware)({
+            path: eachPath,
+            handler: handler,
+            handlers: handlers,
+            method,
+            type: 'route'
+          })
+        }
         return this
       }
 
@@ -286,7 +300,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
     const [path, ...restArgs] = args
     const handlers: Handler<Req, Res>[] = restArgs.flat()
 
-    if (isString(path) || isStringArray(path)) {
+    if (isString(path)) {
       const handler = handlers.splice(0, 1)?.[0]
       pushMiddleware<Req, Res>(this.middleware)({
         path: path,
@@ -298,13 +312,27 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
       return this
     }
 
+    if (isStringArray(path)) {
+      const handler = handlers.splice(0, 1)[0]
+      for (const eachPath of path) {
+        pushMiddleware<Req, Res>(this.middleware)({
+          path: eachPath,
+          handler: handler,
+          handlers: handlers,
+          method: 'M-SEARCH',
+          type: 'route'
+        })
+      }
+      return this
+    }
+
     if (Array.isArray(path)) {
       handlers.unshift(...path)
     } else {
       handlers.unshift(path)
     }
 
-    const handler = handlers.splice(0, 1)?.[0]
+    const handler = handlers.splice(0, 1)[0]
     pushMiddleware<Req, Res>(this.middleware)({
       handler: handler,
       handlers: handlers,
@@ -318,8 +346,8 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
     const [path, ...restArgs] = args
     const handlers: Handler<Req, Res>[] = restArgs.flat()
 
-    if (isString(path) || isStringArray(path)) {
-      const handler = handlers.splice(0, 1)?.[0]
+    if (isString(path)) {
+      const handler = handlers.splice(0, 1)[0]
       pushMiddleware(this.middleware)({
         path: path,
         handler: handler,
@@ -329,13 +357,26 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
       return this
     }
 
+    if (isStringArray(path)) {
+      const handler = handlers.splice(0, 1)[0]
+      for (const eachPath of path) {
+        pushMiddleware(this.middleware)({
+          path: eachPath,
+          handler: handler,
+          handlers: handlers,
+          type: 'route'
+        })
+      }
+      return this
+    }
+
     if (Array.isArray(path)) {
       handlers.unshift(...path)
     } else {
       handlers.unshift(path)
     }
 
-    const handler = handlers.splice(0, 1)?.[0]
+    const handler = handlers.splice(0, 1)[0]
     pushMiddleware(this.middleware)({
       handler: handler,
       handlers: handlers,
@@ -351,14 +392,27 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
     const [path, ...restArgs] = args
     const handlers: Array<Router<App, Req, Res> | Handler<Req, Res>> = restArgs.flat()
 
-    if (isString(path) || isStringArray(path)) {
-      const handler = handlers.splice(0, 1)?.[0]
+    if (isString(path)) {
+      const handler = handlers.splice(0, 1)[0]
       pushMiddleware<Req, Res, Router<App, Req, Res>>(this.middleware)({
         path,
         handler: handler,
         handlers: handlers,
         type: 'mw'
       })
+      return this
+    }
+
+    if (isStringArray(path)) {
+      const handler = handlers.splice(0, 1)[0]
+      for (const eachPath of path) {
+        pushMiddleware<Req, Res, Router<App, Req, Res>>(this.middleware)({
+          path: eachPath,
+          handler: handler,
+          handlers: handlers,
+          type: 'mw'
+        })
+      }
       return this
     }
 
