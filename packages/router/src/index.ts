@@ -1,5 +1,7 @@
 /* HELPER TYPES */
 
+import { isString, isStringArray } from './type-guards'
+
 export type NextFunction = (err?: any) => void
 
 export type SyncHandler<Request = any, Response = any> = (req: Request, res: Response, next: NextFunction) => void
@@ -78,25 +80,28 @@ export type MethodHandler<Req = any, Res = any> = {
   fullPath?: string
 }
 
-export type RouterHandler<Req = any, Res = any> = Handler<Req, Res> | Handler<Req, Res>[] | string[]
+export type RouterHandler<Req = any, Res = any> = Handler<Req, Res> | Handler<Req, Res>[]
 
-export type RouterPathOrHandler<Req = any, Res = any> = string | RouterHandler<Req, Res>
-
-export type RouterMethod<Req = any, Res = any> = (
-  path: string | string[] | Handler<Req, Res>,
-  handler?: RouterHandler<Req, Res>,
-  ...handlers: RouterHandler<Req, Res>[]
-) => any
+export type RouterMethod<Req = any, Res = any> = {
+  (path: string | string[], handler: RouterHandler<Req, Res>, ...handlers: RouterHandler<Req, Res>[]): unknown
+  (handler: RouterHandler<Req, Res>, ...handlers: RouterHandler<Req, Res>[]): unknown
+}
 
 type RouterMethodParams<Req = any, Res = any> = Parameters<RouterMethod<Req, Res>>
 
-export type UseMethod<Req = any, Res = any, App extends Router = any> = (
-  path: RouterPathOrHandler<Req, Res> | App,
-  handler?: RouterHandler<Req, Res> | App,
-  ...handlers: (RouterHandler<Req, Res> | App)[]
-) => any
+export type UseMethod<Req = any, Res = any, App extends Router = any> = {
+  (
+    path: string | string[],
+    handler: RouterHandler<Req, Res> | App,
+    ...handlers: (RouterHandler<Req, Res> | App)[]
+  ): unknown
+  (handler: RouterHandler<Req, Res> | App, ...handlers: (RouterHandler<Req, Res> | App)[]): unknown
+}
 
-export type UseMethodParams<Req = any, Res = any, App extends Router = any> = Parameters<UseMethod<Req, Res, App>>
+export type UseMethodParams<Req = any, Res = any, App extends Router = any> = [
+  string | string[] | RouterHandler<Req, Res> | App,
+  ...Array<RouterHandler<Req, Res> | App>
+]
 
 /** HELPER METHODS */
 
@@ -202,7 +207,7 @@ export class Router<App extends Router = any, Req = any, Res = any> {
     }
   }
 
-  static add<App extends Router = any, Req = any, Res = any>(method: Method) {
+  static add<App extends Router = any, Req = any, Res = any>(method: Method): RIM<Req, Res, Router<App, Req, Res>> {
     return function (this: Router<App, Req, Res>, ...args: RouterMethodParams<Req, Res>): Router<App, Req, Res> {
       const handlers = args.slice(1).flat() as Handler<Req, Res>[]
       if (Array.isArray(args[0])) {
@@ -232,29 +237,60 @@ export class Router<App extends Router = any, Req = any, Res = any> {
   }
 
   msearch(...args: RouterMethodParams<Req, Res>): this {
-    const handlers = args.slice(1).flat() as Handler<Req, Res>[]
+    const [path, ...restArgs] = args
+    const handlers: Handler<Req, Res>[] = restArgs.flat()
+
+    if (isString(path) || isStringArray(path)) {
+      pushMiddleware<Req, Res>(this.middleware)({
+        path: path,
+        handler: handlers[0],
+        handlers: handlers.slice(1),
+        method: 'M-SEARCH',
+        type: 'route'
+      })
+      return this
+    }
+
+    if (Array.isArray(path)) {
+      handlers.unshift(...path)
+    } else {
+      handlers.unshift(path)
+    }
 
     pushMiddleware<Req, Res>(this.middleware)({
-      path: args[0],
       handler: handlers[0],
       handlers: handlers.slice(1),
       method: 'M-SEARCH',
       type: 'route'
     })
-
     return this
   }
 
   all(...args: RouterMethodParams<Req, Res>): this {
-    const handlers = args.slice(1).flat() as Handler<Req, Res>[]
+    const [path, ...restArgs] = args
+    const handlers: Handler<Req, Res>[] = restArgs.flat()
+
+    if (isString(path) || isStringArray(path)) {
+      pushMiddleware(this.middleware)({
+        path: path,
+        handler: handlers[0],
+        handlers: handlers.slice(1),
+        type: 'route'
+      })
+      return this
+    }
+
+    if (Array.isArray(path)) {
+      handlers.unshift(...path)
+    } else {
+      handlers.unshift(path)
+    }
 
     pushMiddleware(this.middleware)({
-      path: args[0],
       handler: handlers[0],
       handlers: handlers.slice(1),
       type: 'route'
     })
-
     return this
   }
 
