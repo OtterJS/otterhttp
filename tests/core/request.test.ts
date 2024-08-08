@@ -355,7 +355,7 @@ describe('Request properties', () => {
     await fetch('/page?a=b').expect(200, 'Path to page: /page')
   })
   it('req.path works properly for optional parameters', async () => {
-    const { fetch } = InitAppAndTest((req, res) => {
+    const { fetch, app } = InitAppAndTest((req, res) => {
       res.send(`Path to page: ${req.path}`)
     }, '/:format?/:uml?')
 

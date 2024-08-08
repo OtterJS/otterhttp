@@ -10,6 +10,7 @@ import { onErrorHandler } from './onError.js'
 import { getURLParams } from './request.js'
 import type { Request, URLParams } from './request.js'
 import type { Response } from './response.js'
+import { isString, isStringArray } from './type-guards'
 import type { AppConstructor, AppRenderOptions, AppSettings, TemplateEngine } from './types.js'
 import { View } from './view.js'
 
@@ -19,7 +20,8 @@ import { View } from './view.js'
  */
 const lead = (x: string) => (x.charCodeAt(0) === 47 ? x : `/${x}`)
 
-const mount = (fn: App | Handler) => (fn instanceof App ? fn.attach : fn)
+const mount = <Req extends Request = Request, Res extends Response = Response>(fn: App<Req, Res> | Handler) =>
+  fn instanceof App ? fn.attach : fn
 
 const applyHandler =
   <Req, Res>(h: Handler<Req, Res>) =>
@@ -55,13 +57,17 @@ const applyHandler =
  * const app = App<any, CoolReq, Response>()
  * ```
  */
-export class App<Req extends Request = Request, Res extends Response = Response> extends Router<App, Req, Res> {
+export class App<Req extends Request = Request, Res extends Response = Response> extends Router<
+  App<Req, Res>,
+  Req,
+  Res
+> {
   middleware: Middleware<Req, Res>[] = []
   locals: Record<string, unknown> = {}
   noMatchHandler: Handler
   onError: ErrorHandler<Req, Res>
   settings: AppSettings
-  engines: Record<string, TemplateEngine> = {}
+  engines: Record<string, TemplateEngine<TemplateEngineOptions>> = {}
   applyExtensions: Handler<Req, Res> | undefined
   attach: (req: Req, res: Res, next?: NextFunction) => void
   cache: Record<string, unknown>
@@ -142,10 +148,7 @@ export class App<Req extends Request = Request, Res extends Response = Response>
   /**
    * Register a template engine with extension
    */
-  engine<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions>(
-    ext: string,
-    fn: TemplateEngine<RenderOptions>
-  ): this {
+  engine(ext: string, fn: TemplateEngine): this {
     this.engines[ext[0] === '.' ? ext : `.${ext}`] = fn
 
     return this
@@ -160,13 +163,13 @@ export class App<Req extends Request = Request, Res extends Response = Response>
    */
   render<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions>(
     name: string,
-    data: Record<string, unknown> = {},
-    options: AppRenderOptions<RenderOptions> = {} as AppRenderOptions<RenderOptions>,
+    data: Record<string, unknown>,
+    options?: AppRenderOptions<RenderOptions>,
     cb: (err: unknown, html?: unknown) => void = () => {}
   ): void {
     let view: View | undefined
 
-    const { _locals, ...opts } = options
+    const { _locals, ...opts }: AppRenderOptions = options ?? {}
 
     let locals = this.locals
 
@@ -174,7 +177,7 @@ export class App<Req extends Request = Request, Res extends Response = Response>
 
     locals = { ...locals, ...data }
 
-    if (opts.cache == null) (opts.cache as boolean) = this.enabled('view cache')
+    if (opts.cache == null) opts.cache = this.enabled('view cache')
 
     if (opts.cache) {
       view = this.cache[name] as View
@@ -182,6 +185,7 @@ export class App<Req extends Request = Request, Res extends Response = Response>
 
     if (!view) {
       const View = this.settings.view
+      if (View == null) throw new TypeError(`No app-wide default view engine is configured, cannot render '${name}'`)
       view = new View(name, {
         defaultEngine: this.settings['view engine'],
         root: this.settings.views,
@@ -209,33 +213,26 @@ export class App<Req extends Request = Request, Res extends Response = Response>
       cb(err)
     }
   }
-  use(...args: UseMethodParams<Req, Res, App>): this {
-    const base = args[0]
 
-    const fns = args.slice(1).flat()
+  use(...args: UseMethodParams<Req, Res, App<Req, Res>>): this {
+    const [base, ...restArgs] = args
+    const fns: Array<App<Req, Res> | Handler<Req, Res>> = restArgs.flat()
 
-    let pathArray = []
-    if (typeof base === 'function' || base instanceof App) {
-      fns.unshift(base)
+    let pathArray: string[] = []
+    if (isString(base)) {
+      pathArray = [base]
+    } else if (isStringArray(base)) {
+      pathArray = base
+    } else if (Array.isArray(base)) {
+      fns.unshift(...base)
     } else {
-      // if base is not an array of paths, then convert it to an array.
-      let basePaths = []
-      if (Array.isArray(base)) basePaths = [...base]
-      else if (typeof base === 'string') basePaths = [base]
-
-      basePaths = basePaths.filter((element) => {
-        if (typeof element === 'string') {
-          pathArray.push(element)
-          return false
-        }
-        return true
-      })
-      fns.unshift(...basePaths)
+      fns.unshift(base)
     }
+
     pathArray = pathArray.length ? pathArray.map((path) => lead(path)) : ['/']
 
     const mountpath = pathArray.join(', ')
-    let regex: { keys: string[]; pattern: RegExp }
+    let regex: { keys: string[]; pattern: RegExp } | undefined = undefined
 
     for (const fn of fns) {
       if (fn instanceof App) {
@@ -248,13 +245,13 @@ export class App<Req extends Request = Request, Res extends Response = Response>
       }
     }
     for (const path of pathArray) {
-      const handlerPaths = []
-      const handlerFunctions = []
+      const handlerPaths: string[] = []
+      const handlerFunctions: Array<App<Req, Res> | Handler<Req, Res>> = []
       const handlerPathBase = path === '/' ? '' : lead(path)
       for (const fn of fns) {
         if (fn instanceof App && fn.middleware?.length) {
           for (const mw of fn.middleware) {
-            handlerPaths.push(handlerPathBase + lead(mw.path))
+            handlerPaths.push(`${handlerPathBase}${mw.path ? lead(mw.path) : ''}`)
             handlerFunctions.push(fn)
           }
         } else {
@@ -262,12 +259,13 @@ export class App<Req extends Request = Request, Res extends Response = Response>
           handlerFunctions.push(fn)
         }
       }
+      const handlerFunction = handlerFunctions.splice(0, 1)[0]
       pushMiddleware(this.middleware)({
         path,
         regex,
         type: 'mw',
-        handler: mount(handlerFunctions[0] as Handler),
-        handlers: handlerFunctions.slice(1).map(mount),
+        handler: mount(handlerFunction),
+        handlers: handlerFunctions.map(mount),
         fullPaths: handlerPaths
       })
     }
@@ -275,8 +273,8 @@ export class App<Req extends Request = Request, Res extends Response = Response>
     return this
   }
 
-  route(path: string): App {
-    const app = new App({ settings: this.settings })
+  route(path: string): App<Req, Res> {
+    const app = new App<Req, Res>({ settings: this.settings })
 
     this.use(path, app)
 
@@ -285,15 +283,17 @@ export class App<Req extends Request = Request, Res extends Response = Response>
 
   #find(url: string): Middleware<Req, Res>[] {
     return this.middleware.filter((m) => {
-      m.regex = m.regex || rg(m.path, m.type === 'mw')
+      m.regex ??= m.path ? rg(m.path, m.type === 'mw') : undefined
 
-      let fullPathRegex: { keys: string[]; pattern: RegExp }
+      let fullPathRegex: { keys: string[]; pattern: RegExp } | undefined
 
       m.fullPath && typeof m.fullPath === 'string'
         ? (fullPathRegex = rg(m.fullPath, m.type === 'mw'))
-        : (fullPathRegex = null)
+        : (fullPathRegex = undefined)
 
-      return m.regex.pattern.test(url) && (m.type === 'mw' && fullPathRegex ? fullPathRegex.pattern.test(url) : true)
+      if (m.regex != null && !m.regex.pattern.test(url)) return false
+      if (m.type === 'mw' && fullPathRegex != null && !fullPathRegex.pattern.test(url)) return false
+      return true
     })
   }
 
@@ -312,7 +312,7 @@ export class App<Req extends Request = Request, Res extends Response = Response>
     const { xPoweredBy } = this.settings
     if (xPoweredBy) res.setHeader('X-Powered-By', typeof xPoweredBy === 'string' ? xPoweredBy : 'tinyhttp')
 
-    const exts = this.applyExtensions || extendMiddleware<RenderOptions>(this)
+    const exts = this.applyExtensions || extendMiddleware<RenderOptions, Req, Res>(this)
 
     req.originalUrl = req.url || req.originalUrl
 
@@ -320,7 +320,7 @@ export class App<Req extends Request = Request, Res extends Response = Response>
 
     const matched = this.#find(pathname)
 
-    const mw: Middleware[] = [
+    const mw: Middleware<Req, Res>[] = [
       {
         handler: exts,
         type: 'mw',
@@ -351,8 +351,27 @@ export class App<Req extends Request = Request, Res extends Response = Response>
       })
     }
 
-    const handle = (mw: Middleware) => async (req: Req, res: Res, next?: NextFunction) => {
-      const { path, handler, regex } = mw
+    let idx = 0
+
+    const loop = (): void => void handle(mw[idx++])(req, res, thisNext)
+
+    const parentNext = next
+    const thisNext = (err: unknown) => {
+      if (err != null) {
+        return this.onError(err, req, res, thisNext)
+      }
+
+      if (res.writableEnded) return
+      if (idx >= mw.length) {
+        if (parentNext != null) parentNext()
+        return
+      }
+
+      loop()
+    }
+
+    const handle = (mw: Middleware<Req, Res>) => async (req: Req, res: Res, next: NextFunction) => {
+      const { path = '/', handler, regex } = mw
 
       let params: URLParams
 
@@ -386,26 +405,7 @@ export class App<Req extends Request = Request, Res extends Response = Response>
 
       if (this.settings?.enableReqRoute) req.route = mw
 
-      await applyHandler<Req, Res>(handler as unknown as Handler<Req, Res>)(req, res, next)
-    }
-
-    let idx = 0
-
-    const loop = (): void => void handle(mw[idx++])(req, res, next)
-
-    const parentNext = next
-    next = (err) => {
-      if (err != null) {
-        return this.onError(err, req, res)
-      }
-
-      if (res.writableEnded) return
-      if (idx >= mw.length) {
-        if (parentNext != null) parentNext()
-        return
-      }
-
-      loop()
+      await applyHandler<Req, Res>(handler)(req, res, next)
     }
 
     loop()

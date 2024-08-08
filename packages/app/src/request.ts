@@ -133,14 +133,14 @@ export interface Request extends IncomingMessage {
   params: URLParams
   connection: Connection
   socket: TLSSocket | Socket
-  route?: Middleware
+  route?: Middleware<never, never>
   protocol: Protocol
   secure: boolean
   xhr: boolean
   hostname?: string
   port?: number
-  ip?: string
-  ips?: string[]
+  ip?: string | undefined
+  ips?: (string | undefined)[]
   subdomains?: string[]
   get: (header: string) => string | string[] | undefined
   range: (size: number, options?: Options) => -1 | -2 | -3 | Ranges | undefined
@@ -155,5 +155,4 @@ export interface Request extends IncomingMessage {
   fresh?: boolean
   stale?: boolean
   body?: any
-  app?: App
 }

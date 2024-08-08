@@ -42,19 +42,20 @@ import type { TemplateEngineOptions } from './types.js'
  * Extends Request and Response objects with custom properties and methods
  */
 export const extendMiddleware =
-  <EngineOptions extends TemplateEngineOptions = TemplateEngineOptions>(app: App) =>
-  (req: Request, res: Response<EngineOptions>, next: NextFunction): void => {
+  <
+    EngineOptions extends TemplateEngineOptions = TemplateEngineOptions,
+    Req extends Request = never,
+    Res extends Response<EngineOptions> = never
+  >(
+    app: App<Req, Res>
+  ) =>
+  (req: Req, res: Res, next: NextFunction): void => {
     const { settings } = app
 
     res.get = getResponseHeader(res)
     req.get = getRequestHeader(req)
 
-    if (settings?.bindAppToReqRes) {
-      req.app = app
-      res.app = app
-    }
-
-    let trust = settings?.['trust proxy']
+    let trust = settings?.['trust proxy'] ?? 0
     if (typeof trust !== 'function') {
       trust = compile(trust)
       settings['trust proxy'] = trust
@@ -63,9 +64,11 @@ export const extendMiddleware =
     if (settings?.networkExtensions) {
       req.protocol = getProtocol(req, trust)
       req.secure = req.protocol === 'https'
-      const { hostname, port } = getHost(req, trust)
-      req.hostname = hostname
-      req.port = port
+      const host = getHost(req, trust)
+      if (host) {
+        req.hostname = host.hostname
+        req.port = host.port
+      }
       req.subdomains = getSubdomains(req, trust, settings.subdomainOffset)
       req.ip = getIP(req, trust)
       req.ips = getIPs(req, trust)
@@ -93,7 +96,7 @@ export const extendMiddleware =
     res.vary = setVaryHeader<Response>(res)
     res.cookie = setCookie<Request, Response>(req, res)
     res.clearCookie = clearCookie<Request, Response>(req, res)
-    res.render = renderTemplate(req, res, app)
+    res.render = renderTemplate<TemplateEngineOptions, Req, Res>(req, res, app)
     res.format = formatResponse(req, res, next)
     res.redirect = redirect(req, res, next)
     res.attachment = attachment<Response>(res)
