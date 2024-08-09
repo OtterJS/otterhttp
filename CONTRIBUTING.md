@@ -91,4 +91,4 @@ Here's a small list of requirements for your PR:
 
 In most other cases, additional steps aren't required. Install, write, test, lint and your code is ready to be submitted!
 
-If everything from the list is done right, feel free to submit a PR! I will look into it asap.
+If everything from the list is done right, feel free to submit a PR!
