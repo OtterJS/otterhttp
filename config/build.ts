@@ -4,7 +4,7 @@ export const build = () => defineConfig({
   entry: {
     index: "src/index.ts",
   },
-  format: ["cjs", "esm"],
+  format: ["esm"],
   target: "node14.21.3",
   clean: true,
   minify: false,
