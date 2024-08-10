@@ -1,6 +1,6 @@
 <br /><br /><br />
 
-<div style="text-align: center">
+<div align="center">
 <img width="500px" src=".github/otterhttp.svg" alt="otterhttp" />
 
 ESM [Express](https://expressjs.com/)-like web framework for modern Node.js
