@@ -26,7 +26,7 @@ export interface Response<B = unknown> extends ServerResponse {
   set(fields: OutgoingHttpHeaders): Response<B>
   get<HeaderName extends string>(field: HeaderName): OutgoingHttpHeaders[HeaderName]
   send(body: B): Response<B>
-  sendFile(path: string, options?: ReadStreamOptions, cb?: (err?: unknown) => void): Response<B>
+  sendFile(path: string, options?: ReadStreamOptions): Promise<Response<B>>
   json(body: B): Response<B>
   status(status: number): Response<B>
   sendStatus(statusCode: number): Response<B>
