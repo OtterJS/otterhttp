@@ -12,7 +12,7 @@ function stringify(
   replacer?: (this: unknown, key: string, value: any) => any,
   spaces?: string | number,
   // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
-  escape: boolean = false
+  escape = false
 ) {
   let json = replacer || spaces ? JSON.stringify(value, replacer, spaces) : JSON.stringify(value)
 

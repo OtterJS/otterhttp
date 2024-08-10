@@ -8,7 +8,10 @@ import mime from 'mime'
 const charsetRegExp = /;\s*charset\s*=/
 
 export const setHeader = <Response extends Res = Res>(res: Response) => {
-  return <HeaderName extends string = string>(field: HeaderName | OutgoingHttpHeaders, val?: OutgoingHttpHeaders[HeaderName]): Response => {
+  return <HeaderName extends string = string>(
+    field: HeaderName | OutgoingHttpHeaders,
+    val?: OutgoingHttpHeaders[HeaderName]
+  ): Response => {
     if (typeof field === 'string') {
       let value = Array.isArray(val) ? val.map(String) : String(val)
 

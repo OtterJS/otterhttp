@@ -4,37 +4,37 @@ import { describe, expect, it } from 'vitest'
 describe('field', () => {
   it('should accept string', () => {
     expect(() => {
-      append("", "foo")
+      append('', 'foo')
     }).not.toThrow()
   })
 
   it('should accept string that is Vary header', () => {
     expect(() => {
-      append("", 'foo, bar')
+      append('', 'foo, bar')
     }).not.toThrow()
   })
 
   it('should accept array of string', () => {
     expect(() => {
-      append("", ['foo', 'bar'])
+      append('', ['foo', 'bar'])
     }).not.toThrow()
   })
 
   it('should not allow separator ":"', () => {
     expect(() => {
-      append("", "invalid:header")
+      append('', 'invalid:header')
     }).toThrow(/field.*contains.*invalid/)
   })
 
   it('should not allow separator " "', () => {
     expect(() => {
-      append("", "invalid header")
+      append('', 'invalid header')
     }).toThrow(/field.*contains.*invalid/)
   })
 
-  it.each(["\n", "\u0080"])("should not allow non-token character '%s'", (character: string) => {
+  it.each(['\n', '\u0080'])("should not allow non-token character '%s'", (character: string) => {
     expect(() => {
-      append("", `invalid${character}header`)
+      append('', `invalid${character}header`)
     }).toThrow(/field.*contains.*invalid/)
   })
 })
@@ -129,6 +129,8 @@ describe('when field is array', () => {
   })
 
   it('should handle existing values', () => {
-    expect(append('Accept, Accept-Encoding', ['origin', 'accept', 'accept-charset'])).toBe('Accept, Accept-Encoding, origin, accept-charset')
+    expect(append('Accept, Accept-Encoding', ['origin', 'accept', 'accept-charset'])).toBe(
+      'Accept, Accept-Encoding, origin, accept-charset'
+    )
   })
 })
