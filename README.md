@@ -51,8 +51,8 @@ For ways to contribute, please see the
 [npm-url]: https://npmjs.com/package/@otterhttp/app
 [github-actions]: https://github.com/otterjs/otterhttp/actions
 [gh-actions-img]: https://img.shields.io/github/actions/workflow/status/otterjs/otterhttp/main.yml?branch=main&style=for-the-badge&logo=github&label=&color=blueviolet
-[cov-img]: https://img.shields.io/coveralls/github/otterjs/otterhttp?style=for-the-badge&color=blueviolet
-[cov-url]: https://coveralls.io/github/otterjs/otterhttp
+[cov-img]: https://img.shields.io/coveralls/github/OtterJS/otterhttp?style=for-the-badge&color=blueviolet
+[cov-url]: https://coveralls.io/github/OtterJS/otterhttp
 [code-quality-img]: https://img.shields.io/codefactor/grade/github/otterjs/otterhttp?style=for-the-badge&color=blueviolet
 [code-quality]: https://www.codefactor.io/repository/github/otterjs/otterhttp
 [npm-img]: https://img.shields.io/npm/dt/@otterhttp/app?style=for-the-badge&color=blueviolet&logo=npm&label=
