@@ -68,7 +68,7 @@ jobs:
         run: pnpm type-check
 
       - name: run tests
-        run: pnpm test
+        run: pnpm test:coverage
         # run coverage only on ubuntu
       - name: Coveralls
         if: ${{ matrix.os == 'ubuntu-latest' }}
