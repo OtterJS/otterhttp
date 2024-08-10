@@ -18,7 +18,7 @@
   "license": "LGPL-3.0-or-later",
   "scripts": {
     "build": "tsup",
-    "prepublishOnly": "pnpm build"
+    "prepack": "pnpm build"
   },
   "dependencies": {
     "@otterhttp/forwarded": "workspace:*",

@@ -32,6 +32,6 @@
   },
   "scripts": {
     "build": "tsup",
-    "prepublishOnly": "pnpm build"
+    "prepack": "pnpm build"
   }
 }
