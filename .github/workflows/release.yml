@@ -42,9 +42,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
+
       - run: pnpm check:fix
-      - run: git add . && git commit --amend --no-edit
+      - run: |
+          git add . 
+          git commit --amend --no-edit
+          git push --force
 
       - if: steps.changesets.outputs.published == 'true'
         run: echo "(a) new version(s) was/were published!"
