@@ -10,42 +10,13 @@ export type DownloadOptions = SendFileOptions &
     headers: Record<string, string>
   }>
 
-type Callback = (err?: unknown) => void
-
-type Download<Response> = {
-  (path: string, cb?: Callback): Response
-  (path: string, filename: string, cb?: Callback): Response
-  (path: string, filename: string, options: DownloadOptions, cb?: Callback): Response
-}
+export type Download<Response> = (path: string, filename?: string, options?: DownloadOptions) => Promise<Response>
 
 export const download = <Request extends Req = Req, Response extends Res = Res>(
   req: Request,
   res: Response
 ): Download<Response> => {
-  return (
-    path: string,
-    pFilename?: string | Callback,
-    pOptions?: DownloadOptions | Callback,
-    pDone?: Callback
-  ): Response => {
-    let done: Callback | undefined
-    let filename: string | undefined
-    let options: DownloadOptions | undefined
-
-    // support function as second or third arg
-    if (typeof pFilename === 'function') {
-      filename = undefined
-      done = pFilename
-    } else if (typeof pOptions === 'function') {
-      filename = pFilename
-      options = undefined
-      done = pOptions
-    } else {
-      filename = pFilename
-      options = pOptions
-      done = pDone
-    }
-
+  return async (path: string, filename?: string, options?: DownloadOptions): Promise<Response> => {
     // set Content-Disposition when file is sent
     const headers = {
       'Content-Disposition': contentDisposition(filename || basename(path))
@@ -62,8 +33,7 @@ export const download = <Request extends Req = Req, Response extends Res = Res>(
     options = { ...options, headers }
 
     // send file
-
-    return sendFile(req, res)(options.root ? path : resolve(path), options, done || (() => undefined))
+    return await sendFile(req, res)(options.root ? path : resolve(path), options)
   }
 }
 

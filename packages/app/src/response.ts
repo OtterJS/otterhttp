@@ -1,6 +1,6 @@
 import type { OutgoingHttpHeaders, ServerResponse } from 'node:http'
 import type { SerializeOptions } from '@otterhttp/cookie'
-import type { DownloadOptions, FormatProps, ReadStreamOptions, getResponseHeader } from '@otterhttp/res'
+import type { Download, FormatProps, ReadStreamOptions } from '@otterhttp/res'
 import type { App } from './app.js'
 import type { Request } from './request.js'
 import type { AppRenderOptions, TemplateEngineOptions } from './types.js'
@@ -47,7 +47,7 @@ export interface Response<B = unknown> extends ServerResponse {
   format(obj: FormatProps): Response<B>
   redirect(url: string, status?: number): Response<B>
   type(type: string): Response<B>
-  download(path: string, filename: string, options?: DownloadOptions, cb?: (err?: unknown) => void): Response<B>
+  download: Download<Response<B>>
   attachment(filename?: string): Response<B>
   locals: Record<string, any>
   /**
