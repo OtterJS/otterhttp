@@ -1,7 +1,6 @@
 import path from 'node:path'
-import { dirname } from 'dirname-filename-esm'
 import { makeFetch } from 'supertest-fetch'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import type { Request, Response } from '@/packages/app/src'
 import {
@@ -20,8 +19,6 @@ import {
   setVaryHeader
 } from '@/packages/res/src'
 import { runServer } from '@/test_helpers/runServer'
-
-const __dirname = dirname(import.meta)
 
 describe('Response extensions', () => {
   describe('res.set(field, val)', () => {
@@ -216,7 +213,7 @@ describe('Response extensions', () => {
     })
     it('should set Content-Disposition with a filename specified', async () => {
       const app = runServer((_, res) => {
-        attachment(res)(path.join(__dirname, '../fixtures', 'favicon.ico')).end()
+        attachment(res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico')).end()
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
@@ -224,56 +221,53 @@ describe('Response extensions', () => {
   })
   describe('res.download(filename)', () => {
     it('should set Content-Disposition based on path', async () => {
-      const app = runServer((req, res) => {
-        download(req, res)(path.join(__dirname, '../fixtures', 'favicon.ico')).end()
+      const app = runServer(async (req, res) => {
+        await download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'))
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
     })
     it('should set Content-Disposition based on filename', async () => {
-      const app = runServer((req, res) => {
-        download(req, res)(path.join(__dirname, '../fixtures', 'favicon.ico'), 'favicon.icon').end()
+      const app = runServer(async (req, res) => {
+        await download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.icon')
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.icon"')
     })
-    it('should pass the error to a callback', async () => {
-      const done = vi.fn().mockName('done')
-      const app = runServer((req, res) => {
-        download(req, res)(path.join(__dirname, '../fixtures'), 'some_file.png', done).end()
+    it('should raise errors without closing response socket', async () => {
+      const app = runServer(async (req, res) => {
+        await expect(
+          download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures'), 'some_file.png')
+        ).rejects.toThrow(/EISDIR/)
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="some_file.png"')
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      expect(done).toHaveBeenCalled()
-      expect(done.mock.lastCall[0]).toBeInstanceOf(Error)
-      expect(done.mock.lastCall[0].message).toContain('EISDIR')
     })
     it('should set "root" from options', async () => {
-      const app = runServer((req, res) => {
-        download(req, res)('favicon.ico', 'favicon.ico', {
-          root: path.join(__dirname, '../fixtures')
-        }).end()
+      const app = runServer(async (req, res) => {
+        await download(req, res)('favicon.ico', 'favicon.ico', {
+          root: path.resolve(import.meta.dirname, '..', 'fixtures')
+        })
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
     })
     it(`'should pass options to sendFile's ReadStream'`, async () => {
-      const app = runServer((req, res) => {
-        download(req, res)(path.join(__dirname, '../fixtures', 'favicon.ico'), 'favicon.ico', {
+      const app = runServer(async (req, res) => {
+        await download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.ico', {
           encoding: 'ascii'
-        }).end()
+        })
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
     })
     it('should set headers from options', async () => {
-      const app = runServer((req, res) => {
-        download(req, res)(path.join(__dirname, '../fixtures', 'favicon.ico'), 'favicon.ico', {
+      const app = runServer(async (req, res) => {
+        await download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.ico', {
           headers: {
             'X-Custom-Header': 'Value'
           }
-        }).end()
+        })
       })
 
       await makeFetch(app)('/')
