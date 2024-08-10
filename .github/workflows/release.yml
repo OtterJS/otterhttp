@@ -11,6 +11,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
     permissions:
       contents: write
       pull-requests: write
@@ -40,6 +42,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - run: pnpm check:fix
+      - run: git add . && git commit --amend
 
       - if: steps.changesets.outputs.published == 'true'
         run: echo "(a) new version(s) was/were published!"
