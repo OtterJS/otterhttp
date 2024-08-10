@@ -165,6 +165,7 @@ function parseNetmask(netmask: string) {
  * @public
  */
 export function proxyaddr(req: Req, trust: Trust): string | undefined {
+  if (trust == null) throw new TypeError('trust argument cannot be null-ish')
   const addrs = alladdrs(req, trust)
 
   return addrs[addrs.length - 1]
