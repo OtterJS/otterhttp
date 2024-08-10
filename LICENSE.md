@@ -10,10 +10,11 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Lesser General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software Foundation,
+You should have received [a copy of the GNU Lesser General Public License](./licenses/lgpl-3.0.md)
+along with this library; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This library is based upon [tinyhttp](https://github.com/tinyhttp/tinyhttp).  
 Copyright (c) 2020 v 1 r t l  
-[v1rtl](https://github.com/talentlessguy) licenses the tinyhttp project to Lordfirespeed under the terms of the MIT license.
+[v1rtl](https://github.com/talentlessguy) licenses the tinyhttp project to Lordfirespeed under the terms of the 
+[MIT license](./licenses/mit.md).
