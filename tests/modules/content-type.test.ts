@@ -64,13 +64,13 @@ describe('format', () => {
 
   it('should reject invalid type', () => {
     expect(() => {
-      contentType.format({ type: 'text/' })
+      contentType.format({ type: 'text/' } as any)
     }).toThrow(/invalid type/)
   })
 
   it('should reject invalid type with LWS', () => {
     expect(() => {
-      contentType.format({ type: 'text/html' })
+      contentType.format({ type: ' text/html' } as any)
     }).toThrow(/invalid type/)
   })
 
