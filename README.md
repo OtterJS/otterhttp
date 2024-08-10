@@ -28,7 +28,7 @@ Visit [otterhttp.lordfirespeed.dev](https://otterhttp.lordfirespeed.dev) for doc
 
 ## Install
 
-[Node.js 14.21.3+](https://node.green/#ES2022) is required.
+[Node.js 15+](https://node.green/#ES2022) is required.
 
 ```sh
 pnpm i @otterhttp/app
