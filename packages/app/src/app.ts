@@ -304,7 +304,7 @@ export class App<Req extends Request = Request, Res extends Response = Response>
   ): void {
     /* Set X-Powered-By header */
     const { xPoweredBy } = this.settings
-    if (xPoweredBy) res.setHeader('X-Powered-By', typeof xPoweredBy === 'string' ? xPoweredBy : 'o')
+    if (xPoweredBy) res.setHeader('X-Powered-By', typeof xPoweredBy === 'string' ? xPoweredBy : 'otterhttp')
 
     const exts = this.applyExtensions || extendMiddleware<RenderOptions, Req, Res>(this)
 
