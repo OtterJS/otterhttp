@@ -21,7 +21,7 @@
   },
   "keywords": ["tinyhttp", "router", "backend", "http", "framework", "api"],
   "author": "v1rtl",
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "dependencies": {
     "@otterhttp/cookie": "workspace:*",
     "@otterhttp/proxy-addr": "workspace:*",

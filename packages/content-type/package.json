@@ -2,7 +2,7 @@
   "name": "@otterhttp/content-type",
   "description": "content-type rewrite in TypeScript",
   "version": "0.1.4",
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "homepage": "https://otterhttp.lordfirespeed.dev",
   "funding": {
     "type": "individual",

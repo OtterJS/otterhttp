@@ -19,7 +19,7 @@
     "node": ">=12.20.0"
   },
   "author": "v1rtl",
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "scripts": {
     "build": "tsup",
     "prepublishOnly": "pnpm build"

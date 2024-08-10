@@ -2,7 +2,7 @@
   "name": "@otterhttp/content-disposition",
   "description": "content-disposition rewrite in TypeScript",
   "version": "2.2.1",
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "homepage": "https://otterhttp.lordfirespeed.dev",
   "funding": {
     "type": "individual",

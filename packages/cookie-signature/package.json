@@ -17,7 +17,7 @@
   "keywords": ["tinyhttp", "node.js", "web framework", "web", "backend", "static", "cookie"],
   "files": ["dist"],
   "author": "v1rtl",
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "scripts": {
     "build": "tsup",
     "prepublishOnly": "pnpm build"
