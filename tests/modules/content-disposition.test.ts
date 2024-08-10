@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, onTestFinished, vi } from 'vitest'
 
 import { ContentDisposition, contentDisposition, parse } from '@/packages/content-disposition/src'
 
@@ -17,12 +17,9 @@ describe('contentDisposition(filename)', () => {
     expect(contentDisposition('/path/to/plans.pdf')).toBe('attachment; filename="plans.pdf"')
   })
   it('should throw an error when non latin fallback is used', () => {
-    expect.assertions(1)
-    try {
+    expect(() => {
       contentDisposition('index.ht', { type: 'html', fallback: 'ÇŞ' })
-    } catch (e) {
-      expect((e as Error).message).toBe('fallback must be ISO-8859-1 string')
-    }
+    }).toThrow('fallback must be ISO-8859-1 string')
   })
   it('should use hasfallback', () => {
     expect(contentDisposition('index.ht', { type: 'html', fallback: 'html' })).toEqual(
@@ -40,12 +37,9 @@ describe('contentDisposition(filename)', () => {
     )
   })
   it('should throw an error when non string options.type is used', () => {
-    expect.assertions(1)
-    try {
+    expect(() => {
       contentDisposition('index.ht', { type: { test: 'test' } as unknown as string })
-    } catch (e) {
-      expect((e as Error).message).toBe('invalid type')
-    }
+    }).toThrow('invalid type')
   })
   describe('when "filename" is US-ASCII', () => {
     it('should only include filename parameter', () => {
@@ -61,18 +55,14 @@ describe('contentDisposition(filename)', () => {
 describe('parse(string)', () => {
   describe('with type', () => {
     it('should throw on quoted value', () => {
-      try {
+      expect(() => {
         parse('"attachment"')
-      } catch (e) {
-        expect(e.message).toBe('invalid type format')
-      }
+      }).toThrow('invalid type format')
     })
     it('should throw on trailing semi', () => {
-      try {
+      expect(() => {
         parse('attachment;')
-      } catch (e) {
-        expect(e.message).toBe('invalid parameter format')
-      }
+      }).toThrow('invalid parameter format')
     })
     it('should parse "attachment"', () => {
       expect(parse('attachment')).toStrictEqual(new ContentDisposition('attachment', {}))
@@ -92,63 +82,43 @@ describe('parse(string)', () => {
   })
   describe('with parameters', () => {
     it('should throw on trailing semi', () => {
-      try {
+      expect(() => {
         parse('attachment; filename="rates.pdf";')
-      } catch (e) {
-        expect(e.message).toBe('invalid parameter format')
-      }
+      }).toThrow('invalid parameter format')
     })
     it('should throw on invalid param name', () => {
-      try {
+      expect(() => {
         parse('attachment; filename@="rates.pdf"')
-      } catch (e) {
-        expect(e.message).toBe('invalid parameter format')
-      }
+      }).toThrow('invalid parameter format')
     })
     it('should throw on missing param value', () => {
-      try {
+      expect(() => {
         parse('attachment; filename=')
-      } catch (e) {
-        expect(e.message).toBe('invalid parameter format')
-      }
+      }).toThrow('invalid parameter format')
     })
 
     it('should reject invalid parameter value', () => {
-      try {
+      expect(() => {
         parse('attachment; filename=trolly,trains')
-      } catch (e) {
-        expect(e.message).toMatch(/invalid parameter format/)
-      }
+      }).toThrow(/invalid parameter format/)
     })
 
     it('should reject invalid parameters', () => {
-      try {
+      expect(() => {
         parse('attachment; filename=total/; foo=bar')
-      } catch (e) {
-        expect(e.message).toMatch(/invalid parameter format/)
-      }
+      }).toThrow(/invalid parameter format/)
     })
 
     it('should reject duplicate parameters', () => {
-      try {
+      expect(() => {
         parse('attachment; filename=foo; filename=bar')
-      } catch (e) {
-        expect(e.message).toMatch(/invalid duplicate parameter/)
-      }
+      }).toThrow(/invalid duplicate parameter/)
     })
 
-    it('should reject missing type', () => {
-      try {
-        parse('filename="plans.pdf"')
-      } catch (e) {
-        expect(e.message).toMatch(/invalid type format/)
-      }
-
-      try {
-        parse('; filename="plans.pdf"')
-      } catch (e) {
-        expect(e.message).toMatch(/invalid type format/)
-      }
+    it.each(['filename="plans.pdf"', '; filename="plans.pdf"'])('should reject missing type', (value: string) => {
+      expect(() => {
+        parse(value)
+      }).toThrow(/invalid type format/)
     })
 
     it('should lower-case parameter name', () => {
@@ -198,27 +168,21 @@ describe('parse(string)', () => {
         parameters: { filename: '£ rates.pdf' }
       })
     })
-    it('should throw error if decodedURI throws an error', () => {
-      const cutomdecodeURIComponent = (encodedURIComponent: string) => {
+    it('should throw error if decodeURI throws an error', () => {
+      onTestFinished(() => vi.unstubAllGlobals())
+      vi.stubGlobal('decodeURIComponent', (encodedURIComponent: string) => {
         throw encodedURIComponent
-      }
-      vi.stubGlobal('decodeURIComponent', cutomdecodeURIComponent)
-      expect.assertions(1)
-      try {
+      })
+      expect(() => {
         parse("attachment; filename*=UTF-8'en'%E2%82%AC%20rates.pdf")
-      } catch (error) {
-        expect(error).toBeDefined()
-      }
-      vi.unstubAllGlobals()
+      }).toThrow()
     })
   })
   describe('with extended parameters', () => {
     it('should reject quoted extended parameter value', () => {
-      try {
+      expect(() => {
         parse('attachment; filename*="UTF-8\'\'%E2%82%AC%20rates.pdf"')
-      } catch (e) {
-        expect(e.message).toMatch(/invalid extended.*value/)
-      }
+      }).toThrow(/invalid extended.*value/)
     })
 
     it('should parse UTF-8 extended parameter value', () => {
@@ -247,11 +211,9 @@ describe('parse(string)', () => {
     })
 
     it('should reject unsupported charset', () => {
-      try {
+      expect(() => {
         parse("attachment; filename*=ISO-8859-2''%A4%20rates.pdf")
-      } catch (e) {
-        expect(e.message).toMatch(/unsupported charset/)
-      }
+      }).toThrow(/unsupported charset/)
     })
 
     it('should parse with embedded language', () => {
@@ -282,11 +244,9 @@ describe('parse(string)', () => {
       })
 
       it('should reject ""inline""', () => {
-        try {
+        expect(() => {
           parse('"inline"')
-        } catch (e) {
-          expect(e.message).toMatch(/invalid type format/)
-        }
+        }).toThrow(/invalid type format/)
       })
 
       it('should parse "inline; filename="foo.html""', () => {
@@ -319,11 +279,9 @@ describe('parse(string)', () => {
       })
 
       it('should reject ""attachment""', () => {
-        try {
+        expect(() => {
           parse('"attachment')
-        } catch (e) {
-          expect(e.message).toMatch(/invalid type format/)
-        }
+        }).toThrow(/invalid type format/)
       })
 
       it('should parse "ATTACHMENT"', () => {
@@ -404,35 +362,27 @@ describe('parse(string)', () => {
       })
 
       it('should reject "attachment; filename=foo,bar.html"', () => {
-        try {
+        expect(() => {
           parse('attachment; filename=foo,bar.html')
-        } catch (e) {
-          expect(e.message).toMatch(/invalid parameter format/)
-        }
+        }).toThrow(/invalid parameter format/)
       })
 
       it('should reject "attachment; filename=foo.html ;"', () => {
-        try {
+        expect(() => {
           parse('attachment; filename=foo.html ;')
-        } catch (e) {
-          expect(e.message).toMatch(/invalid parameter format/)
-        }
+        }).toThrow(/invalid parameter format/)
       })
 
       it('should reject "attachment; ;filename=foo"', () => {
-        try {
+        expect(() => {
           parse('attachment; ;filename=foo')
-        } catch (e) {
-          expect(e.message).toMatch(/invalid parameter format/)
-        }
+        }).toThrow(/invalid parameter format/)
       })
 
       it('should reject "attachment; filename=foo bar.html"', () => {
-        try {
+        expect(() => {
           parse('attachment; filename=foo bar.html')
-        } catch (e) {
-          expect(e.message).toMatch(/invalid parameter format/)
-        }
+        }).toThrow(/invalid parameter format/)
       })
 
       it("should parse \"attachment; filename='foo.bar'", () => {
