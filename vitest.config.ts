@@ -36,6 +36,7 @@ export default defineConfig({
       '@otterhttp/send': relative('packages/send/src'),
       '@otterhttp/type-is': relative('packages/type-is/src'),
       '@otterhttp/url': relative('packages/url/src'),
+      '@otterhttp/vary': relative('packages/vary/src'),
       '@': relative('.')
     }
   }
