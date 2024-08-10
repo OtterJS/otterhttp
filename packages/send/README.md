@@ -5,7 +5,7 @@
 [![][web-badge]](https://tinyhttp.v1rtl.site/mw/send)
 
 Extensions for sending a response, including `send`, `sendStatus`, `status`,
-`sendFile` and `json`. Works with any backend framework.
+`sendFile` and `json`. Works with any backend framework that supports `async`/`await` middleware.
 
 ## Install
 
@@ -92,7 +92,7 @@ a proper `Content-Type` header.
 ##### Example
 
 ```js
-res.sendFile('song.mp3', { root: process.cwd() }, (err) => console.log(err))
+await res.sendFile('song.mp3', { root: process.cwd() })
 ```
 
 ## Example
