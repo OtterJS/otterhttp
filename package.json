@@ -24,10 +24,8 @@
     "jsonwebtoken": "9.0.2",
     "regexparam": "3.0.0",
     "supertest-fetch": "1.5.0",
-    "tslib": "2.6.3",
+    "tsup": "^8.2.4",
     "typescript": "~5.5.2",
-    "vite": "^5.3.1",
-    "vite-plugin-dts": "^3.9.1",
     "vitest": "2.0.5"
   },
   "scripts": {

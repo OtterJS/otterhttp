@@ -1,22 +1,14 @@
-import { builtinModules } from 'node:module'
-import { defineConfig } from 'vite'
-import dts from 'vite-plugin-dts'
+import { defineConfig } from 'tsup'
 
-export const build = (dependencies: Record<string, string> = {}) =>
-  defineConfig({
-    build: {
-      target: 'node14.21.3',
-      minify: false,
-      lib: {
-        entry: 'src/index.ts',
-        fileName: () => 'index.js',
-        formats: ['es']
-      },
-      ssr: true,
-      sourcemap: true
-    },
-    plugins: [dts({ insertTypesEntry: true })],
-    ssr: {
-      external: [...Object.keys(dependencies), ...builtinModules]
-    }
-  })
+export const build = () => defineConfig({
+  entry: {
+    index: "src/index.ts",
+  },
+  format: ["cjs", "esm"],
+  target: "node14.21.3",
+  clean: true,
+  minify: false,
+  dts: true,
+  outDir: "dist",
+})
+
