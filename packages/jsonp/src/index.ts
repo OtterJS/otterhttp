@@ -9,15 +9,15 @@ export type JSONPOptions = Partial<{
 
 function stringify(
   value: unknown,
-  replacer: (this: any, key: string, value: any) => any,
-  spaces: string | number,
+  replacer?: (this: unknown, key: string, value: any) => any,
+  spaces?: string | number,
   // biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
-  escape: boolean
+  escape: boolean = false
 ) {
   let json = replacer || spaces ? JSON.stringify(value, replacer, spaces) : JSON.stringify(value)
 
   if (escape) {
-    json = json.replace(/[<>&]/g, (c) => {
+    json = json.replace(/[<>&]/g, (c: string): string => {
       switch (c.charCodeAt(0)) {
         case 0x3c:
           return '\\u003c'
@@ -26,6 +26,7 @@ function stringify(
         case 0x26:
           return '\\u0026'
       }
+      return undefined as never
     })
   }
 
