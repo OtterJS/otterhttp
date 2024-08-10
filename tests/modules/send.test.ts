@@ -155,7 +155,7 @@ describe('sendStatus(status)', () => {
 })
 
 describe('sendFile(path)', () => {
-  const testFilePath = path.resolve(import.meta.dirname, '..', 'fixtures', 'test.txt')
+  const testFilePath = path.resolve(import.meta.dirname, '..', 'fixtures', 'test-send-file.txt')
 
   beforeAll(() => {
     fs.writeFileSync(testFilePath, 'Hello World')
