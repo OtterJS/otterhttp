@@ -1,14 +1,24 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import * as dotenv from '@/packages/dotenv/src'
 
-import { dirname } from 'dirname-filename-esm'
+vi.mock<typeof fs>(import('node:fs'), async (importOriginal) => {
+  const module = await importOriginal()
 
-const __dirname = dirname(import.meta)
+  const modifiedModule = {
+    ...module,
+    readFileSync: vi.fn(module.readFileSync)
+  } satisfies typeof fs
 
-const envPath = path.join(__dirname, '../fixtures/.env')
+  return {
+    ...modifiedModule,
+    default: modifiedModule
+  }
+})
+
+const envPath = path.resolve(import.meta.dirname, '..', 'fixtures', '.env')
 
 const envFile = fs.readFileSync(envPath, { encoding: 'utf8' })
 
@@ -17,6 +27,8 @@ const parsed = dotenv.parse(envFile)
 const mockParseResponse = { test: 'foo' }
 
 const expectedPayload = { SERVER: 'localhost', PASSWORD: 'password', DB: 'tests' }
+
+afterEach(() => vi.restoreAllMocks())
 
 describe('Dotenv parsing', () => {
   it('sets basic environment variable', () => {
@@ -85,31 +97,24 @@ describe('Dotenv config', () => {
   describe('options', () => {
     it('takes path as option', () => {
       const { parsed } = dotenv.config({ path: envPath })
-
-      expect(parsed.BASIC).toBe('basic')
+      expect(parsed).toMatchObject({ BASIC: 'basic' })
     })
     it('takes encoding as option', () => {
-      const readFileSync = fs.readFileSync
       const encoding = 'latin1'
 
-      // @ts-ignore
-      fs.readFileSync = (
-        _path: Parameters<typeof fs.readFileSync>[0],
-        options: Parameters<typeof fs.readFileSync>[1]
-      ) => {
-        expect(typeof options !== 'string' && options.encoding).toBe(encoding)
-      }
+      vi.mocked(fs.readFileSync).mockImplementation((_: unknown, options: Parameters<typeof fs.readFileSync>[1]) => {
+        expect(options).toMatchObject({ encoding })
+      })
 
       dotenv.config({ encoding })
-
-      fs.readFileSync = readFileSync
+      expect(fs.readFileSync).toHaveBeenCalled()
     })
   })
 
   it('reads path with encoding, parsing output to process.env', () => {
     const { parsed } = dotenv.config({ path: envPath })
 
-    expect(parsed.test).toEqual(mockParseResponse.test)
+    expect(parsed).toMatchObject(mockParseResponse)
   })
 
   it('does not write over keys already in process.env', () => {
@@ -117,7 +122,7 @@ describe('Dotenv config', () => {
     process.env.test = existing
     const env = dotenv.config({ path: envPath })
 
-    expect(env.parsed?.test).toBe(mockParseResponse.test)
+    expect(env.parsed).toMatchObject(mockParseResponse)
     expect(process.env.test).toBe(existing)
   })
 
@@ -126,6 +131,7 @@ describe('Dotenv config', () => {
     process.env.test = existing
     const env = dotenv.config({ path: envPath, debug: true })
 
-    expect(env.parsed?.test).toBe(mockParseResponse.test)
+    expect(env.parsed).toMatchObject(mockParseResponse)
+    expect(process.env.test).toBe(existing)
   })
 })
