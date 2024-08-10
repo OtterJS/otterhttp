@@ -89,7 +89,7 @@ class ContentType {
 /**
  * Format object to media type.
  */
-export function format(obj: ContentType) {
+export function format(obj: { type: string; parameters?: Record<string, unknown> }) {
   if (!obj || typeof obj !== 'object') throw new TypeError('argument obj is required')
 
   const { parameters, type } = obj
