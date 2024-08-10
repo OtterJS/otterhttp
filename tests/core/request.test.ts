@@ -2,7 +2,7 @@ import { Agent } from 'node:http'
 import { makeFetch } from 'supertest-fetch'
 import { assert, afterEach, describe, expect, it, vi } from 'vitest'
 
-import { App } from '@/packages/app/src'
+import { App, type Request } from '@/packages/app/src'
 import * as req from '@/packages/req/src'
 import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
@@ -392,7 +392,7 @@ describe('Request properties', () => {
     await fetch('/page?a=b').expect(200, 'Path to page: /page')
   })
   it('req.path works properly for optional parameters', async () => {
-    const { fetch, app } = InitAppAndTest((req, res) => {
+    const { fetch } = InitAppAndTest((req, res) => {
       res.send(`Path to page: ${req.path}`)
     }, '/:format?/:uml?')
 
