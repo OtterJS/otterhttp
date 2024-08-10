@@ -25,5 +25,5 @@
     }
   },
   "include": ["**/*.ts", "**/*.json"],
-  "exclude": ["examples", "dist", "node_modules"]
+  "exclude": ["examples", "packages/*/dist", "node_modules"]
 }
