@@ -5,11 +5,9 @@ import { eTag } from '@/packages/etag/src'
 
 describe('etag(entity)', () => {
   it('should require an entity', () => {
-    try {
-      eTag(undefined)
-    } catch (e) {
-      expect((e as TypeError).message).toBe('argument entity is required')
-    }
+    expect(() => {
+      eTag(undefined as any)
+    }).toThrow('argument entity is required')
   })
   it('should generate a strong ETag', () => {
     expect(eTag('beep boop')).toBe('"9-fINXV39R1PCo05OqGqr7KIY9lCE"')
