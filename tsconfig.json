@@ -25,6 +25,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["*.json"],
+  "include": ["**/*.ts", "*.json"],
   "exclude": ["examples", "packages/*/dist", "node_modules"]
 }
