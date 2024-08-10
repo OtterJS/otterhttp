@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
-    "@tinyhttp/cookie-parser": "^2.0.6"
+    "@otterhttp/app": "workspace:*",
+    "@otterhttp/cookie-parser": "^2.0.6"
   },
   "scripts": {
     "start": "node index.js"

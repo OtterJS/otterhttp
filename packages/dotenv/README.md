@@ -1,6 +1,6 @@
-# @tinyhttp/dotenv
+# @otterhttp/dotenv
 
-[![npm (scoped)](https://img.shields.io/npm/v/@tinyhttp/dotenv?style=flat-square)](https://npmjs.com/package/@tinyhttp/dotenv) [![npm](https://img.shields.io/npm/dt/@tinyhttp/dotenv?style=flat-square)](https://npmjs.com/package/@tinyhttp/dotenv)
+[![npm (scoped)](https://img.shields.io/npm/v/@otterhttp/dotenv?style=flat-square)](https://npmjs.com/package/@otterhttp/dotenv) [![npm](https://img.shields.io/npm/dt/@otterhttp/dotenv?style=flat-square)](https://npmjs.com/package/@otterhttp/dotenv)
 
 > A rewrite of [dotenv](https://github.com/motdotla/dotenv) module.
 
@@ -9,13 +9,13 @@ Dotenv is a 0-dependency module to load envinronmental variables from `.env` to 
 ## Installation
 
 ```sh
-pnpm i @tinyhttp/dotenv
+pnpm i @otterhttp/dotenv
 ```
 
 ## API
 
 ```ts
-import * as dotenv from '@tinyhttp/dotenv'
+import * as dotenv from '@otterhttp/dotenv'
 ```
 
 ### `dotenv.config`
@@ -41,7 +41,7 @@ console.log(result.parsed)
 You may specify a custom path if your file containing environment variables is located elsewhere.
 
 ```ts
-import * as dotenv from '@tinyhttp/dotenv'
+import * as dotenv from '@otterhttp/dotenv'
 dotenv.config({ path: '/custom/path/to/.env' })
 ```
 
@@ -52,7 +52,7 @@ dotenv.config({ path: '/custom/path/to/.env' })
 You may specify the encoding of your file containing environment variables.
 
 ```ts
-import * as dotenv from '@tinyhttp/dotenv'
+import * as dotenv from '@otterhttp/dotenv'
 dotenv.config({ encoding: 'latin1' })
 ```
 
@@ -63,7 +63,7 @@ dotenv.config({ encoding: 'latin1' })
 You may turn on logging to help debug why certain keys or values are not being set as you expect.
 
 ```ts
-import * as dotenv from '@tinyhttp/dotenv'
+import * as dotenv from '@otterhttp/dotenv'
 dotenv.config({ debug: process.env.DEBUG })
 ```
 
@@ -72,7 +72,7 @@ dotenv.config({ debug: process.env.DEBUG })
 The engine which parses the contents of your file containing environment variables is available to use. It accepts a String or Buffer and will return an Object with the parsed keys and values.
 
 ```ts
-import * as dotenv from '@tinyhttp/dotenv'
+import * as dotenv from '@otterhttp/dotenv'
 const buf = Buffer.from('BASIC=basic')
 const config = dotenv.parse(buf) // will return an object
 console.log(typeof config, config) // object { BASIC : 'basic' }
@@ -104,7 +104,7 @@ line'}
 You may turn on logging to help debug why certain keys or values are not being set as you expect.
 
 ```ts
-import * as dotenv from '@tinyhttp/dotenv'
+import * as dotenv from '@otterhttp/dotenv'
 const buf = Buffer.from('hello world')
 const opt = { debug: true }
 const config = dotenv.parse(buf, opt)

@@ -5,8 +5,8 @@
   "private": true,
   "dependencies": {
     "@elastic/elasticsearch": "^8.14.0",
-    "@tinyhttp/app": "workspace:*",
-    "@tinyhttp/dotenv": "workspace:*",
+    "@otterhttp/app": "workspace:*",
+    "@otterhttp/dotenv": "workspace:*",
     "milliparsec": "^2.3.0"
   },
   "scripts": {

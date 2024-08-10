@@ -1,6 +1,6 @@
 /* c8 ignore start*/
-import type { Trust } from '@tinyhttp/proxy-addr'
-import type { Handler } from '@tinyhttp/router'
+import type { Trust } from '@otterhttp/proxy-addr'
+import type { Handler } from '@otterhttp/router'
 import type { ErrorHandler } from './onError.js'
 import type { Request } from './request.js'
 import type { Response } from './response.js'

@@ -1,5 +1,5 @@
-import { App } from '@tinyhttp/app'
-import { markdownStaticHandler } from '@tinyhttp/markdown'
+import { App } from '@otterhttp/app'
+import { markdownStaticHandler } from '@otterhttp/markdown'
 
 const app = new App()
 

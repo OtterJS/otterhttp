@@ -1,5 +1,5 @@
-import { App } from '@tinyhttp/app'
-import { status } from '@tinyhttp/send'
+import { App } from '@otterhttp/app'
+import { status } from '@otterhttp/send'
 import turbo from 'turbo-http'
 
 const app = new App({

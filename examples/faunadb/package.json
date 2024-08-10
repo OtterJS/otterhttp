@@ -3,8 +3,8 @@
   "name": "faunadb",
   "private": true,
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
-    "@tinyhttp/dotenv": "workspace:*",
+    "@otterhttp/app": "workspace:*",
+    "@otterhttp/dotenv": "workspace:*",
     "faunadb": "^4.8.0",
     "milliparsec": "^2.3.0"
   },

@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import https from 'node:https'
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 
 const app = new App({
   settings: {

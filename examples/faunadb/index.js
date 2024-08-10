@@ -1,5 +1,5 @@
-import { App } from '@tinyhttp/app'
-import * as dotenv from '@tinyhttp/dotenv'
+import { App } from '@otterhttp/app'
+import * as dotenv from '@otterhttp/dotenv'
 import fauna from 'faunadb'
 import { json } from 'milliparsec'
 

@@ -1,5 +1,5 @@
 {
-  "name": "@tinyhttp/cookie-signature",
+  "name": "@otterhttp/cookie-signature",
   "version": "2.1.1",
   "description": "HTTP cookie signing and unsigning",
   "homepage": "https://tinyhttp.v1rtl.site",

@@ -1,5 +1,5 @@
+import { App } from '@otterhttp/app'
 import Prisma from '@prisma/client'
-import { App } from '@tinyhttp/app'
 import graphql from 'graphql'
 import { createHandler } from 'graphql-http/lib/use/http'
 

@@ -1,5 +1,5 @@
 {
-  "name": "@tinyhttp/content-disposition",
+  "name": "@otterhttp/content-disposition",
   "description": "content-disposition rewrite in TypeScript",
   "version": "2.2.1",
   "license": "MIT",

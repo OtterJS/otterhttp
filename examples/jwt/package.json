@@ -2,8 +2,8 @@
   "name": "auth",
   "private": true,
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
-    "@tinyhttp/jwt": "^2.0.0",
+    "@otterhttp/app": "workspace:*",
+    "@otterhttp/jwt": "^2.0.0",
     "@types/jsonwebtoken": "^9.0.6",
     "jsonwebtoken": "^9.0.2",
     "milliparsec": "^2.3.0"

@@ -1,8 +1,8 @@
 import type { OutgoingHttpHeaders } from 'node:http'
 import type { IncomingMessage as Req, ServerResponse as Res } from 'node:http'
-import { encodeUrl } from '@tinyhttp/encode-url'
-import { getRequestHeader } from '@tinyhttp/req'
-import { vary } from '@tinyhttp/vary'
+import { encodeUrl } from '@otterhttp/encode-url'
+import { getRequestHeader } from '@otterhttp/req'
+import { vary } from '@otterhttp/vary'
 import mime from 'mime'
 
 const charsetRegExp = /;\s*charset\s*=/

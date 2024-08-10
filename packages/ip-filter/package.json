@@ -1,5 +1,5 @@
 {
-  "name": "@tinyhttp/ip-filter",
+  "name": "@otterhttp/ip-filter",
   "version": "2.1.2",
   "description": "tinyhttp IP filtering middleware",
   "types": "./dist/index.d.ts",

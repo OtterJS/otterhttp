@@ -1,6 +1,6 @@
 import type { IncomingMessage as Req, ServerResponse as Res } from 'node:http'
-import * as cookie from '@tinyhttp/cookie'
-import { sign } from '@tinyhttp/cookie-signature'
+import * as cookie from '@otterhttp/cookie'
+import { sign } from '@otterhttp/cookie-signature'
 import { append } from './append.js'
 
 export const setCookie =

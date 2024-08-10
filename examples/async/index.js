@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 
 const app = new App()
 

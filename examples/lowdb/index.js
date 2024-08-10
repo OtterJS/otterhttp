@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import { Low } from 'lowdb'
 import { JSONFile } from 'lowdb/node'
 import { urlencoded } from 'milliparsec'

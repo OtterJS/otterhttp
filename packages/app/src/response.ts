@@ -1,6 +1,6 @@
 import type { OutgoingHttpHeaders, ServerResponse } from 'node:http'
-import type { SerializeOptions } from '@tinyhttp/cookie'
-import type { DownloadOptions, FormatProps, ReadStreamOptions, getResponseHeader } from '@tinyhttp/res'
+import type { SerializeOptions } from '@otterhttp/cookie'
+import type { DownloadOptions, FormatProps, ReadStreamOptions, getResponseHeader } from '@otterhttp/res'
 import type { App } from './app.js'
 import type { Request } from './request.js'
 import type { AppRenderOptions, TemplateEngineOptions } from './types.js'
@@ -52,7 +52,7 @@ export interface Response<B = unknown> extends ServerResponse {
   /**
    * Send JSON response with JSONP callback support.
    *
-   * To enable this method, install the `@tinyhttp/jsonp` package and attach the method to `res.jsonp` property.
+   * To enable this method, install the `@otterhttp/jsonp` package and attach the method to `res.jsonp` property.
    *
    * @param obj Response object
    */

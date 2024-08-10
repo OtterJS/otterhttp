@@ -1,5 +1,5 @@
-import { App } from '@tinyhttp/app'
-import { rateLimit } from '@tinyhttp/rate-limit'
+import { App } from '@otterhttp/app'
+import { rateLimit } from '@otterhttp/rate-limit'
 
 const app = new App()
 const maxNumberOfRequests = 5

@@ -1,6 +1,6 @@
-# @tinyhttp/cookie
+# @otterhttp/cookie
 
-[![npm (scoped)](https://img.shields.io/npm/v/@tinyhttp/cookie?style=flat-square)](https://npmjs.com/package/@tinyhttp/cookie) [![npm](https://img.shields.io/npm/dt/@tinyhttp/cookie?style=flat-square)](https://npmjs.com/package/@tinyhttp/cookie)
+[![npm (scoped)](https://img.shields.io/npm/v/@otterhttp/cookie?style=flat-square)](https://npmjs.com/package/@otterhttp/cookie) [![npm](https://img.shields.io/npm/dt/@otterhttp/cookie?style=flat-square)](https://npmjs.com/package/@otterhttp/cookie)
 
 > A rewrite of [cookie](https://github.com/jshttp/cookie) module.
 
@@ -9,13 +9,13 @@ HTTP cookie parser and serializer for Node.js.
 ## Install
 
 ```sh
-pnpm i @tinyhttp/cookie
+pnpm i @otterhttp/cookie
 ```
 
 ## API
 
 ```js
-import { parse, serialize } from '@tinyhttp/cookie'
+import { parse, serialize } from '@otterhttp/cookie'
 ```
 
 ### `parse(str, options)`
@@ -25,7 +25,7 @@ The `str` argument is the string representing a `Cookie` header value and `optio
 optional object containing additional parsing options.
 
 ```js
-import { parse } from '@tinyhttp/cookie'
+import { parse } from '@otterhttp/cookie'
 
 parse('foo=bar; equation=E%3Dmc%5E2')
 // { foo: 'bar', equation: 'E=mc^2' }
@@ -54,7 +54,7 @@ name for the cookie, the `value` argument is the value to set the cookie to, and
 argument is an optional object containing additional serialization options.
 
 ```js
-import { serialize } from '@tinyhttp/cookie'
+import { serialize } from '@otterhttp/cookie'
 
 serialize('foo', 'bar')
 // foo=bar
@@ -137,8 +137,8 @@ the server in the future if the browser does not have an HTTPS connection.
 ## Example
 
 ```ts
-import { App } from '@tinyhttp/app'
-import { parse, serialize } from '@tinyhttp/cookie'
+import { App } from '@otterhttp/app'
+import { parse, serialize } from '@otterhttp/cookie'
 import { escapeHTML } from 'es-escape-html'
 
 new App()

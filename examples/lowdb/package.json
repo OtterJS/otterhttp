@@ -2,7 +2,7 @@
   "name": "lowdb",
   "type": "module",
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
+    "@otterhttp/app": "workspace:*",
     "lowdb": "^7.0.1",
     "milliparsec": "^2.3.0"
   },

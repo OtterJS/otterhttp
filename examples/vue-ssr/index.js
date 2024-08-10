@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import sirv from 'sirv'
 import { renderToString } from 'vue/server-renderer'
 import { createApp } from './app.js'

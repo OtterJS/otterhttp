@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@prisma/client": "5.16.0",
-    "@tinyhttp/app": "workspace:*",
+    "@otterhttp/app": "workspace:*",
     "graphql": "^16.9.0",
     "graphql-http": "^1.22.1"
   },

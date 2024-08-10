@@ -1,4 +1,4 @@
-# @tinyhttp/ip-filter
+# @otterhttp/ip-filter
 
 [![npm (scoped)][badge-url]][npm-url] [![npm][dl-badge-url]][npm-url]
 
@@ -7,13 +7,13 @@ IP Filtering middleware to send 403 on bad IPs.
 ## Install
 
 ```sh
-pnpm i @tinyhttp/ip-filter
+pnpm i @otterhttp/ip-filter
 ```
 
 ## API
 
 ```ts
-import { ipFilter } from '@tinyhttp/ip-filter'
+import { ipFilter } from '@otterhttp/ip-filter'
 ```
 
 ### `ipFilter(options)`
@@ -30,8 +30,8 @@ Returns the IP filter middleware.
 ## Example
 
 ```ts
-import { App } from '@tinyhttp/app'
-import { ipFilter } from '@tinyhttp/ip-filter'
+import { App } from '@otterhttp/app'
+import { ipFilter } from '@otterhttp/ip-filter'
 
 const app = new App()
 
@@ -44,6 +44,6 @@ app.get('/', (req, res) => {
 app.listen(3000)
 ```
 
-[badge-url]: https://img.shields.io/npm/v/@tinyhttp/ip-filter?style=flat-square
-[npm-url]: https://npmjs.com/package/@tinyhttp/ip-filter
-[dl-badge-url]: https://img.shields.io/npm/dt/@tinyhttp/ip-filter?style=flat-square
+[badge-url]: https://img.shields.io/npm/v/@otterhttp/ip-filter?style=flat-square
+[npm-url]: https://npmjs.com/package/@otterhttp/ip-filter
+[dl-badge-url]: https://img.shields.io/npm/dt/@otterhttp/ip-filter?style=flat-square

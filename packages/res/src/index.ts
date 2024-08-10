@@ -1,4 +1,4 @@
-export * from '@tinyhttp/send'
+export * from '@otterhttp/send'
 export * from './cookie.js'
 export {
   setContentType,

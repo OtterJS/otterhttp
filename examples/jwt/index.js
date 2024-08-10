@@ -1,5 +1,5 @@
-import { App } from '@tinyhttp/app'
-import { jwt } from '@tinyhttp/jwt'
+import { App } from '@otterhttp/app'
+import { jwt } from '@otterhttp/jwt'
 import jsonwebtoken from 'jsonwebtoken'
 import { urlencoded } from 'milliparsec'
 

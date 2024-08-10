@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import { h, text } from 'hyperapp'
 import { renderToString } from 'hyperapp-render'
 

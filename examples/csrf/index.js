@@ -1,5 +1,5 @@
-import { App } from '@tinyhttp/app'
-import { cookieParser } from '@tinyhttp/cookie-parser'
+import { App } from '@otterhttp/app'
+import { cookieParser } from '@otterhttp/cookie-parser'
 import { csrf } from 'malibu'
 import { json } from 'milliparsec'
 

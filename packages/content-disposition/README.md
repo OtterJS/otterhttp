@@ -1,4 +1,4 @@
-# @tinyhttp/content-disposition
+# @otterhttp/content-disposition
 
 > [`content-disposition`](https://github.com/jshttp/content-disposition) rewrite
 > in TypeScript.
@@ -8,13 +8,13 @@ Create and parse HTTP `Content-Disposition` header
 ## Install
 
 ```sh
-pnpm i @tinyhttp/content-disposition
+pnpm i @otterhttp/content-disposition
 ```
 
 ## API
 
 ```ts
-import { contentDisposition, parse } from '@tinyhttp/content-disposition'
+import { contentDisposition, parse } from '@otterhttp/content-disposition'
 ```
 
 ### `contentDisposition(filename)`
@@ -88,7 +88,7 @@ preferences in order and will get back the best match between the client and
 server.
 
 ```ts
-import { contentDisposition } from '@tinyhttp/content-disposition'
+import { contentDisposition } from '@otterhttp/content-disposition'
 import destroy from 'destroy'
 import fs from 'node:fs'
 import { createServer } from 'node:http'

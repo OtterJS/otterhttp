@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import { lruSend } from 'lru-send'
 
 const URL = 'https://goweather.herokuapp.com/weather/'

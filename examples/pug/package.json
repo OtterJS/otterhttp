@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
+    "@otterhttp/app": "workspace:*",
     "pug": "^3.0.3"
   },
   "scripts": {

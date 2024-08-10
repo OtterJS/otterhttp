@@ -2,7 +2,7 @@
   "name": "file-upload",
   "private": true,
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
+    "@otterhttp/app": "workspace:*",
     "formidable": "^3.5.1"
   },
   "type": "module",

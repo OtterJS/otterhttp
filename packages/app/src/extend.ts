@@ -1,4 +1,4 @@
-import { compile } from '@tinyhttp/proxy-addr'
+import { compile } from '@otterhttp/proxy-addr'
 import {
   checkIfXMLHttpRequest,
   getAccepts,
@@ -9,7 +9,7 @@ import {
   getQueryParams,
   getRangeFromHeader,
   getRequestHeader
-} from '@tinyhttp/req'
+} from '@otterhttp/req'
 import {
   append,
   attachment,
@@ -29,8 +29,8 @@ import {
   setLocationHeader,
   setVaryHeader,
   status
-} from '@tinyhttp/res'
-import type { NextFunction } from '@tinyhttp/router'
+} from '@otterhttp/res'
+import type { NextFunction } from '@otterhttp/router'
 import type { App } from './app.js'
 import { type Request, getSubdomains } from './request.js'
 import { getHost, getIP, getIPs, getProtocol } from './request.js'

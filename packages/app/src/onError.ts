@@ -1,5 +1,5 @@
 import { STATUS_CODES } from 'node:http'
-import type { NextFunction } from '@tinyhttp/router'
+import type { NextFunction } from '@otterhttp/router'
 import type { App } from './app.js'
 import type { Request } from './request.js'
 import type { Response } from './response.js'

@@ -6,7 +6,7 @@
     "start": "tsm index.ts"
   },
   "dependencies": {
-    "@tinyhttp/app": "workspace:*"
+    "@otterhttp/app": "workspace:*"
   },
   "devDependencies": {
     "tsm": "^2.3.0"

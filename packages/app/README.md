@@ -1,18 +1,18 @@
-# @tinyhttp/app
+# @otterhttp/app
 
 The core of tinyhttp. Contains the `App`, `Request` and `Response`. Additionally, it provides special tinyhttp-specific types.
 
 ## Install
 
 ```sh
-pnpm i @tinyhttp/app
+pnpm i @otterhttp/app
 ```
 
 ## Example
 
 ```ts
-import { App } from '@tinyhttp/app'
-import type { Request, Response, NextFunction } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
+import type { Request, Response, NextFunction } from '@otterhttp/app'
 
 new App()
   .use((req: Request, res: Response, next: NextFunction) => {

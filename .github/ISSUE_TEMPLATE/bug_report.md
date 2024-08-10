@@ -25,7 +25,7 @@ A clear and concise description of what you expected to happen.
 **Versions**
 
 - `node`: 14
-- `@tinyhttp/app`: 1.3.X
+- `@otterhttp/app`: 1.3.X
 
 **Additional context**
 

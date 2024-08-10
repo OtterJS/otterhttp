@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import { renderFile as eta } from 'eta'
 import type { EtaConfig, PartialConfig } from 'eta/dist/types/config'
 

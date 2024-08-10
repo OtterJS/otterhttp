@@ -1,5 +1,5 @@
 {
-  "name": "@tinyhttp/send",
+  "name": "@otterhttp/send",
   "version": "2.2.2",
   "type": "module",
   "description": "json, send, sendFile, status and sendStatus methods for tinyhttp",
@@ -23,8 +23,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@tinyhttp/content-type": "^0.1.4",
-    "@tinyhttp/etag": "workspace:*",
+    "@otterhttp/content-type": "^0.1.4",
+    "@otterhttp/etag": "workspace:*",
     "mime": "4.0.0-beta.1"
   }
 }

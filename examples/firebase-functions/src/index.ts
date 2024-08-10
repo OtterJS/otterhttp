@@ -1,4 +1,4 @@
-import { App, type Request, type Response } from '@tinyhttp/app'
+import { App, type Request, type Response } from '@otterhttp/app'
 import * as functions from 'firebase-functions'
 const tinyhttp = new App()
 

@@ -1,4 +1,4 @@
-import { config } from '@tinyhttp/dotenv'
+import { config } from '@otterhttp/dotenv'
 
 config()
 

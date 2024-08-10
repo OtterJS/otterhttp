@@ -1,4 +1,4 @@
-import * as typer from '@tinyhttp/content-type'
+import * as typer from '@otterhttp/content-type'
 import mime from 'mime'
 
 function normalizeType(value: string) {

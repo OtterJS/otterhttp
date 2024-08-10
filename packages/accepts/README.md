@@ -1,4 +1,4 @@
-# @tinyhttp/accepts
+# @otterhttp/accepts
 
 > [`accepts`](https://github.com/jshttp/accepts) rewrite in TypeScript.
 
@@ -18,13 +18,13 @@ In addition to negotiator, it allows:
 ## Install
 
 ```sh
-pnpm i @tinyhttp/accepts
+pnpm i @otterhttp/accepts
 ```
 
 ## API
 
 ```ts
-import { Accepts } from '@tinyhttp/accepts'
+import { Accepts } from '@otterhttp/accepts'
 ```
 
 ### accepts(req)
@@ -83,7 +83,7 @@ preferences in order and will get back the best match between the client and
 server.
 
 ```ts
-import Accepts from '@tinyhttp/accepts'
+import Accepts from '@otterhttp/accepts'
 import { createServer } from 'node:http'
 
 createServer((req, res) => {

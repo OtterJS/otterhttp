@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
-    "@tinyhttp/dotenv": "workspace:*",
+    "@otterhttp/app": "workspace:*",
+    "@otterhttp/dotenv": "workspace:*",
     "deta": "^2.0.0",
     "milliparsec": "^2.3.0"
   }

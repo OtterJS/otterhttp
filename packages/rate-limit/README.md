@@ -1,20 +1,20 @@
-# @tinyhttp/rate-limit
+# @otterhttp/rate-limit
 
-[![npm (scoped)][npm-badge]](https://npmjs.com/package/@tinyhttp/rate-limit) [![npm][dl-badge]](https://npmjs.com/package/@tinyhttp/rate-limit) [![][web-badge]](https://tinyhttp.v1rtl.site/mw/rate-limit)
+[![npm (scoped)][npm-badge]](https://npmjs.com/package/@otterhttp/rate-limit) [![npm][dl-badge]](https://npmjs.com/package/@otterhttp/rate-limit) [![][web-badge]](https://tinyhttp.v1rtl.site/mw/rate-limit)
 
 Basic rate-limiting middleware for tinyhttp. Used to limit repeated requests to public APIs and/or endpoints such as password reset.
 
 ## Install
 
 ```sh
-pnpm i @tinyhttp/rate-limit
+pnpm i @otterhttp/rate-limit
 ```
 
 ## Usage
 
 ```js
-import { App } from '@tinyhttp/app'
-import { rateLimit } from '@tinyhttp/rate-limit'
+import { App } from '@otterhttp/app'
+import { rateLimit } from '@otterhttp/rate-limit'
 
 new App().get('limited-route', rateLimit({ max: 10, windowMs: 60 * 1000 /* 1 minute */ }), (_, res) =>
   res.send('Limited route')
@@ -42,6 +42,6 @@ new App().get('limited-route', rateLimit({ max: 10, windowMs: 60 * 1000 /* 1 min
 - [node-rate-limiter](https://github.com/jhurliman/node-rate-limiter)
 - [node-rate-limiter-flexible](https://github.com/animir/node-rate-limiter-flexible)
 
-[npm-badge]: https://img.shields.io/npm/v/@tinyhttp/rate-limit?style=flat-square
-[dl-badge]: https://img.shields.io/npm/dt/@tinyhttp/rate-limit?style=flat-square
+[npm-badge]: https://img.shields.io/npm/v/@otterhttp/rate-limit?style=flat-square
+[dl-badge]: https://img.shields.io/npm/dt/@otterhttp/rate-limit?style=flat-square
 [web-badge]: https://img.shields.io/badge/website-visit-hotpink?style=flat-square

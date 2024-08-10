@@ -5,7 +5,7 @@
     "start": "tsm index.ts"
   },
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
+    "@otterhttp/app": "workspace:*",
     "express-decorators": "^1.2.1"
   },
   "devDependencies": {

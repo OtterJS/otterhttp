@@ -5,8 +5,8 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
-    "@tinyhttp/logger": "^2.0.0"
+    "@otterhttp/app": "workspace:*",
+    "@otterhttp/logger": "^2.0.0"
   },
   "type": "module"
 }

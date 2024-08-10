@@ -1,6 +1,6 @@
-# @tinyhttp/etag
+# @otterhttp/etag
 
-[![npm (scoped)](https://img.shields.io/npm/v/@tinyhttp/etag?style=flat-square)](https://npmjs.com/package/@tinyhttp/etag) [![npm](https://img.shields.io/npm/dt/@tinyhttp/etag?style=flat-square)](https://npmjs.com/package/@tinyhttp/etag) [![](https://img.shields.io/badge/website-visit-hotpink?style=flat-square)](https://tinyhttp.v1rtl.site/mw/etag)
+[![npm (scoped)](https://img.shields.io/npm/v/@otterhttp/etag?style=flat-square)](https://npmjs.com/package/@otterhttp/etag) [![npm](https://img.shields.io/npm/dt/@otterhttp/etag?style=flat-square)](https://npmjs.com/package/@otterhttp/etag) [![](https://img.shields.io/badge/website-visit-hotpink?style=flat-square)](https://tinyhttp.v1rtl.site/mw/etag)
 
 > A rewrite of [etag](https://www.npmjs.com/package/etag) module.
 
@@ -9,13 +9,13 @@ This module generates HTTP ETags (as defined in RFC 7232) for use in HTTP respon
 ## Install
 
 ```sh
-pnpm i @tinyhttp/etag
+pnpm i @otterhttp/etag
 ```
 
 ## API
 
 ```ts
-import { eTag } from '@tinyhttp/etag'
+import { eTag } from '@otterhttp/etag'
 ```
 
 `eTag(entity, [options])`

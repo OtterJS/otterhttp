@@ -1,5 +1,5 @@
 {
-  "name": "@tinyhttp/proxy-addr",
+  "name": "@otterhttp/proxy-addr",
   "version": "2.2.0",
   "type": "module",
   "description": "proxy-addr rewrite with TypeScript and ESM support",
@@ -23,7 +23,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@tinyhttp/forwarded": "workspace:*",
+    "@otterhttp/forwarded": "workspace:*",
     "ipaddr.js": "^2.2.0"
   }
 }

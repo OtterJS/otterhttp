@@ -1,5 +1,5 @@
 import type { IncomingMessage } from 'node:http'
-import { Accepts } from '@tinyhttp/accepts'
+import { Accepts } from '@otterhttp/accepts'
 
 type Request = Pick<IncomingMessage, 'headers'>
 

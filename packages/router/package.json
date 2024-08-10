@@ -1,5 +1,5 @@
 {
-  "name": "@tinyhttp/router",
+  "name": "@otterhttp/router",
   "version": "2.2.2",
   "type": "module",
   "description": "Router for tinyhttp",

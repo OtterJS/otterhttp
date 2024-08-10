@@ -1,5 +1,5 @@
 {
-  "name": "@tinyhttp/encode-url",
+  "name": "@otterhttp/encode-url",
   "version": "2.1.1",
   "description": "encode-url rewrite in TypeScript",
   "type": "module",

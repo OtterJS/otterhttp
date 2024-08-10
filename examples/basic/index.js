@@ -1,5 +1,5 @@
-import { App } from '@tinyhttp/app'
-import { logger } from '@tinyhttp/logger'
+import { App } from '@otterhttp/app'
+import { logger } from '@otterhttp/logger'
 
 const app = new App()
 

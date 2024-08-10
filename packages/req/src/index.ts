@@ -1,12 +1,12 @@
 import type { IncomingHttpHeaders, IncomingMessage as Request, ServerResponse as Response } from 'node:http'
 import { type Options, type Ranges, type Result, parseRange } from 'header-range-parser'
 
-import { typeIs } from '@tinyhttp/type-is'
+import { typeIs } from '@otterhttp/type-is'
 import { fresh } from './fresh.js'
 
 export * from './accepts.js'
 
-export * from '@tinyhttp/url'
+export * from '@otterhttp/url'
 
 export const getRequestHeader = (req: Pick<Request, 'headers'>) => {
   return <HeaderName extends string>(header: HeaderName): IncomingHttpHeaders[HeaderName] => {

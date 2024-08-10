@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 
 const app = new App()
 const db = {

@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import { tinyws } from 'tinyws'
 
 const app = new App()

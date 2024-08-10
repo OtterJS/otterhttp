@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import graphql from 'graphql'
 import { createHandler } from 'graphql-http/lib/use/http'
 

@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import react from 'htm/react/index.js'
 import ReactDOMServer from 'react-dom/server.js'
 

@@ -2,7 +2,7 @@
   "name": "session",
   "private": true,
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
+    "@otterhttp/app": "workspace:*",
     "milliparsec": "^2.3.0",
     "next-session": "^4.0.5"
   },

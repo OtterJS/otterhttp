@@ -6,7 +6,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
+    "@otterhttp/app": "workspace:*",
     "lru-send": "^0.1.3"
   }
 }

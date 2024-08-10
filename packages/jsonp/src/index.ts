@@ -1,4 +1,4 @@
-import type { Request, Response } from '@tinyhttp/app'
+import type { Request, Response } from '@otterhttp/app'
 
 export type JSONPOptions = Partial<{
   escape: boolean

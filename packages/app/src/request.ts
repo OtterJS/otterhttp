@@ -1,18 +1,18 @@
 import type { IncomingHttpHeaders, IncomingMessage } from 'node:http'
 import type { ParsedUrlQuery } from 'node:querystring'
 
-import { type Trust, all, compile, proxyaddr as proxyAddr } from '@tinyhttp/proxy-addr'
+import { type Trust, all, compile, proxyaddr as proxyAddr } from '@otterhttp/proxy-addr'
 import type { Options, Ranges } from 'header-range-parser'
 
-import type { Middleware } from '@tinyhttp/router'
+import type { Middleware } from '@otterhttp/router'
 import type { App } from './app.js'
 
 import { isIP } from 'node:net'
 import type { Socket } from 'node:net'
 import type { TLSSocket } from 'node:tls'
-import type { URLParams, getRequestHeader } from '@tinyhttp/req'
+import type { URLParams, getRequestHeader } from '@otterhttp/req'
 
-export { getURLParams } from '@tinyhttp/req'
+export { getURLParams } from '@otterhttp/req'
 
 export type Host = {
   hostname: string

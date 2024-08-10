@@ -1,8 +1,8 @@
 import type { IncomingMessage as Req, ServerResponse as Res } from 'node:http'
 import { basename, extname, resolve } from 'node:path'
-import { contentDisposition } from '@tinyhttp/content-disposition'
-import { sendFile } from '@tinyhttp/send'
-import type { SendFileOptions } from '@tinyhttp/send'
+import { contentDisposition } from '@otterhttp/content-disposition'
+import { sendFile } from '@otterhttp/send'
+import type { SendFileOptions } from '@otterhttp/send'
 import { setContentType, setHeader } from './headers.js'
 
 export type DownloadOptions = SendFileOptions &

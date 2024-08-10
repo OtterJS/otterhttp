@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { App, type Request, type Response } from '@tinyhttp/app'
+import { App, type Request, type Response } from '@otterhttp/app'
 import { json } from 'milliparsec'
 import { createConnection } from 'typeorm'
 import { User } from './entity/User'

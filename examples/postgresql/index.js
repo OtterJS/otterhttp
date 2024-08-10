@@ -1,5 +1,5 @@
-import { App } from '@tinyhttp/app'
-import * as dotenv from '@tinyhttp/dotenv'
+import { App } from '@otterhttp/app'
+import * as dotenv from '@otterhttp/dotenv'
 import { urlencoded as parser } from 'milliparsec'
 import pg from 'pg-promise'
 

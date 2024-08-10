@@ -2,7 +2,7 @@
   "name": "eta",
   "private": true,
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
+    "@otterhttp/app": "workspace:*",
     "eta": "^2.2.0"
   },
   "scripts": {

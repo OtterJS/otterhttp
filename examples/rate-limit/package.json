@@ -6,7 +6,7 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
-    "@tinyhttp/rate-limit": "workspace:*"
+    "@otterhttp/app": "workspace:*",
+    "@otterhttp/rate-limit": "workspace:*"
   }
 }

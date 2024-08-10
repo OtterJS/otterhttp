@@ -13,7 +13,7 @@ import type {
   AsyncHandler as RAsyncHandler,
   Handler as RHandler,
   SyncHandler as RSyncHandler
-} from '@tinyhttp/router'
+} from '@otterhttp/router'
 import type { Request } from './request.js'
 import type { Response } from './response.js'
 

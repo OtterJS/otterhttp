@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import { urlencoded } from 'milliparsec'
 import getSession from 'next-session'
 

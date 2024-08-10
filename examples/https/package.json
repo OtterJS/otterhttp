@@ -2,7 +2,7 @@
   "name": "https",
   "type": "module",
   "dependencies": {
-    "@tinyhttp/app": "workspace:*"
+    "@otterhttp/app": "workspace:*"
   },
   "scripts": {
     "start": "node index.js"

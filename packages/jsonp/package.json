@@ -1,5 +1,5 @@
 {
-  "name": "@tinyhttp/jsonp",
+  "name": "@otterhttp/jsonp",
   "version": "2.1.12",
   "type": "module",
   "description": "JSONP response middleware",
@@ -23,6 +23,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@tinyhttp/app": "workspace:*"
+    "@otterhttp/app": "workspace:*"
   }
 }

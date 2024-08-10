@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises'
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import { CustomView } from './view.js'
 
 const app = new App()

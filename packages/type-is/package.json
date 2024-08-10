@@ -1,5 +1,5 @@
 {
-  "name": "@tinyhttp/type-is",
+  "name": "@otterhttp/type-is",
   "version": "2.2.3",
   "type": "module",
   "description": "TypeScript rewrite of type-is with CJS and ESM targets",
@@ -23,7 +23,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@tinyhttp/content-type": "^0.1.4",
+    "@otterhttp/content-type": "^0.1.4",
     "mime": "4.0.1"
   }
 }

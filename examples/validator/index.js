@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import Validator from 'fastest-validator'
 import { json } from 'milliparsec'
 

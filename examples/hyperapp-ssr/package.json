@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
+    "@otterhttp/app": "workspace:*",
     "hyperapp": "^2.0.22",
     "hyperapp-render": "^4.0.1"
   },

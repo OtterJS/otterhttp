@@ -1,5 +1,5 @@
 import type { IncomingMessage as Request, ServerResponse as Response } from 'node:http'
-import { send, status } from '@tinyhttp/send'
+import { send, status } from '@otterhttp/send'
 import { MemoryStore, type Store } from './memory-store.js'
 
 export interface RequestWithRateLimit extends Request {

@@ -1,6 +1,6 @@
 # Swagger documentation example
 
-tinyhttp example using `@tinyhttp/swagger` to generate and serve swagger documentation
+tinyhttp example using `@otterhttp/swagger` to generate and serve swagger documentation
 
 ## Run
 

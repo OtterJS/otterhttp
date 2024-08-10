@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import { driver } from 'neo4j-driver'
 
 const neo4jDriver = driver('bolt://localhost:7687')

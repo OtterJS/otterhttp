@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@tinyhttp/app": "workspace:*",
-    "@tinyhttp/markdown": "^2.0.4"
+    "@otterhttp/app": "workspace:*",
+    "@otterhttp/markdown": "^2.0.4"
   },
   "scripts": {
     "start": "node index.js"

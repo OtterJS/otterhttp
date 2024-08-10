@@ -2,7 +2,7 @@
   "name": "caddy",
   "private": true,
   "dependencies": {
-    "@tinyhttp/app": "workspace:*"
+    "@otterhttp/app": "workspace:*"
   },
   "type": "module",
   "scripts": {

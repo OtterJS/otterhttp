@@ -1,4 +1,4 @@
-import { App } from '@tinyhttp/app'
+import { App } from '@otterhttp/app'
 import { json as json_parser } from 'milliparsec'
 import { bulkInsert, insert, search } from './client.js'
 import { PORT, hasPostProps, isEmptyObject, isEmptyString } from './utils.js'

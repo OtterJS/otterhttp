@@ -1,5 +1,5 @@
 import { Client } from '@elastic/elasticsearch'
-import { config } from '@tinyhttp/dotenv'
+import { config } from '@otterhttp/dotenv'
 config()
 
 //define elastic client and read keys from the environment

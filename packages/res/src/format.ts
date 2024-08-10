@@ -1,5 +1,5 @@
 import type { IncomingMessage as Req, ServerResponse as Res } from 'node:http'
-import { getAccepts } from '@tinyhttp/req'
+import { getAccepts } from '@otterhttp/req'
 import { setVaryHeader } from './headers.js'
 import { normalizeType, normalizeTypes } from './util.js'
 
