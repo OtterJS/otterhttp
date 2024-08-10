@@ -1239,10 +1239,10 @@ describe('App settings', () => {
 
       expect(app.settings.xPoweredBy).toBe(true)
     })
-    it('should set X-Powered-By to "tinyhttp"', async () => {
+    it('should set X-Powered-By to "otterhttp"', async () => {
       const { fetch } = InitAppAndTest((_req, res) => void res.send('hi'))
 
-      await fetch('/').expectHeader('X-Powered-By', 'tinyhttp')
+      await fetch('/').expectHeader('X-Powered-By', 'otterhttp')
     })
     it('when disabled should not send anything', async () => {
       const app = new App({ settings: { xPoweredBy: false } })
