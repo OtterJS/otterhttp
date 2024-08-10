@@ -1,14 +1,64 @@
-node_modules
-dist
-log.txt
-coverage
-examples/*/.env
-.next
-.cache
-.clinic
-examples/aws/.build
-.pnpm-debug.log*
-*.log
-coverage.lcov
-.gitsigners
-*.tsbuildinfo
+# Exclude everything
+/*
+
+# Specific includes
+
+## Monorepo subpackages
+!/packages
+/packages/*/*
+
+## Editorconfig
+!.editorconfig
+
+## Package manager
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+
+## Config files
+!*config.ts
+!*config.mjs
+!*config.cjs
+!*config.js
+!*config.json
+!*env.d.ts
+!*env.ts
+!*rc.json
+
+## Biome.js
+!biome.json
+
+## Husky
+!.husky
+
+## VSCode
+!.vscode
+
+## Changesets
+!.changeset
+
+## Markdowns
+!*.md
+!LICENSE
+!licenses
+
+## important Git files
+!.gitmodules
+!.gitignore
+!.gitattributes
+!.git-blame-ignore-revs
+
+## GitHub specific
+!/.github/
+
+## Sources
+!config
+!examples
+!src
+!tests
+!test_helpers
+
+# Explicit exceptions/ignores
+
+## changesets generated changelogs
+/packages/*/CHANGELOG.md
