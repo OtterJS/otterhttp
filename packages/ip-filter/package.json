@@ -12,7 +12,7 @@
     "directory": "packages/ip-filter"
   },
   "keywords": [
-    "tinyhttp",
+    "otterhttp",
     "node.js",
     "web framework",
     "web",

@@ -11,7 +11,7 @@
     "url": "https://github.com/otterjs/otterhttp.git",
     "directory": "packages/cors"
   },
-  "keywords": ["tinyhttp", "node.js", "web framework", "web", "backend", "cors"],
+  "keywords": ["otterhttp", "node.js", "web framework", "web", "backend", "cors"],
   "engines": {
     "node": ">=12.20.0"
   },

@@ -14,7 +14,7 @@
   "type": "module",
   "types": "./dist/index.d.ts",
   "exports": "./dist/index.js",
-  "keywords": ["tinyhttp", "node.js", "web framework", "web", "backend", "static", "cookie"],
+  "keywords": ["otterhttp", "node.js", "web framework", "web", "backend", "static", "cookie"],
   "files": ["dist"],
   "license": "LGPL-3.0-or-later",
   "scripts": {
