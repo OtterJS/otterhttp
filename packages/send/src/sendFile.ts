@@ -2,6 +2,7 @@ import { createReadStream, statSync } from 'node:fs'
 import type { IncomingMessage as I, ServerResponse as S } from 'node:http'
 import { extname, isAbsolute } from 'node:path'
 import { join } from 'node:path'
+import { pipeline } from 'node:stream/promises'
 import mime from 'mime'
 import { createETag } from './utils.js'
 
@@ -51,11 +52,11 @@ export const enableCaching = (res: Res, caching: Caching): void => {
  *
  * Path argument must be absolute. To use a relative path, specify the `root` option first.
  *
+ * @param req Request
  * @param res Response
  */
-export const sendFile =
-  <Request extends Req = Req, Response extends Res = Res>(req: Request, res: Response) =>
-  (path: string, opts: SendFileOptions = {}, cb?: (err?: any) => void): Response => {
+export const sendFile = <Request extends Req = Req, Response extends Res = Res>(req: Request, res: Response) => {
+  return async (path: string, opts: SendFileOptions = {}): Promise<Response> => {
     const { root, headers = {}, encoding = 'utf-8', caching, ...options } = opts
 
     if (!isAbsolute(path) && !root) throw new TypeError('path must be absolute')
@@ -102,10 +103,8 @@ export const sendFile =
     res.writeHead(status, headers)
 
     const stream = createReadStream(filePath, options)
-
-    if (cb) stream.on('error', (err) => cb(err)).on('end', () => cb())
-
-    stream.pipe(res)
+    await pipeline(stream, res)
 
     return res
   }
+}
