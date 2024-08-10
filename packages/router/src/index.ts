@@ -2,17 +2,23 @@
 
 import { isString, isStringArray } from './type-guards'
 
-export type NextFunction = (err?: any) => void
+export type NextFunction = (err?: unknown) => void
 
-export type SyncHandler<Request = any, Response = any> = (req: Request, res: Response, next: NextFunction) => void
+export type SyncHandler<Request = unknown, Response = unknown> = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => void
 
-export type AsyncHandler<Request = any, Response = any> = (
+export type AsyncHandler<Request = unknown, Response = unknown> = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => Promise<void>
 
-export type Handler<Request = any, Response = any> = AsyncHandler<Request, Response> | SyncHandler<Request, Response>
+export type Handler<Request = unknown, Response = unknown> =
+  | AsyncHandler<Request, Response>
+  | SyncHandler<Request, Response>
 
 const METHODS = [
   'ACL',
