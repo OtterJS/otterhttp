@@ -9,28 +9,24 @@ const trustAll = () => true
 
 const trustNone = () => false
 
-const trust10x = (addr: string) => /^10\./.test(addr)
+const trust10x = (addr: string | undefined) => Boolean(addr && /^10\./.test(addr))
 
 describe('proxyaddr(req, trust)', () => {
   describe('arguments', () => {
     describe('req', () => {
       it('should be required', () => {
-        try {
-          proxyaddr(null, null)
-        } catch (error) {
-          expect(error).toBeDefined()
-        }
+        expect(() => {
+          proxyaddr(null as any, null as any)
+        }).toThrow()
       })
     })
 
     describe('trust', () => {
       it('should be required', () => {
         const req = createReq('127.0.0.1')
-        try {
-          proxyaddr(req, null)
-        } catch (error) {
-          expect(error).toBeDefined()
-        }
+        expect(() => {
+          proxyaddr(req, null as any)
+        }).toThrow()
       })
       it('should accept a function', () => {
         const req = createReq('127.0.0.1')
@@ -79,42 +75,20 @@ describe('proxyaddr(req, trust)', () => {
         expect(proxyaddr(req, arr)).toBe('127.0.0.1')
         expect(arr).toEqual(['loopback', '10.0.0.1'])
       })
-      it('should reject non-IP', () => {
+      it.each(['blegh', '10.0.300.1', '::ffff:30.168.1.9000', '-1'])("should reject non-IP '%s'", (value: unknown) => {
         const req = createReq('127.0.0.1')
-
-        try {
-          proxyaddr(req, 'blegh')
-        } catch (e) {
-          expect(e.message).toContain('invalid IP address')
-        }
-        try {
-          proxyaddr(req, '10.0.300.1')
-        } catch (e) {
-          expect(e.message).toContain('invalid IP address')
-        }
-        try {
-          proxyaddr(req, '::ffff:30.168.1.9000')
-        } catch (e) {
-          expect(e.message).toContain('invalid IP address')
-        }
-        try {
-          proxyaddr(req, '-1')
-        } catch (e) {
-          expect(e.message).toContain('invalid IP address')
-        }
+        expect(() => {
+          proxyaddr(req, value as any)
+        }).toThrow('invalid IP address')
       })
       it.each(['10.0.0.1/internet', '10.0.0.1/6000', '::1/6000', '::ffff:a00:2/136', '::ffff:a00:2/-1'])(
         "should reject bad CIDR '%s'",
         (trust: string) => {
           const req = createReq('127.0.0.1')
 
-          try {
+          expect(() => {
             proxyaddr(req, trust)
-          } catch (e) {
-            expect(e.message).toContain('invalid range on address')
-            return
-          }
-          assert.fail()
+          }).toThrow('invalid range on address')
         }
       )
       it.each([
@@ -126,16 +100,12 @@ describe('proxyaddr(req, trust)', () => {
       ])("should reject bad netmask '%s'", (netmask: string) => {
         const req = createReq('127.0.0.1')
 
-        try {
+        expect(() => {
           proxyaddr(req, netmask)
-        } catch (e) {
-          expect(e.message).toContain('invalid range on address')
-          return
-        }
-        assert.fail()
+        }).toThrow('invalid range on address')
       })
       it('should be invoked as trust(addr, i)', () => {
-        const log = []
+        const log: Array<[string | undefined, number]> = []
 
         const req = createReq('127.0.0.1', {
           'x-forwarded-for': '192.168.0.1, 10.0.0.1'
@@ -400,13 +370,13 @@ describe('proxyaddr(req, trust)', () => {
       expect(proxyaddr(req, '127.0.0.1')).toBe('::8:8:8:8:8:8:8:8:8')
     })
     it('should provide all values to function', () => {
-      const log = []
+      const log: Array<[string | undefined, number]> = []
       const req = createReq('127.0.0.1', {
         'x-forwarded-for': 'myrouter, 127.0.0.1, proxy'
       })
 
-      proxyaddr(req, (...args) => {
-        log.push(args.slice())
+      proxyaddr(req, (addr, i) => {
+        log.push([addr, i])
         return true
       })
 
@@ -420,11 +390,11 @@ describe('proxyaddr(req, trust)', () => {
 
   describe('when socket address undefined', () => {
     it('should return undefined as address', () => {
-      const req = createReq(undefined)
+      const req = createReq(undefined as any)
       expect(proxyaddr(req, '127.0.0.1')).toBeUndefined()
     })
     it('should return undefined even with trusted headers', () => {
-      const req = createReq(undefined, {
+      const req = createReq(undefined as any, {
         'x-forwarded-for': '127.0.0.1, 10.0.0.1'
       })
       expect(proxyaddr(req, '127.0.0.1')).toBeUndefined()
@@ -452,23 +422,17 @@ describe('proxyaddr.all(req, trust?)', () => {
   describe('arguments', () => {
     describe('req', () => {
       it('should be required', () => {
-        try {
-          all(null)
-        } catch (error) {
-          expect(error).toBeDefined()
-          return
-        }
-        assert.fail()
+        expect(() => {
+          all(null as any)
+        }).toThrow()
       })
     })
     describe('trust', () => {
       it('should be optional', () => {
         const req = createReq('127.0.0.1')
-        try {
+        expect(() => {
           all(req)
-        } catch (error) {
-          assert.fail()
-        }
+        }).not.toThrow()
       })
     })
   })
@@ -519,13 +483,9 @@ describe('proxyaddr.compile(trust)', () => {
   describe('arguments', () => {
     describe('trust', () => {
       it('should be required', () => {
-        try {
-          compile(null)
-        } catch (error) {
-          expect(error).toBeDefined()
-          return
-        }
-        assert.fail()
+        expect(() => {
+          compile(null as any)
+        }).toThrow()
       })
       it('should accept a string array', () => {
         expect(compile(['127.0.0.1'])).toBeTypeOf('function')
@@ -549,27 +509,17 @@ describe('proxyaddr.compile(trust)', () => {
         expect(compile(['loopback', '10.0.0.1'])).toBeTypeOf('function')
       })
       it.each(['blargh', '-1'])("should reject non-IP '%s'", (value: string) => {
-        try {
+        expect(() => {
           compile(value)
-        } catch (error) {
-          expect(error).toBeDefined()
-          expect(error.message).toMatch(/invalid IP address/)
-          return
-        }
-        assert.fail()
+        }).toThrow(/invalid IP address/)
       })
 
       it.each(['10.0.0.1/6000', '::1/6000', '::ffff:a00:2/136', '::ffff:a00:2/-1'])(
         "should reject bad CIDR '%s'",
         (value: string) => {
-          try {
+          expect(() => {
             compile(value)
-          } catch (error) {
-            expect(error).toBeDefined()
-            expect(error.message).toMatch(/invalid range on address/)
-            return
-          }
-          assert.fail()
+          }).toThrow(/invalid range on address/)
         }
       )
       it('should not alter input array', () => {
