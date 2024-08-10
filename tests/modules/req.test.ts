@@ -264,7 +264,7 @@ describe('Request extensions', () => {
       const app = runServer((req, res) => {
         const range = getRangeFromHeader(req)
         const size = 300
-        expect(range(size)[0].end).toBe(size - 1)
+        expect((range(size) as Ranges)[0].end).toBe(size - 1)
         res.end()
       })
 
@@ -279,7 +279,7 @@ describe('Request extensions', () => {
       const app = runServer((req, res) => {
         const range = getRangeFromHeader(req)
         const size = 300
-        expect(range(size)[0].end).toBe(size - 1)
+        expect((range(size) as Ranges)[0].end).toBe(size - 1)
         res.end()
       })
 
