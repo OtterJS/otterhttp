@@ -41,7 +41,7 @@ export function fresh(reqHeaders: IncomingHttpHeaders, resHeaders: OutgoingHttpH
   if (cacheControl && CACHE_CONTROL_NO_CACHE_REGEXP.test(cacheControl)) return false
 
   // if-none-match
-  if (noneMatch !== '*') {
+  if (noneMatch && noneMatch !== '*') {
     const etag = resHeaders.etag as string | undefined
 
     if (!etag || isStale(etag, noneMatch)) return false
@@ -49,7 +49,7 @@ export function fresh(reqHeaders: IncomingHttpHeaders, resHeaders: OutgoingHttpH
 
   // if-modified-since
   if (modifiedSince) {
-    const lastModified = resHeaders['last-modified'] as string | undefined
+    const lastModified = resHeaders['last-modified']
 
     if (!lastModified || !(Date.parse(lastModified) <= Date.parse(modifiedSince))) return false
   }

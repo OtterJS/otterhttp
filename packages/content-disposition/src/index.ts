@@ -52,14 +52,17 @@ function ustring(val: unknown): string {
 
 const basename = (str: string) => str.slice(str.lastIndexOf('/') + 1)
 
-function format({
+/**
+ * Format Content-Disposition header string.
+ */
+export function format({
   parameters,
   type
 }: Partial<{
   parameters: Record<string, unknown>
   type: string | boolean | undefined
 }>) {
-  if (!type || typeof type !== 'string' || !TOKEN_REGEXP.test(type)) {
+  if (type == null || typeof type !== 'string' || !TOKEN_REGEXP.test(type)) {
     throw new TypeError('invalid type')
   }
 
@@ -79,17 +82,13 @@ function format({
   return string
 }
 
-function createParams(filename?: string, fallback?: string | boolean) {
-  if (filename === undefined) return
+function createParams(filename?: string, fallback?: string | boolean): Record<string, string> {
+  if (filename == null) return {}
 
-  const params: Partial<
-    Record<string, string> & {
-      filename: string
-    }
-  > = {}
+  const params: Record<string, string> = {}
 
   // fallback defaults to true
-  if (!fallback) fallback = true
+  if (fallback == null) fallback = true
   if (typeof fallback === 'string' && NON_LATIN1_REGEXP.test(fallback)) {
     throw new TypeError('fallback must be ISO-8859-1 string')
   }
@@ -176,8 +175,8 @@ export function parse(header: string): ContentDisposition {
   const type = match[1].toLowerCase()
 
   let key: string
-  const names = []
-  const params = {}
+  const names: string[] = []
+  const params: Record<string, string> = {}
   let value: string | string[]
 
   // calculate index to start at

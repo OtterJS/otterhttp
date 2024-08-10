@@ -9,7 +9,7 @@ function normalizeType(value: string) {
   return typer.format(type)
 }
 
-function tryNormalizeType(value: string) {
+function tryNormalizeType(value: string | undefined) {
   if (!value) return null
 
   try {
@@ -19,9 +19,9 @@ function tryNormalizeType(value: string) {
   }
 }
 
-function mimeMatch(expected: string | boolean, actual: string | boolean): boolean {
+function mimeMatch(expected: string | null, actual: string | null): boolean {
   // invalid type
-  if (expected === false) return false
+  if (expected == null) return false
 
   // split types
   const actualParts = (actual as string).split('/')
@@ -46,9 +46,9 @@ function mimeMatch(expected: string | boolean, actual: string | boolean): boolea
   return true
 }
 
-function normalize(type: string | unknown) {
+function normalize(type: string): string | null {
   // invalid type
-  if (typeof type !== 'string') return false
+  if (typeof type !== 'string') return null
 
   switch (type) {
     case 'urlencoded':
@@ -68,7 +68,7 @@ function normalize(type: string | unknown) {
  * a special shortcut like `multipart` or `urlencoded`,
  * or a mime type.
  */
-export const typeIs = (value: string, ...types: string[]) => {
+export const typeIs = (value: string | undefined, ...types: string[]) => {
   let i: number
   // remove parameters and normalize
   const val = tryNormalizeType(value)

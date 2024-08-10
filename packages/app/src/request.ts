@@ -98,16 +98,19 @@ export const getHost = (req: Request, trust: Trust): Host | undefined => {
 }
 
 export const getIP = (req: Pick<Request, 'headers' | 'connection' | 'socket'>, trust: Trust): string | undefined =>
-  proxyAddr(req, trust).replace(/^.*:/, '') // striping the redundant prefix addeded by OS to IPv4 address
+  proxyAddr(req, trust)?.replace(/^.*:/, '') // stripping the redundant prefix added by OS to IPv4 address
 
-export const getIPs = (req: Pick<Request, 'headers' | 'connection' | 'socket'>, trust: Trust): string[] | undefined =>
-  all(req, trust)
+export const getIPs = (
+  req: Pick<Request, 'headers' | 'connection' | 'socket'>,
+  trust: Trust
+): Array<string | undefined> => all(req, trust)
 
 export const getSubdomains = (req: Request, trust: Trust, subdomainOffset = 2): string[] => {
   const host = getHost(req, trust)
-  if (!host?.hostname) return []
+  if (host == null) return []
+  const { hostname } = host
 
-  const subdomains = isIP(host.hostname) ? [host.hostname] : host.hostname.split('.').reverse()
+  const subdomains = isIP(hostname) ? [hostname] : hostname.split('.').reverse()
 
   return subdomains.slice(subdomainOffset)
 }
@@ -130,14 +133,14 @@ export interface Request extends IncomingMessage {
   params: URLParams
   connection: Connection
   socket: TLSSocket | Socket
-  route?: Middleware
+  route?: Middleware<never, never>
   protocol: Protocol
   secure: boolean
   xhr: boolean
   hostname?: string
   port?: number
-  ip?: string
-  ips?: string[]
+  ip?: string | undefined
+  ips?: (string | undefined)[]
   subdomains?: string[]
   get: <HeaderName extends string>(header: HeaderName) => IncomingHttpHeaders[HeaderName]
   range: (size: number, options?: Options) => -1 | -2 | -3 | Ranges | undefined
@@ -152,5 +155,4 @@ export interface Request extends IncomingMessage {
   fresh?: boolean
   stale?: boolean
   body?: any
-  app?: App
 }

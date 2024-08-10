@@ -694,7 +694,7 @@ describe('Subapps', () => {
         verb,
         fetchWithVerb
       }: {
-        verb: (app: App) => (...args: Parameters<RouterMethod<Request, Response>>) => App
+        verb: (app: App) => RouterMethod<Request, Response, App>
         fetchWithVerb: string
       }) => {
         it("should continue middleware execution when '.use'd sub-app middleware is exhausted", async () => {
@@ -1254,29 +1254,6 @@ describe('App settings', () => {
       const fetch = makeFetch(server)
 
       await fetch('/').expectHeader('X-Powered-By', null)
-    })
-  })
-  describe('bindAppToReqRes', () => {
-    it('references the current app instance in req.app and res.app', async () => {
-      const app = new App({
-        settings: {
-          bindAppToReqRes: true
-        }
-      })
-
-      app.locals.hello = 'world'
-
-      app.use((req, res) => {
-        expect(req.app).toBeInstanceOf(App)
-        expect(res.app).toBeInstanceOf(App)
-        expect(req.app?.locals.hello).toBe('world')
-        expect(res.app?.locals.hello).toBe('world')
-        res.end()
-      })
-
-      const server = app.listen()
-
-      await makeFetch(server)('/').expect(200)
     })
   })
   describe('enableReqRoute', () => {

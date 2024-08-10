@@ -1,6 +1,6 @@
 /* c8 ignore start*/
 import type { Trust } from '@tinyhttp/proxy-addr'
-import type { Handler, NextFunction } from '@tinyhttp/router'
+import type { Handler } from '@tinyhttp/router'
 import type { ErrorHandler } from './onError.js'
 import type { Request } from './request.js'
 import type { Response } from './response.js'
@@ -22,9 +22,7 @@ export type AppSettings = Partial<{
   'trust proxy': Trust
 }>
 
-export type TemplateEngineOptions = {
-  [key: string]: unknown
-}
+export type TemplateEngineOptions = Record<string, unknown>
 
 /**
  * Function that processes the template
@@ -46,8 +44,8 @@ export type AppRenderOptions<O extends TemplateEngineOptions = TemplateEngineOpt
 
 export type AppConstructor<Req extends Request = Request, Res extends Response = Response> = Partial<{
   noMatchHandler: Handler<Req, Res>
-  onError: ErrorHandler
+  onError: ErrorHandler<Req, Res>
   settings: AppSettings
-  applyExtensions: (req: Request, res: Response, next: NextFunction) => void
+  applyExtensions: Handler<Req, Res>
 }>
 /* c8 ignore stop */

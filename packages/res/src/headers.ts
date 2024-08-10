@@ -82,6 +82,7 @@ export const setContentType =
   <Response extends Res = Res>(res: Response) =>
   (type: string): Response => {
     const ct = type.indexOf('/') === -1 ? mime.getType(type) : type
+    if (ct == null) return res
 
     setHeader(res)('Content-Type', ct)
 

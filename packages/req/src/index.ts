@@ -15,22 +15,23 @@ export const getRequestHeader = (req: Pick<Request, 'headers'>) => {
     switch (lc) {
       case 'referer':
       case 'referrer':
-        return req.headers.referrer || req.headers.referer
+        return req.headers.referrer ?? req.headers.referer
       default:
         return req.headers[lc]
     }
   }
 }
 
-export const getRangeFromHeader =
-  (req: Pick<Request, 'headers'>) =>
-  (size: number, options?: Options): Result | Ranges => {
-    const range = getRequestHeader(req)('range')
+export const getRangeFromHeader = (req: Pick<Request, 'headers'>) => {
+  return (size: number, options?: Options): Result | Ranges | undefined => {
+    let range = getRequestHeader(req)('range')
 
+    if (Array.isArray(range)) range = range.pop()
     if (!range) return
 
     return parseRange(size, range, options)
   }
+}
 
 export const getFreshOrStale = (
   req: Pick<Request, 'headers' | 'method'>,
@@ -56,7 +57,6 @@ export const getFreshOrStale = (
 export const checkIfXMLHttpRequest = (req: Pick<Request, 'headers'>): boolean =>
   req.headers['x-requested-with'] === 'XMLHttpRequest'
 
-export const reqIs =
-  (req: Pick<Request, 'headers'>) =>
-  (...types: string[]) =>
-    typeIs(req.headers['content-type'], ...types)
+export const reqIs = (req: Pick<Request, 'headers'>) => {
+  return (...types: string[]) => typeIs(req.headers['content-type'], ...types)
+}

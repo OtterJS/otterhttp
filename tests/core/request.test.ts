@@ -88,13 +88,13 @@ describe('Request properties', () => {
     })
     it('should set the correct req.url on middlewares even in a subapp', async () => {
       const echo = (req, res) => res.send({ url: req.url, params: req.params })
-      const mw = (req, res, next) => {
+      const mw = (req, _res, next) => {
         req.urls ||= []
         req.urls.push(req.url)
         next()
       }
       const makeApp = () =>
-        new App()
+        new App<Request & { urls?: string[] }>()
           .get('/', echo)
           .use('/a1/b', echo)
           .use('/a2/b', mw, mw, mw, (req, res) => res.send({ urls: req.urls, params: req.params }))
@@ -391,7 +391,7 @@ describe('Request properties', () => {
     await fetch('/page?a=b').expect(200, 'Path to page: /page')
   })
   it('req.path works properly for optional parameters', async () => {
-    const { fetch } = InitAppAndTest((req, res) => {
+    const { fetch, app } = InitAppAndTest((req, res) => {
       res.send(`Path to page: ${req.path}`)
     }, '/:format?/:uml?')
 

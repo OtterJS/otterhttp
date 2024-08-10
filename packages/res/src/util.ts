@@ -1,14 +1,19 @@
 import mime from 'mime'
 
 export type NormalizedType = {
-  value: string
+  value: string | null
   quality?: number
   params: Record<string, string>
   originalIndex?: number
 }
 
-export const normalizeType = (type: string): NormalizedType =>
-  ~type.indexOf('/') ? acceptParams(type) : { value: mime.getType(type), params: {} }
+export const normalizeType = (type: string): NormalizedType => {
+  if (type.indexOf('/') === -1) {
+    return { value: mime.getType(type), params: {} }
+  }
+
+  return acceptParams(type)
+}
 
 export function acceptParams(str: string, index?: number): NormalizedType {
   const parts = str.split(/ *; */)

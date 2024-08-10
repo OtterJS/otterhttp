@@ -12,7 +12,7 @@ describe('Testing Router', () => {
   })
   describe('.use method', () => {
     it('new ware gets added via .use', () => {
-      const app = new Router()
+      const app = new Router<never, unknown, Response>()
 
       app.use((_: unknown, res: Response) => res.end('hi'))
 
@@ -375,7 +375,7 @@ describe('Testing HTTP methods', () => {
     expect(router.middleware[0].type).toBe('route')
   })
   it('should push a dummy GET HTTP method and its handlers and expect the middleware object to match', () => {
-    function dummyHandler(req, res) {
+    function dummyHandler(_req, res) {
       res.send('Hello World!')
     }
     const middleware: Middleware[] = []
@@ -388,12 +388,11 @@ describe('Testing HTTP methods', () => {
       path: '/',
       method: 'GET',
       type: 'route',
-      handler: dummyHandler,
-      fullPath: dummyHandler
+      handler: dummyHandler
     })
   })
   it('should push a dummy GET HTTP method containing the fullPaths array and expect the middleware object to match', () => {
-    function dummyHandler(req, res) {
+    function dummyHandler(_req, res) {
       res.send('Hello World!')
     }
     const fullPaths = ['']
@@ -402,7 +401,7 @@ describe('Testing HTTP methods', () => {
       method: 'GET',
       type: 'route',
       fullPaths: fullPaths,
-      handlers: [dummyHandler]
+      handler: dummyHandler
     })
     expect(middleware[0]).toMatchObject({
       path: '/',

@@ -6,7 +6,11 @@ import type { Request } from './request.js'
 import type { AppRenderOptions, TemplateEngineOptions } from './types.js'
 
 export const renderTemplate =
-  <O extends TemplateEngineOptions = TemplateEngineOptions>(_req: Request, res: Response, app: App) =>
+  <O extends TemplateEngineOptions = TemplateEngineOptions, Req extends Request = never, Res extends Response = never>(
+    _req: Req,
+    res: Res,
+    app: App<Req, Res>
+  ) =>
   (file: string, data?: Record<string, unknown>, options?: AppRenderOptions<O>): Response => {
     app.render(file, data ? { ...res.locals, ...data } : res.locals, options, (err: unknown, html: unknown) => {
       if (err) throw err
@@ -44,7 +48,6 @@ export interface Response<B = unknown> extends ServerResponse {
   type(type: string): Response<B>
   download(path: string, filename: string, options?: DownloadOptions, cb?: (err?: unknown) => void): Response<B>
   attachment(filename?: string): Response<B>
-  app?: App
   locals: Record<string, any>
   /**
    * Send JSON response with JSONP callback support.

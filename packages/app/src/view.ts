@@ -9,6 +9,7 @@
 
 import { statSync } from 'node:fs'
 import { basename, dirname, extname, join, resolve } from 'node:path'
+import { isString, isStringArray } from './type-guards'
 import type { TemplateEngine, TemplateEngineOptions } from './types.js'
 
 function tryStat(path: string) {
@@ -34,12 +35,12 @@ function tryStat(path: string) {
  */
 
 export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions> {
-  ext: string
-  defaultEngine: string
+  ext: string | undefined
+  defaultEngine: string | undefined
   name: string
   engine: TemplateEngine<RenderOptions>
   path: string
-  root: string | string[]
+  root: string[]
   constructor(
     name: string,
     opts: Partial<{
@@ -50,7 +51,7 @@ export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOp
   ) {
     this.ext = extname(name)
     this.name = name
-    this.root = opts.root
+    this.root = opts.root == null ? [] : isString(opts.root) ? [opts.root] : opts.root
     this.defaultEngine = opts.defaultEngine
 
     if (!this.ext && !this.defaultEngine)
@@ -60,22 +61,21 @@ export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOp
 
     if (!this.ext) {
       // get extension from default engine name
-      this.ext = this.defaultEngine[0] !== '.' ? `.${this.defaultEngine}` : this.defaultEngine
+      this.ext = this.defaultEngine && this.defaultEngine[0] !== '.' ? `.${this.defaultEngine}` : this.defaultEngine
 
       fileName += this.ext
     }
 
-    if (!opts.engines[this.ext]) throw new Error(`No engine was found for ${this.ext}`)
+    if (this.ext == null || !opts?.engines?.[this.ext]) throw new Error(`No engine was found for ${this.ext}`)
 
     this.engine = opts.engines[this.ext]
     this.path = this.#lookup(fileName)
   }
-  #lookup(name: string) {
-    let path: string
-    const roots = [].concat(this.root)
+  #lookup(name: string): string {
+    let path: string | undefined = undefined
 
-    for (let i = 0; i < roots.length && !path; i++) {
-      const root = roots[i]
+    for (let i = 0; i < this.root.length && !path; i++) {
+      const root = this.root[i]
       // resolve the path
       const loc = resolve(root, name)
       const dir = dirname(loc)
@@ -83,6 +83,14 @@ export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOp
 
       // resolve the file
       path = this.#resolve(dir, file)
+    }
+
+    if (!path) {
+      const dirs =
+        this.root.length > 1
+          ? `directories "${this.root.slice(0, -1).join('", "')}" or "${this.root[this.root.length - 1]}"`
+          : `directory "${this.root[0]}"`
+      throw new Error(`Failed to lookup view "${name}" in views ${dirs}`)
     }
 
     return path

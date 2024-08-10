@@ -4,43 +4,48 @@ import ipRegex from 'ip-regex'
 type Filter = string | RegExp
 
 const processIpFilters = (ip: string, filter: Filter[], strict: boolean): boolean => {
-  if (typeof ip !== 'string') throw new TypeError('ip-filter: expect `ip` to be a string')
+  if (strict && !ipRegex().test(ip)) throw new Error(`@tinyhttp/ip-filter: Invalid IP: ${ip}`)
 
-  if ((strict ?? true) && !ipRegex().test(ip)) throw new Error(`@tinyhttp/ip-filter: Invalid IP: ${ip}`)
-
-  const results = filter.map((f) => {
-    if (typeof f === 'string') {
-      return new RegExp(f).test(ip)
-    }
+  return filter.some((f) => {
+    if (typeof f === 'string') return f === ip
     if (f instanceof RegExp) return f.test(ip)
   })
-
-  return results.includes(true)
 }
 
 export type IPFilterOptions = {
-  ip?: string
+  getIp?: (request: Request, response: Response) => string | undefined
   strict?: boolean
   filter: Filter[]
   forbidden?: string
 }
 
-export const ipFilter =
-  (opts?: IPFilterOptions) =>
-  (req: Request & { ip?: string }, res: Response, next?: (err?: Error) => void): void => {
-    const ip = opts.ip ?? req.ip
+export const ipFilter = (opts: IPFilterOptions) => {
+  if (opts == null) throw new TypeError('opts must be provided to ipFilter()')
+  let { getIp, strict, filter, forbidden } = opts
+  getIp ??= (req: Request & { ip?: string }) => req.ip
+  strict ??= true
+  forbidden ??= '403 Forbidden'
+
+  const fail = (res: Response): void => void res.writeHead(403, forbidden).end()
+
+  return (req: Request, res: Response, next: (err?: unknown) => void): void => {
+    const ip = getIp(req, res)
+    if (ip == null) return fail(res)
+    if (typeof ip !== 'string') throw new TypeError('@tinyhttp/ip-filter: expect `getIp` to return a string')
 
     let isBadIP: boolean
 
     try {
-      isBadIP = processIpFilters(ip, opts.filter, opts.strict)
+      isBadIP = processIpFilters(ip, filter, strict)
     } catch (e) {
       next(e)
+      return
     }
 
     if (isBadIP) {
-      res.writeHead(403, opts.forbidden ?? '403 Forbidden').end()
-    } else {
-      next()
+      return fail(res)
     }
+
+    next()
   }
+}
