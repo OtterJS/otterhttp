@@ -18,11 +18,11 @@ ESM [Express](https://expressjs.com/)-like web framework for modern Node.js
 
 ## Features
 
-- ↪ Async middleware support
-- ☑ ESM-only
-- 🚀 No legacy dependencies, just the JavaScript itself
-- 🔨 Types out of the box
-- 🔥 Prebuilt middleware for modern Node.js
+- :arrow_right_hook: Async middleware support
+- :white_check_mark: ESM-only
+- :rocket: No legacy dependencies, just the JavaScript itself
+- :hammer: Types out of the box
+- :fire: Prebuilt middleware for modern Node.js
 
 Visit [otterhttp.lordfirespeed.dev](https://otterhttp.lordfirespeed.dev) for docs, guides and middleware.
 
