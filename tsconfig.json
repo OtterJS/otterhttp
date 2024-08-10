@@ -10,13 +10,12 @@
     "noImplicitAny": false,
     "noUnusedParameters": true,
     "skipLibCheck": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "resolveJsonModule": true,
     "declarationMap": true,
-    "composite": true,
     "sourceMap": true,
     "strict": true,
     "alwaysStrict": true,
@@ -26,5 +25,5 @@
     }
   },
   "include": ["**/*.ts", "**/*.json"],
-  "exclude": ["examples", "packages/*/dist", "node_modules"]
+  "exclude": ["examples", "dist", "node_modules"]
 }
