@@ -47,7 +47,7 @@ jobs:
       - run: |
           git add . 
           git commit --amend --no-edit
-          git push --force
+          git push origin HEAD:changeset-release/main --force
 
       - if: steps.changesets.outputs.published == 'true'
         run: echo "(a) new version(s) was/were published!"
