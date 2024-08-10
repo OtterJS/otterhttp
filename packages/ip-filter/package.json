@@ -24,7 +24,6 @@
     "security",
     "network"
   ],
-  "author": "v1rtl",
   "license": "LGPL-3.0-or-later",
   "dependencies": {
     "ip-regex": "^5.0.0"

@@ -11,7 +11,6 @@
     "url": "https://github.com/otterjs/otterhttp.git",
     "directory": "packages/dotenv"
   },
-  "author": "v1rtl",
   "license": "LGPL-3.0-or-later",
   "keywords": ["tinyhttp", "node.js", "web framework", "web", "backend", "dotenv"],
   "engines": {

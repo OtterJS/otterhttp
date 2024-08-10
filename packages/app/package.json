@@ -20,7 +20,6 @@
     "node": ">=14.21.3"
   },
   "keywords": ["tinyhttp", "router", "backend", "http", "framework", "api"],
-  "author": "v1rtl",
   "license": "LGPL-3.0-or-later",
   "dependencies": {
     "@otterhttp/cookie": "workspace:*",
