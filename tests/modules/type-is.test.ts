@@ -3,10 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { typeIs } from '@/packages/type-is/src'
 
 describe('typeIs', () => {
-  it('should return false when value is falsy', () => {
-    expect(typeIs('')).toBe(false)
-    expect(typeIs(null)).toBe(false)
-    expect(typeIs(undefined)).toBe(false)
+  it.each(['', false, null, undefined])("should return false when value is '%s'", (value: unknown) => {
+    expect(typeIs(value as any)).toBe(false)
   })
 
   it('should return value if types are empty', () => {
@@ -41,11 +39,12 @@ describe('typeIs', () => {
     expect(typeIs('multipart/form-data', 'multipart')).toBe('multipart')
   })
 
-  it('should return false if types are not strings', () => {
-    expect(typeIs('multipart/form-data', false as any)).toBe(false)
-    expect(typeIs('multipart/form-data', null)).toBe(false)
-    expect(typeIs('multipart/form-data', undefined)).toBe(false)
-  })
+  it.each(['', false, null, undefined])(
+    "should return false when matching against a falsy value '%s'",
+    (value: unknown) => {
+      expect(typeIs('multipart/form-data', value as any)).toBe(false)
+    }
+  )
 
   it('should return false if expected type has wrong format', () => {
     expect(typeIs('multipart/form-data', 'application/javascript/wrong')).toBe(false)
