@@ -2,6 +2,7 @@ import { createReadStream, statSync } from 'node:fs'
 import type { IncomingMessage as I, ServerResponse as S } from 'node:http'
 import { extname, isAbsolute } from 'node:path'
 import { join } from 'node:path'
+import { Writable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import mime from 'mime'
 import { createETag } from './utils.js'
@@ -43,6 +44,10 @@ export const enableCaching = (res: Res, caching: Caching): void => {
   else if (cc && caching.maxAge === 0) cc += ',must-revalidate'
 
   if (cc) res.setHeader('Cache-Control', cc)
+}
+
+const makeIndestructible = (stream: NodeJS.WritableStream) => {
+  return new Writable({ write: stream.write.bind(stream) })
 }
 
 /**
@@ -103,7 +108,7 @@ export const sendFile = <Request extends Req = Req, Response extends Res = Res>(
     res.writeHead(status, headers)
 
     const stream = createReadStream(filePath, options)
-    await pipeline(stream, res)
+    await pipeline(stream, makeIndestructible(res))
 
     return res
   }
