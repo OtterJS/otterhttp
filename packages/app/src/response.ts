@@ -20,7 +20,8 @@ export const renderTemplate =
   }
 
 export interface Response<B = unknown> extends ServerResponse {
-  header(field: string | Record<string, unknown>, val?: string | any[]): Response<B>
+  header<HeaderName extends string>(field: HeaderName, val: OutgoingHttpHeaders[HeaderName]): Response<B>
+  header(fields: OutgoingHttpHeaders): Response<B>
   set<HeaderName extends string>(field: HeaderName, val: OutgoingHttpHeaders[HeaderName]): Response<B>
   set(fields: OutgoingHttpHeaders): Response<B>
   get<HeaderName extends string>(field: HeaderName): OutgoingHttpHeaders[HeaderName]

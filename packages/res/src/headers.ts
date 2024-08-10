@@ -7,9 +7,8 @@ import mime from 'mime'
 
 const charsetRegExp = /;\s*charset\s*=/
 
-export const setHeader =
-  <Response extends Res = Res>(res: Response) =>
-  (field: string | Record<string, string | number | string[]>, val?: string | number | readonly string[]): Response => {
+export const setHeader = <Response extends Res = Res>(res: Response) => {
+  return <HeaderName extends string = string>(field: HeaderName | OutgoingHttpHeaders, val?: OutgoingHttpHeaders[HeaderName]): Response => {
     if (typeof field === 'string') {
       let value = Array.isArray(val) ? val.map(String) : String(val)
 
@@ -34,6 +33,7 @@ export const setHeader =
     }
     return res
   }
+}
 
 export const setLocationHeader =
   <Request extends Req = Req, Response extends Res = Res>(req: Request, res: Response) =>
