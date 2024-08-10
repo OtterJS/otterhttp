@@ -33,8 +33,7 @@
     "node": ">=12.20.0"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "build": "tsup",
     "type-check": "tsc --noEmit"
   }
 }
