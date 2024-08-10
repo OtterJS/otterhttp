@@ -20,8 +20,9 @@ import { View } from './view.js'
  */
 const lead = (x: string) => (x.charCodeAt(0) === 47 ? x : `/${x}`)
 
-const mount = <Req extends Request = Request, Res extends Response = Response>(fn: App<Req, Res> | Handler) =>
-  fn instanceof App ? fn.attach : fn
+const mount = <Req extends Request = Request, Res extends Response = Response>(
+  fn: App<Req, Res> | Handler<Req, Res>
+) => (fn instanceof App ? fn.attach : fn)
 
 const applyHandler =
   <Req, Res>(h: Handler<Req, Res>) =>
@@ -64,7 +65,7 @@ export class App<Req extends Request = Request, Res extends Response = Response>
 > {
   middleware: Middleware<Req, Res>[] = []
   locals: Record<string, unknown> = {}
-  noMatchHandler: Handler
+  noMatchHandler: Handler<Req, Res>
   onError: ErrorHandler<Req, Res>
   settings: AppSettings
   engines: Record<string, TemplateEngine<TemplateEngineOptions>> = {}
