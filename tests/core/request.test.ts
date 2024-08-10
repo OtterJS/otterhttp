@@ -1,9 +1,10 @@
 import { Agent } from 'node:http'
 import { makeFetch } from 'supertest-fetch'
 import { assert, afterEach, describe, expect, it, vi } from 'vitest'
-import { App } from '../../packages/app/src/app'
-import * as req from '../../packages/req/src'
-import { InitAppAndTest } from '../../test_helpers/initAppAndTest'
+
+import { App } from '@/packages/app/src'
+import * as req from '@/packages/req/src'
+import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
 vi.mock<typeof req>(import('../../packages/req/src'), async (importOriginal) => {
   const module = await importOriginal()

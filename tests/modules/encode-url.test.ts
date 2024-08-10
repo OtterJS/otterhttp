@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { encodeUrl } from '../../packages/encode-url/src'
+
+import { encodeUrl } from '@/packages/encode-url/src'
 
 describe('encodeUrl(url)', () => {
   it('should keep URL the same', () => {

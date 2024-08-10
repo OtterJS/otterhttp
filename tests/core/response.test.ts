@@ -1,8 +1,9 @@
 import { type EtaConfig, renderFile } from 'eta'
 import { makeFetch } from 'supertest-fetch'
 import { describe, expect, it } from 'vitest'
-import { App } from '../../packages/app/src/app'
-import { InitAppAndTest } from '../../test_helpers/initAppAndTest'
+
+import { App } from '@/packages/app/src'
+import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
 describe('Response properties', () => {
   it('should have default HTTP Response properties', async () => {

@@ -1,6 +1,7 @@
 import { describe, it } from 'vitest'
-import { jsonp } from '../../packages/jsonp/src/index'
-import { InitAppAndTest } from '../../test_helpers/initAppAndTest'
+
+import { jsonp } from '@/packages/jsonp/src'
+import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
 describe('jsonp', () => {
   it('when no callback is defined', async () => {

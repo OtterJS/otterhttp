@@ -1,5 +1,6 @@
-import { append } from '@/packages/vary/src'
 import { describe, expect, it } from 'vitest'
+
+import { append } from '@/packages/vary/src'
 
 describe('field', () => {
   it('should accept string', () => {

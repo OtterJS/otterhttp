@@ -2,7 +2,8 @@ import path from 'node:path'
 import { dirname } from 'dirname-filename-esm'
 import { makeFetch } from 'supertest-fetch'
 import { describe, expect, it, vi } from 'vitest'
-import type { Request, Response } from '../../packages/app/src/index.js'
+
+import type { Request, Response } from '@/packages/app/src'
 import {
   append,
   attachment,
@@ -17,8 +18,8 @@ import {
   setLinksHeader,
   setLocationHeader,
   setVaryHeader
-} from '../../packages/res/src/index.js'
-import { runServer } from '../../test_helpers/runServer'
+} from '@/packages/res/src'
+import { runServer } from '@/test_helpers/runServer'
 
 const __dirname = dirname(import.meta)
 

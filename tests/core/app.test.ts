@@ -3,10 +3,11 @@ import http from 'node:http'
 import { renderFile } from 'eta'
 import { makeFetch } from 'supertest-fetch'
 import { describe, expect, it } from 'vitest'
-import { App, type Request, type Response } from '../../packages/app/src/index'
-import type { View } from '../../packages/app/src/view'
-import type { RouterMethod } from '../../packages/router/src'
-import { InitAppAndTest } from '../../test_helpers/initAppAndTest'
+
+import { App, type Request, type Response } from '@/packages/app/src'
+import type { View } from '@/packages/app/src'
+import type { RouterMethod } from '@/packages/router/src'
+import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
 describe('Testing App', () => {
   it('should launch a basic server', async () => {

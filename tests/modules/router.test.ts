@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import type { Response } from '../../packages/app/src'
-import { type Middleware, Router, pushMiddleware } from '../../packages/router/src'
+
+import type { Response } from '@/packages/app/src'
+import { type Middleware, Router, pushMiddleware } from '@/packages/router/src'
 
 describe('Testing Router', () => {
   describe('Basic', () => {

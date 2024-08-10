@@ -1,7 +1,8 @@
 import type { Ranges } from 'header-range-parser'
 import { makeFetch } from 'supertest-fetch'
 import { describe, expect, it } from 'vitest'
-import { App } from '../../packages/app/src'
+
+import { App } from '@/packages/app/src'
 import {
   checkIfXMLHttpRequest,
   getAccepts,
@@ -12,8 +13,8 @@ import {
   getRangeFromHeader,
   getRequestHeader,
   reqIs
-} from '../../packages/req/src'
-import { runServer } from '../../test_helpers/runServer'
+} from '@/packages/req/src'
+import { runServer } from '@/test_helpers/runServer'
 
 describe('Request extensions', () => {
   describe('req.get(header)', () => {

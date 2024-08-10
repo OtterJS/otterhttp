@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { typeIs } from '../../packages/type-is/src'
+
+import { typeIs } from '@/packages/type-is/src'
 
 describe('typeIs', () => {
   it('should return false when value is falsy', () => {

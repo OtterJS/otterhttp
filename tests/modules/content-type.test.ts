@@ -1,5 +1,6 @@
-import * as contentType from '@/packages/content-type/src/index'
 import { describe, expect, it } from 'vitest'
+
+import * as contentType from '@/packages/content-type/src/index'
 
 describe('format', () => {
   it('should format basic type', () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import * as cookie from '../../packages/cookie/src/index'
+
+import * as cookie from '@/packages/cookie/src'
 
 describe('Cookie parsing', () => {
   it('should parse basic cookies', () => {
