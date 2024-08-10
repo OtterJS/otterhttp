@@ -18,7 +18,8 @@
   "author": "v1rtl",
   "license": "MIT",
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@otterhttp/forwarded": "workspace:*",

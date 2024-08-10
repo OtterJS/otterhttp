@@ -21,7 +21,8 @@
   "exports": "./dist/index.js",
   "files": ["dist"],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {},
   "keywords": ["http", "esm", "es", "vary", "nodejs", "javascript"]
