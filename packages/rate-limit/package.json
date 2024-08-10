@@ -33,8 +33,7 @@
   "author": "Luiginator",
   "license": "MIT",
   "scripts": {
-    "build": "tsup",
-    "type-check": "tsc --noEmit"
+    "build": "tsup"
   },
   "dependencies": {
     "@otterhttp/send": "workspace:*"

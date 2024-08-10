@@ -32,7 +32,6 @@
     "regexparam": "^2.0.2"
   },
   "scripts": {
-    "build": "tsup",
-    "type-check": "tsc --noEmit"
+    "build": "tsup"
   }
 }

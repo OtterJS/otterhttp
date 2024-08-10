@@ -19,8 +19,7 @@
   "author": "v1rtl",
   "license": "MIT",
   "scripts": {
-    "build": "tsup",
-    "type-check": "tsc --noEmit"
+    "build": "tsup"
   },
   "dependencies": {}
 }

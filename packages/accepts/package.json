@@ -28,7 +28,6 @@
     "negotiator": "^0.6.3"
   },
   "scripts": {
-    "build": "tsup",
-    "type-check": "tsc --noEmit"
+    "build": "tsup"
   }
 }

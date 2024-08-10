@@ -33,7 +33,6 @@
     "node": ">=12.20.0"
   },
   "scripts": {
-    "build": "tsup",
-    "type-check": "tsc --noEmit"
+    "build": "tsup"
   }
 }

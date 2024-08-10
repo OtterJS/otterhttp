@@ -21,8 +21,7 @@
   "exports": "./dist/index.js",
   "files": ["dist"],
   "scripts": {
-    "build": "tsup",
-    "type-check": "tsc --noEmit"
+    "build": "tsup"
   },
   "dependencies": {}
 }
