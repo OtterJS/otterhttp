@@ -1,4 +1,4 @@
-# @tinyhttp/vary
+# @otterhttp/vary
 
 [![Version][v-badge-url]][npm-url] [![Downloads][dl-badge-url]][npm-url] [![GitHub Workflow Status][gh-actions-img]][github-actions] [![Codecov][cov-badge-url]][cov-url]
 
@@ -9,13 +9,13 @@ Manipulate the HTTP Vary header
 ## Install
 
 ```sh
-pnpm i @tinyhttp/vary
+pnpm i @otterhttp/vary
 ```
 
 ## API
 
 ```ts
-import { vary, append } from '@tinyhttp/vary'
+import { vary, append } from '@otterhttp/vary'
 ```
 
 ### `vary(res, field)`

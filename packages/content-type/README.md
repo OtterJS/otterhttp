@@ -9,13 +9,13 @@ Create and parse HTTP Content-Type header according to RFC 7231
 ## Install
 
 ```sh
-pnpm i @tinyhttp/content-type
+pnpm i @otterhttp/content-type
 ```
 
 ## API
 
 ```ts
-import { parse, format } from '@tinyhttp/content-type'
+import { parse, format } from '@otterhttp/content-type'
 ```
 
 ### `parse(string: string | Request | Response)`
