@@ -27,7 +27,9 @@ export type DotenvConfigOptions = {
   debug: boolean
 }
 
-export type DotenvConfigOutput = { error: unknown } | { parsed: DotenvParseOutput }
+export type DotenvConfigOutput =
+  | { parsed?: undefined; error: unknown }
+  | { parsed: DotenvParseOutput; error?: undefined }
 
 export type config = (options?: DotenvConfigOptions) => DotenvConfigOutput
 /* c8 ignore stop */
