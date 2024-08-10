@@ -14,7 +14,7 @@ You should have received [a copy of the GNU Lesser General Public License](./lic
 along with this library; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This library is based upon [tinyhttp](https://github.com/tinyhttp/tinyhttp).  
+This library is based upon [tinyhttp](https://github.com/otterjs/otterhttp).  
 Copyright (c) 2020 v 1 r t l  
 [v1rtl](https://github.com/talentlessguy) licenses the tinyhttp project to Lordfirespeed under the terms of the 
 [MIT license](./licenses/mit.md).

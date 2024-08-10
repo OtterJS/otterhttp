@@ -6,12 +6,12 @@
   "homepage": "https://tinyhttp.v1rtl.site",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinyhttp/tinyhttp.git",
+    "url": "https://github.com/otterjs/otterhttp.git",
     "directory": "packages/app"
   },
   "funding": {
     "type": "individual",
-    "url": "https://github.com/tinyhttp/tinyhttp?sponsor=1"
+    "url": "https://github.com/otterjs/otterhttp?sponsor=1"
   },
   "types": "./dist/index.d.ts",
   "exports": "./dist/index.js",

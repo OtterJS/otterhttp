@@ -18,7 +18,11 @@
     "composite": true,
     "sourceMap": true,
     "strict": true,
-    "alwaysStrict": true
+    "alwaysStrict": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   "include": ["*.json"],
   "exclude": ["examples", "packages/*/dist", "node_modules"]
