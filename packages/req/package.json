@@ -3,7 +3,7 @@
   "version": "2.2.3",
   "type": "module",
   "description": "request extensions for tinyhttp",
-  "homepage": "https://tinyhttp.v1rtl.site",
+  "homepage": "https://otterhttp.lordfirespeed.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/otterjs/otterhttp.git",

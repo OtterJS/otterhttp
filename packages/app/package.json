@@ -3,7 +3,7 @@
   "version": "2.4.0",
   "description": "0-legacy, tiny & fast web framework as a replacement of Express",
   "type": "module",
-  "homepage": "https://tinyhttp.v1rtl.site",
+  "homepage": "https://otterhttp.lordfirespeed.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/otterjs/otterhttp.git",
