@@ -10,7 +10,7 @@
 "@otterhttp/forwarded": major
 "@otterhttp/ip-filter": major
 "@otterhttp/jsonp": major
-"@otterhttp/proxy-addr": major
+"@otterhttp/proxy-address": major
 "@otterhttp/rate-limit": major
 "@otterhttp/req": major
 "@otterhttp/res": major

@@ -1,5 +1,5 @@
 {
-  "name": "@otterhttp/proxy-addr",
+  "name": "@otterhttp/proxy-address",
   "version": "2.2.0",
   "type": "module",
   "description": "proxy-addr rewrite with TypeScript and ESM support",

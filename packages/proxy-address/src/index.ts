@@ -55,7 +55,7 @@ const trustNone: TrustFunction = () => false
  * @param req
  * @param trust
  */
-function alladdrs(req: Req, trust?: Trust): Array<string | undefined> {
+function allAddresses(req: Req, trust?: Trust): Array<string | undefined> {
   // get addresses
 
   const addrs = forwarded(req)
@@ -164,9 +164,9 @@ function parseNetmask(netmask: string) {
  * @param trust
  * @public
  */
-export function proxyaddr(req: Req, trust: Trust): string | undefined {
+function proxyAddress(req: Req, trust: Trust): string | undefined {
   if (trust == null) throw new TypeError('trust argument cannot be null-ish')
-  const addrs = alladdrs(req, trust)
+  const addrs = allAddresses(req, trust)
 
   return addrs[addrs.length - 1]
 }
@@ -219,5 +219,4 @@ function trustSingle(subnet: Subnet): TrustFunction {
   }
 }
 
-export { alladdrs as all }
-export { compile }
+export { allAddresses, compile, proxyAddress }
