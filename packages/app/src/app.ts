@@ -1,14 +1,14 @@
 import { type Server, createServer } from 'node:http'
-import { getPathname } from '@otterhttp/req'
+import { Request } from '@otterhttp/req'
 import type { Handler, Middleware, NextFunction, UseMethodParams } from '@otterhttp/router'
 import { Router, pushMiddleware } from '@otterhttp/router'
+import { type URLParams, getPathname, getURLParams } from '@otterhttp/url'
 import { parse as rg } from 'regexparam'
+
 import { extendMiddleware } from './extend.js'
 import type { TemplateEngineOptions } from './index.js'
 import type { ErrorHandler } from './onError.js'
 import { onErrorHandler } from './onError.js'
-import { getURLParams } from './request.js'
-import type { Request, URLParams } from './request.js'
 import type { Response } from './response.js'
 import { isString, isStringArray } from './type-guards'
 import type { AppConstructor, AppRenderOptions, AppSettings, TemplateEngine } from './types.js'
@@ -413,6 +413,6 @@ export class App<Req extends Request = Request, Res extends Response = Response>
    * @param host server listening host
    */
   listen(port?: number, cb?: () => void, host?: string): Server {
-    return createServer().on('request', this.attach).listen(port, host, cb)
+    return createServer({ IncomingMessage: Request }).on('request', this.attach).listen(port, host, cb)
   }
 }
