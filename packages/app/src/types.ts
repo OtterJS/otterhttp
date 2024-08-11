@@ -10,7 +10,6 @@ import type { View } from './view.js'
  * tinyhttp App has a few settings for toggling features
  */
 export type AppSettings = Partial<{
-  networkExtensions: boolean
   subdomainOffset: number
   bindAppToReqRes: boolean
   xPoweredBy: string | boolean
