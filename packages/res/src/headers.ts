@@ -44,7 +44,7 @@ export const setLocationHeader =
     let loc = url
 
     // "back" is an alias for the referrer
-    if (url === 'back') loc = (getRequestHeader(req)('Referrer') as string) || '/'
+    if (url === 'back') loc = getRequestHeader(req, 'referer') || '/'
 
     // set location
     res.setHeader('Location', encodeUrl(loc))
