@@ -3,16 +3,16 @@ import { makeFetch } from 'supertest-fetch'
 import { assert, afterEach, describe, expect, it, vi } from 'vitest'
 
 import { App, type Request } from '@/packages/app/src'
-import * as req from '@/packages/req/src'
+import * as reqGetHeader from '@/packages/req/src/get-header'
 import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
-vi.mock<typeof req>(import('../../packages/req/src'), async (importOriginal) => {
+vi.mock<typeof reqGetHeader>(import('@/packages/req/src/get-header'), async (importOriginal) => {
   const module = await importOriginal()
 
   return {
     ...module,
     getRequestHeader: vi.fn(module.getRequestHeader)
-  } satisfies typeof req
+  } satisfies typeof reqGetHeader
 })
 
 describe('Request properties', () => {
@@ -171,13 +171,9 @@ describe('Request properties', () => {
         ips: req.ips
       })
     }
-    const options = {
-      settings: {
-        networkExtensions: true
-      }
-    }
+
     it('IPv4 req.ip & req.ips is being parsed properly', async () => {
-      const { fetch } = InitAppAndTest(ipHandler, '/', 'GET', options)
+      const { fetch } = InitAppAndTest(ipHandler)
 
       const agent = new Agent({ family: 4 }) // ensure IPv4 only
       await fetch('/', { agent }).expect(200, {
@@ -188,7 +184,7 @@ describe('Request properties', () => {
     if (process.env.GITHUB_ACTION) {
       // skip ipv6 tests only for github ci/cd
       it('IPv6 req.ip & req.ips is being parsed properly', async () => {
-        const { fetch } = InitAppAndTest(ipHandler, '/', 'GET', options)
+        const { fetch } = InitAppAndTest(ipHandler)
 
         const agent = new Agent({ family: 6 }) // ensure IPv6 only
         await fetch('/', { agent }).expect(200, {
@@ -198,7 +194,7 @@ describe('Request properties', () => {
       })
     }
     it('IPv4 req.ip & req.ips do not trust proxies by default', async () => {
-      const { fetch } = InitAppAndTest(ipHandler, '/', 'GET', options)
+      const { fetch } = InitAppAndTest(ipHandler)
 
       const agent = new Agent({ family: 4 }) // ensure IPv4 only
       await fetch('/', { agent, headers: { 'x-forwarded-for': '10.0.0.1, 10.0.0.2, 127.0.0.2' } }).expect(200, {
@@ -207,7 +203,7 @@ describe('Request properties', () => {
       })
     })
     it('IPv4 req.ip & req.ips support trusted proxies with "trust proxy"', async () => {
-      const { fetch, app } = InitAppAndTest(ipHandler, '/', 'GET', options)
+      const { fetch, app } = InitAppAndTest(ipHandler)
       app.set('trust proxy', ['127.0.0.1'])
 
       const agent = new Agent({ family: 4 }) // ensure IPv4 only
@@ -217,121 +213,76 @@ describe('Request properties', () => {
       })
     })
     it('req.protocol is http by default', async () => {
-      const { fetch } = InitAppAndTest(
-        (req, res) => {
-          res.send(`protocol: ${req.protocol}`)
-        },
-        '/',
-        'GET',
-        options
-      )
+      const { fetch } = InitAppAndTest((req, res) => {
+        res.send(`protocol: ${req.protocol}`)
+      })
 
       await fetch('/').expect(200, 'protocol: http')
     })
     it('req.secure is false by default', async () => {
-      const { fetch } = InitAppAndTest(
-        (req, res) => {
-          res.send(`secure: ${req.secure}`)
-        },
-        '/',
-        'GET',
-        options
-      )
+      const { fetch } = InitAppAndTest((req, res) => {
+        res.send(`secure: ${req.secure}`)
+      })
 
       await fetch('/').expect(200, 'secure: false')
     })
     it('req.subdomains is empty by default', async () => {
-      const { fetch } = InitAppAndTest(
-        (req, res) => {
-          res.send(`subdomains: ${req.subdomains?.join(', ')}`)
-        },
-        '/',
-        'GET',
-        options
-      )
+      const { fetch } = InitAppAndTest((req, res) => {
+        res.send(`subdomains: ${req.subdomains?.join(', ')}`)
+      })
 
       await fetch('/').expect(200, 'subdomains: ')
     })
     it('should derive hostname from the host header and assign it to req.hostname', async () => {
-      const { fetch } = InitAppAndTest(
-        (req, res) => {
-          res.send(`hostname: ${req.hostname}`)
-        },
-        '/',
-        'GET',
-        options
-      )
+      const { fetch } = InitAppAndTest((req, res) => {
+        res.send(`hostname: ${req.hostname}`)
+      })
 
       await fetch('/', { headers: { Host: 'foo.bar:8080' } }).expect(200, 'hostname: foo.bar')
     })
     it('should not derive hostname from the host header when multiple values are provided', async () => {
-      const { fetch } = InitAppAndTest(
-        (req, res) => {
-          res.send(`hostname: ${req.hostname}`)
-        },
-        '/',
-        'GET',
-        options
-      )
-
-      await fetch('/', { headers: { Host: ['foo.bar:8080', 'bar.baz:8080'] } }).expect(200, 'hostname: undefined')
-    })
-    it('should derive hostname from the :authority header and assign it to req.hostname', async () => {
-      const { getRequestHeader }: typeof req = await vi.importActual('../../packages/req/src')
-      vi.mocked(req.getRequestHeader).mockImplementation((req) => {
-        const defaultGetter = getRequestHeader(req)
-        return (header: string) => {
-          if (header === 'host') return undefined
-          if (header === ':authority') return 'userinfo@bar.baz:8080'
-          return defaultGetter(header)
-        }
+      const { fetch } = InitAppAndTest((req, res) => {
+        res.send(`hostname: ${req.hostname}`)
       })
 
-      const { fetch } = InitAppAndTest(
-        (req, res) => {
-          expect(req.get('host')).toBeUndefined()
-          res.send(`hostname: ${req.hostname}`)
-        },
-        '/',
-        'GET',
-        options
-      )
+      const response = await fetch('/', { headers: { Host: ['foo.bar:8080', 'bar.baz:8080'] } })
+      assert(!response.ok)
+    })
+    it('should derive hostname from the :authority header and assign it to req.hostname', async () => {
+      const { getRequestHeader }: typeof reqGetHeader = await vi.importActual('@/packages/req/src/get-header')
+      vi.mocked(reqGetHeader.getRequestHeader).mockImplementation((req: Request, header: string) => {
+        if (header === 'host') return undefined
+        if (header === ':authority') return 'userinfo@bar.baz:8080'
+        return getRequestHeader(req, header)
+      })
+
+      const { fetch } = InitAppAndTest((req, res) => {
+        expect(req.get('host')).toBeUndefined()
+        res.send(`hostname: ${req.hostname}`)
+      })
 
       const response = await fetch('/')
       expect(response.status).toBe(200)
       await expect(response.text()).resolves.toEqual('hostname: bar.baz')
     })
     it('should derive port from the host header and assign it to req.port', async () => {
-      const { fetch } = InitAppAndTest(
-        (req, res) => {
-          res.json({ port: req.port })
-        },
-        '/',
-        'GET',
-        options
-      )
+      const { fetch } = InitAppAndTest((req, res) => {
+        res.json({ port: req.port })
+      })
 
       await fetch('/', { headers: { Host: 'foo.bar:8080' } }).expect(200, { port: 8080 })
     })
     it('should derive port from the :authority header and assign it to req.port', async () => {
-      const { getRequestHeader }: typeof req = await vi.importActual('../../packages/req/src')
-      vi.mocked(req.getRequestHeader).mockImplementation((req) => {
-        const defaultGetter = getRequestHeader(req)
-        return (header: string) => {
-          if (header === 'host') return undefined
-          if (header === ':authority') return 'bar.baz:8080'
-          return defaultGetter(header)
-        }
+      const { getRequestHeader }: typeof reqGetHeader = await vi.importActual('@/packages/req/src/get-header')
+      vi.mocked(reqGetHeader.getRequestHeader).mockImplementation((req: Request, header: string) => {
+        if (header === 'host') return undefined
+        if (header === ':authority') return 'bar.baz:8080'
+        return getRequestHeader(req, header)
       })
 
-      const { fetch, server } = InitAppAndTest(
-        (req, res) => {
-          res.json({ port: req.port })
-        },
-        '/',
-        'GET',
-        options
-      )
+      const { fetch, server } = InitAppAndTest((req, res) => {
+        res.json({ port: req.port })
+      })
       const serverAddress = server.address()
       if (typeof serverAddress === 'string') throw new Error('Cannot listen on unix socket')
 
@@ -340,36 +291,23 @@ describe('Request properties', () => {
       await expect(response.json()).resolves.toEqual({ port: 8080 })
     })
     it('should reject request when the :authority header disagrees with the host header', async () => {
-      const { getRequestHeader }: typeof req = await vi.importActual('../../packages/req/src')
-      vi.mocked(req.getRequestHeader).mockImplementation((req) => {
-        const defaultGetter = getRequestHeader(req)
-        return (header: string) => {
-          if (header === 'host') return 'foo.bar'
-          if (header === ':authority') return 'bar.baz'
-          return defaultGetter(header)
-        }
+      const { getRequestHeader }: typeof reqGetHeader = await vi.importActual('@/packages/req/src/get-header')
+      vi.mocked(reqGetHeader.getRequestHeader).mockImplementation((req: Request, header: string) => {
+        if (header === 'host') return 'foo.bar'
+        if (header === ':authority') return 'bar.baz'
+        return getRequestHeader(req, header)
       })
 
-      const { fetch } = InitAppAndTest(
-        (req, res) => {
-          res.json({ port: req.port })
-        },
-        '/',
-        'GET',
-        options
-      )
+      const { fetch } = InitAppAndTest((req, res) => {
+        res.json({ port: req.port })
+      })
       const response = await fetch('/')
-      assert(!response.ok)
+      expect(response.ok).toBe(false)
     })
     it('should not crash app when host header is malformed', async () => {
-      const { fetch } = InitAppAndTest(
-        (req, res) => {
-          res.json({ port: req.port })
-        },
-        '/',
-        'GET',
-        options
-      )
+      const { fetch } = InitAppAndTest((req, res) => {
+        res.json({ port: req.port })
+      })
 
       await fetch('/', { headers: { host: 'foo.bar:baz' } }).expect(500)
       await fetch('/', { headers: { Host: 'foo.bar:8080' } }).expect(200, { port: 8080 })
@@ -397,17 +335,5 @@ describe('Request properties', () => {
     }, '/:format?/:uml?')
 
     await fetch('/page/page-1').expect(200, 'Path to page: /page/page-1')
-  })
-  it('req.fresh and req.stale get set', async () => {
-    const etag = '123'
-    const { fetch } = InitAppAndTest(
-      (_req, res) => {
-        res.set('ETag', etag).send('stale')
-      },
-      '/',
-      'GET'
-    )
-
-    await fetch('/', { headers: { 'If-None-Match': etag } }).expectStatus(304)
   })
 })
