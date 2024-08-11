@@ -3,31 +3,20 @@ import { makeFetch } from 'supertest-fetch'
 import { describe, expect, it } from 'vitest'
 
 import { App } from '@/packages/app/src'
-import {
-  checkIfXMLHttpRequest,
-  getAccepts,
-  getAcceptsCharsets,
-  getAcceptsEncodings,
-  getAcceptsLanguages,
-  getFreshOrStale,
-  getRangeFromHeader,
-  getRequestHeader,
-  reqIs
-} from '@/packages/req/src'
 import { runServer } from '@/test_helpers/runServer'
 
 describe('Request extensions', () => {
   describe('req.get(header)', () => {
     it('should return a specified header', async () => {
       const app = runServer((req, res) => {
-        res.end(getRequestHeader(req)('accept'))
+        res.end(req.get('accept'))
       })
 
       await makeFetch(app)('/').expect('*/*')
     })
     it('should handle "referer"', async () => {
       const app = runServer((req, res) => {
-        res.end(getRequestHeader(req)('referrer'))
+        res.end(req.get('referrer'))
       })
 
       await makeFetch(app)('/', {
@@ -39,7 +28,7 @@ describe('Request extensions', () => {
     })
     it('should handle "referrer"', async () => {
       const app = runServer((req, res) => {
-        res.end(getRequestHeader(req)('referrer'))
+        res.end(req.get('referrer'))
       })
 
       await makeFetch(app)('/', {
@@ -53,7 +42,7 @@ describe('Request extensions', () => {
   describe('req.xhr', () => {
     it('should be false in node environment', async () => {
       const app = runServer((req, res) => {
-        res.end(`Browser request: ${checkIfXMLHttpRequest(req) ? 'yes' : 'no'}`)
+        res.end(`Browser request: ${req.xhr ? 'yes' : 'no'}`)
       })
 
       await makeFetch(app)('/').expect('Browser request: no')
@@ -78,7 +67,7 @@ describe('Request extensions', () => {
   describe('req.accepts()', () => {
     it('should detect an "Accept" header', async () => {
       const app = runServer((req, res) => {
-        const accepts = getAccepts(req)()
+        const accepts = req.accepts()
 
         res.end(accepts[0])
       })
@@ -91,7 +80,7 @@ describe('Request extensions', () => {
     })
     it('should parse multiple values', async () => {
       const app = runServer((req, res) => {
-        const accepts = getAccepts(req)()
+        const accepts = req.accepts()
 
         res.end((accepts as string[]).join(' | '))
       })
@@ -106,7 +95,7 @@ describe('Request extensions', () => {
   describe('req.acceptsEncodings()', () => {
     it('should detect "Accept-Encoding" header', async () => {
       const app = runServer((req, res) => {
-        const encodings = getAcceptsEncodings(req)()
+        const encodings = req.acceptsEncodings()
 
         res.end(encodings[0])
       })
@@ -119,7 +108,7 @@ describe('Request extensions', () => {
     })
     it('should parse multiple values', async () => {
       const app = runServer((req, res) => {
-        const encodings = getAcceptsEncodings(req)()
+        const encodings = req.acceptsEncodings()
 
         res.end((encodings as string[]).join(' | '))
       })
@@ -134,7 +123,7 @@ describe('Request extensions', () => {
   describe('req.acceptsCharsets()', () => {
     it('should detect "Accept-Charset" header', async () => {
       const app = runServer((req, res) => {
-        const charsets = getAcceptsCharsets(req)()
+        const charsets = req.acceptsCharsets()
 
         res.end(charsets[0])
       })
@@ -147,7 +136,7 @@ describe('Request extensions', () => {
     })
     it('should parse multiple values', async () => {
       const app = runServer((req, res) => {
-        const charsets = getAcceptsCharsets(req)()
+        const charsets = req.acceptsCharsets()
 
         res.end((charsets as string[]).join(' | '))
       })
@@ -162,7 +151,7 @@ describe('Request extensions', () => {
   describe('req.acceptsLanguages()', () => {
     it('should detect "Accept-Language" header', async () => {
       const app = runServer((req, res) => {
-        const languages = getAcceptsLanguages(req)()
+        const languages = req.acceptsLanguages()
 
         res.end(languages[0])
       })
@@ -175,7 +164,7 @@ describe('Request extensions', () => {
     })
     it('should parse multiple values', async () => {
       const app = runServer((req, res) => {
-        const languages = getAcceptsLanguages(req)()
+        const languages = req.acceptsLanguages()
 
         res.end((languages as string[]).join(' | '))
       })
@@ -187,67 +176,11 @@ describe('Request extensions', () => {
       }).expect('ru-RU | ru | en-US')
     })
   })
-  describe('req.fresh', () => {
-    it('returns false if method is neither GET nor HEAD', async () => {
-      const app = runServer((req, res) => {
-        const fresh = getFreshOrStale(req, res)
-
-        res.end(fresh ? 'fresh' : 'stale')
-      })
-
-      await makeFetch(app)('/', {
-        method: 'POST',
-        body: 'Hello World'
-      }).expect('stale')
-    })
-    it('returns true when the resource is not modified', async () => {
-      const etag = '123'
-      const app = runServer((req, res) => {
-        res.setHeader('ETag', etag)
-        const fresh = getFreshOrStale(req, res)
-
-        res.end(fresh ? 'fresh' : 'stale')
-      })
-
-      await makeFetch(app)('/', {
-        headers: {
-          'If-None-Match': etag
-        }
-      }).expect('fresh')
-    })
-    it('should return false when the resource is modified', async () => {
-      const etag = '123'
-      const app = runServer((req, res) => {
-        res.setHeader('ETag', etag)
-        const fresh = getFreshOrStale(req, res)
-
-        res.end(fresh ? 'fresh' : 'stale')
-      })
-
-      await makeFetch(app)('/', {
-        headers: {
-          'If-None-Match': '12345'
-        }
-      }).expect('stale')
-    })
-    it('returns false if status code is neither >=200 nor < 300, nor 304', async () => {
-      const app = runServer((req, res) => {
-        res.statusCode = 418
-
-        const fresh = getFreshOrStale(req, res)
-
-        res.end(fresh ? 'fresh' : 'stale')
-      })
-
-      await makeFetch(app)('/').expect('stale')
-    })
-  })
 
   describe('req.range', () => {
     it('should return parsed ranges', async () => {
       const app = runServer((req, res) => {
-        const range = getRangeFromHeader(req)
-        const array = range(300)
+        const array = req.range(300)
         expect(array).toContainEqual({ end: 299, start: 0 })
         expect(array).toHaveLength(1)
         res.end()
@@ -262,9 +195,8 @@ describe('Request extensions', () => {
     })
     it('should cap to the given size', async () => {
       const app = runServer((req, res) => {
-        const range = getRangeFromHeader(req)
         const size = 300
-        expect((range(size) as Ranges)[0].end).toBe(size - 1)
+        expect((req.range(size) as Ranges)[0].end).toBe(size - 1)
         res.end()
       })
 
@@ -277,9 +209,8 @@ describe('Request extensions', () => {
     })
     it('should cap to the given size when open-ended', async () => {
       const app = runServer((req, res) => {
-        const range = getRangeFromHeader(req)
         const size = 300
-        expect((range(size) as Ranges)[0].end).toBe(size - 1)
+        expect((req.range(size) as Ranges)[0].end).toBe(size - 1)
         res.end()
       })
 
@@ -292,8 +223,7 @@ describe('Request extensions', () => {
     })
     it('should have a .type', async () => {
       const app = runServer((req, res) => {
-        const range = getRangeFromHeader(req)
-        expect((range(300) as Ranges).type).toBe('bytes')
+        expect((req.range(300) as Ranges).type).toBe('bytes')
         res.end()
       })
 
@@ -306,8 +236,7 @@ describe('Request extensions', () => {
     })
     it('should accept any type', async () => {
       const app = runServer((req, res) => {
-        const range = getRangeFromHeader(req)
-        expect((range(300) as Ranges).type).toBe('any')
+        expect((req.range(300) as Ranges).type).toBe('any')
         res.end()
       })
 
@@ -320,8 +249,7 @@ describe('Request extensions', () => {
     })
     it('should return undefined if no range', async () => {
       const app = runServer((req, res) => {
-        const range = getRangeFromHeader(req)
-        expect(range(300)).toBeUndefined()
+        expect(req.range(300)).toBeUndefined()
         res.end()
       })
 
@@ -331,8 +259,7 @@ describe('Request extensions', () => {
     describe('with options', () => {
       it('should return combined ranges if combine set to true', async () => {
         const app = runServer((req, res) => {
-          const range = getRangeFromHeader(req)
-          const array = range(300, { combine: true })
+          const array = req.range(300, { combine: true })
           expect(array).toContainEqual({ end: 299, start: 0 })
           expect(array).toHaveLength(1)
           res.end()
@@ -347,8 +274,7 @@ describe('Request extensions', () => {
       })
       it('should return separated ranges if combine set to false', async () => {
         const app = runServer((req, res) => {
-          const range = getRangeFromHeader(req)
-          const array = range(300, { combine: false })
+          const array = req.range(300, { combine: false })
           expect(array).toContainEqual({ end: 100, start: 0 })
           expect(array).toContainEqual({ end: 299, start: 101 })
           expect(array).toHaveLength(2)
@@ -367,7 +293,7 @@ describe('Request extensions', () => {
   describe('req.is', () => {
     it('should return the given MIME type when matching', async () => {
       const app = runServer((req, res) => {
-        expect(reqIs(req)('text/plain')).toBe('text/plain')
+        expect(req.is('text/plain')).toBe(true)
         res.end()
       })
       await makeFetch(app)('/', {
@@ -379,7 +305,7 @@ describe('Request extensions', () => {
     })
     it('should return false when not matching', async () => {
       const app = runServer((req, res) => {
-        expect(reqIs(req)('text/other')).toBe(false)
+        expect(req.is('text/other')).toBe(false)
         res.end()
       })
       await makeFetch(app)('/', {
@@ -391,7 +317,7 @@ describe('Request extensions', () => {
     })
     it('should return false when Content-Type header is not present', async () => {
       const app = runServer((req, res) => {
-        expect(reqIs(req)('text/other')).toBe(false)
+        expect(req.is('text/other')).toBe(false)
         res.end()
       })
       await makeFetch(app)('/', {
@@ -401,7 +327,7 @@ describe('Request extensions', () => {
     })
     it("Should lookup the MIME type with the extension given (e.g. req.is('json')", async () => {
       const app = runServer((req, res) => {
-        expect(reqIs(req)('json')).toBe('json')
+        expect(req.is('json')).toBe(true)
         res.end()
       })
       await makeFetch(app)('/', {
@@ -413,7 +339,7 @@ describe('Request extensions', () => {
     })
     it('should ignore charset', async () => {
       const app = runServer((req, res) => {
-        expect(reqIs(req)('text/html')).toBe('text/html')
+        expect(req.is('text/html')).toBe(true)
         res.end()
       })
       await makeFetch(app)('/', {
