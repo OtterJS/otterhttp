@@ -71,7 +71,7 @@ export const getFreshness = (
   const method = req.method
   const status = res.statusCode
 
-  // GET or HEAD for weak freshness.ts validation only
+  // GET or HEAD for weak freshness validation only
   if (method !== 'GET' && method !== 'HEAD') return false
 
   // 2xx or 304 as per rfc2616 14.26
