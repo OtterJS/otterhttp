@@ -22,8 +22,10 @@
   },
   "dependencies": {
     "@otterhttp/accepts": "workspace:*",
+    "@otterhttp/proxy-address": "workspace:*",
     "@otterhttp/type-is": "workspace:*",
     "@otterhttp/url": "workspace:*",
+    "@otterhttp/router": "workspace:*",
     "header-range-parser": "^1.1.3"
   }
 }
