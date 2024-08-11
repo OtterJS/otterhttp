@@ -1,62 +1,8 @@
-import type { IncomingHttpHeaders, IncomingMessage as Request, ServerResponse as Response } from 'node:http'
-import { type Options, type Ranges, type Result, parseRange } from 'header-range-parser'
+export * from './accepts'
+export * from './addresses'
+export * from './get-header'
+export * from './host'
+export * from './protocol'
+export * from './range'
 
-import { typeIs } from '@otterhttp/type-is'
-import { fresh } from './fresh.js'
-
-export * from './accepts.js'
-
-export * from '@otterhttp/url'
-
-export const getRequestHeader = (req: Pick<Request, 'headers'>) => {
-  return <HeaderName extends string>(header: HeaderName): IncomingHttpHeaders[HeaderName] => {
-    const lc = header.toLowerCase()
-
-    switch (lc) {
-      case 'referer':
-      case 'referrer':
-        return req.headers.referrer ?? req.headers.referer
-      default:
-        return req.headers[lc]
-    }
-  }
-}
-
-export const getRangeFromHeader = (req: Pick<Request, 'headers'>) => {
-  return (size: number, options?: Options): Result | Ranges | undefined => {
-    let range = getRequestHeader(req)('range')
-
-    if (Array.isArray(range)) range = range.pop()
-    if (!range) return
-
-    return parseRange(size, range, options)
-  }
-}
-
-export const getFreshOrStale = (
-  req: Pick<Request, 'headers' | 'method'>,
-  res: Pick<Response, 'getHeader' | 'statusCode'>
-): boolean => {
-  const method = req.method
-  const status = res.statusCode
-
-  // GET or HEAD for weak freshness validation only
-  if (method !== 'GET' && method !== 'HEAD') return false
-
-  // 2xx or 304 as per rfc2616 14.26
-  if ((status >= 200 && status < 300) || status === 304) {
-    return fresh(req.headers, {
-      etag: res.getHeader('ETag') as string,
-      'last-modified': res.getHeader('Last-Modified') as string
-    })
-  }
-
-  return false
-}
-
-export const checkIfXMLHttpRequest = (req: Pick<Request, 'headers'>): boolean =>
-  req.headers['x-requested-with'] === 'XMLHttpRequest'
-
-export const reqIs = (req: Pick<Request, 'headers'>) => {
-  return (...types: string[]) => typeIs(req.headers['content-type'], ...types)
-}
+export { Request } from './prototype'
