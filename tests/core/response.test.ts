@@ -231,4 +231,17 @@ describe('Response methods', () => {
       await fetch('/').expect(200, 'Hello from v1rtl')
     })
   })
+
+  it('res.fresh and res.stale get set', async () => {
+    const etag = '123'
+    const { fetch } = InitAppAndTest(
+      (_req, res) => {
+        res.set('ETag', etag).send('stale')
+      },
+      '/',
+      'GET'
+    )
+
+    await fetch('/', { headers: { 'If-None-Match': etag } }).expectStatus(304)
+  })
 })
