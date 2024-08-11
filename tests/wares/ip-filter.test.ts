@@ -1,6 +1,6 @@
+import { ipFilter } from '@/packages/ip-filter/src'
+import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 import { describe, it } from 'vitest'
-import { ipFilter } from '../../packages/ip-filter/src'
-import { InitAppAndTest } from '../../test_helpers/initAppAndTest'
 
 describe('ip-filter middleware tests', () => {
   it('should filter ip', async () => {
