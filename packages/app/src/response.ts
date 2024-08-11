@@ -1,8 +1,8 @@
 import type { OutgoingHttpHeaders, ServerResponse } from 'node:http'
 import type { SerializeOptions } from '@otterhttp/cookie'
+import type { Request } from '@otterhttp/req'
 import type { Download, FormatProps, ReadStreamOptions } from '@otterhttp/res'
 import type { App } from './app.js'
-import type { Request } from './request.js'
 import type { AppRenderOptions, TemplateEngineOptions } from './types.js'
 
 export const renderTemplate =

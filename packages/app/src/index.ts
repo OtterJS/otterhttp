@@ -1,5 +1,6 @@
+import { Request } from '@otterhttp/req'
+
 export { App } from './app.js'
-export * from './request.js'
 export * from './response.js'
 export { extendMiddleware } from './extend.js'
 export { onErrorHandler, type ErrorHandler } from './onError.js'
