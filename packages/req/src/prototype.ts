@@ -39,6 +39,7 @@ export class Request extends IncomingMessage {
   signedCookies?: unknown
   body?: unknown
 
+  /** @internal */
   populate({ trust, subdomainOffset }: { trust: Trust; subdomainOffset: number | undefined }) {
     this._acceptsMeta = new Accepts(this)
     this._query = getQueryParams(this.url)
