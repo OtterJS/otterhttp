@@ -1,15 +1,5 @@
-import { compile } from '@otterhttp/proxy-addr'
-import {
-  checkIfXMLHttpRequest,
-  getAccepts,
-  getAcceptsCharsets,
-  getAcceptsEncodings,
-  getAcceptsLanguages,
-  getFreshOrStale,
-  getQueryParams,
-  getRangeFromHeader,
-  getRequestHeader
-} from '@otterhttp/req'
+import { compile } from '@otterhttp/proxy-address'
+import type { Request } from '@otterhttp/req'
 import {
   append,
   attachment,
@@ -32,8 +22,6 @@ import {
 } from '@otterhttp/res'
 import type { NextFunction } from '@otterhttp/router'
 import type { App } from './app.js'
-import { type Request, getSubdomains } from './request.js'
-import { getHost, getIP, getIPs, getProtocol } from './request.js'
 import type { Response } from './response.js'
 import { renderTemplate } from './response.js'
 import type { TemplateEngineOptions } from './types.js'
@@ -53,36 +41,15 @@ export const extendMiddleware =
     const { settings } = app
 
     res.get = getResponseHeader(res)
-    req.get = getRequestHeader(req)
 
     let trust = settings?.['trust proxy'] ?? 0
     if (typeof trust !== 'function') {
       trust = compile(trust)
       settings['trust proxy'] = trust
     }
+    const { subdomainOffset } = settings
 
-    if (settings?.networkExtensions) {
-      req.protocol = getProtocol(req, trust)
-      req.secure = req.protocol === 'https'
-      const host = getHost(req, trust)
-      if (host) {
-        req.hostname = host.hostname
-        req.port = host.port
-      }
-      req.subdomains = getSubdomains(req, trust, settings.subdomainOffset)
-      req.ip = getIP(req, trust)
-      req.ips = getIPs(req, trust)
-    }
-
-    req.query = getQueryParams(req.url)
-
-    req.range = getRangeFromHeader(req)
-    req.accepts = getAccepts(req)
-    req.acceptsCharsets = getAcceptsCharsets(req)
-    req.acceptsEncodings = getAcceptsEncodings(req)
-    req.acceptsLanguages = getAcceptsLanguages(req)
-
-    req.xhr = checkIfXMLHttpRequest(req)
+    req.populate({ trust, subdomainOffset })
 
     res.header = res.set = setHeader<Response>(res)
     res.send = send<Request, Response>(req, res)
@@ -103,9 +70,6 @@ export const extendMiddleware =
     res.download = download<Request, Response>(req, res)
     res.append = append<Response>(res)
     res.locals = res.locals || Object.create(null)
-
-    Object.defineProperty(req, 'fresh', { get: getFreshOrStale.bind(null, req, res), configurable: true })
-    req.stale = !req.fresh
 
     next()
   }
