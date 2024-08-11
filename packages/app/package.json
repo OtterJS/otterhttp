@@ -23,7 +23,7 @@
   "license": "LGPL-3.0-or-later",
   "dependencies": {
     "@otterhttp/cookie": "workspace:*",
-    "@otterhttp/proxy-addr": "workspace:*",
+    "@otterhttp/proxy-address": "workspace:*",
     "@otterhttp/req": "workspace:*",
     "@otterhttp/res": "workspace:*",
     "@otterhttp/router": "workspace:*",
