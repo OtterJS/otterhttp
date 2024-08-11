@@ -27,6 +27,7 @@
     "@otterhttp/req": "workspace:*",
     "@otterhttp/res": "workspace:*",
     "@otterhttp/router": "workspace:*",
+    "@otterhttp/url": "workspace:*",
     "header-range-parser": "1.1.3",
     "regexparam": "^2.0.2"
   },
