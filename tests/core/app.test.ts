@@ -4,8 +4,7 @@ import { renderFile } from 'eta'
 import { makeFetch } from 'supertest-fetch'
 import { describe, expect, it } from 'vitest'
 
-import { App, type Request, type Response } from '@/packages/app/src'
-import type { View } from '@/packages/app/src'
+import { App, Request, type Response, type View } from '@/packages/app/src'
 import type { RouterMethod } from '@/packages/router/src'
 import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
@@ -56,7 +55,9 @@ describe('Testing App', () => {
   it('App works with HTTP 1.1', async () => {
     const app = new App()
 
-    const server = http.createServer()
+    const server = http.createServer({
+      IncomingMessage: Request
+    })
 
     server.on('request', app.attach)
 
@@ -88,7 +89,7 @@ describe('Testing App', () => {
         req.body = await readFile(`${process.cwd()}/tests/fixtures/test.txt`)
         next()
       })
-      .use((req, res) => res.send(req.body.toString()))
+      .use((req, res) => res.send((req.body as any).toString()))
 
     const server = app.listen()
 
