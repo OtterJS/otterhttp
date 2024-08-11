@@ -1,7 +1,7 @@
 import { STATUS_CODES } from 'node:http'
+import type { Request } from '@otterhttp/req'
 import type { NextFunction } from '@otterhttp/router'
 import type { App } from './app.js'
-import type { Request } from './request.js'
 import type { Response } from './response.js'
 
 export type ErrorHandler<Req extends Request = Request, Res extends Response = Response> = (
