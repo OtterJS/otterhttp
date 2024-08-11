@@ -78,6 +78,8 @@ export const sendFile = <Request extends Req = Req, Response extends Res = Res>(
 
     headers.ETag = createETag(stats, encoding)
 
+    // TODO: add freshness check here
+
     if (!res.getHeader('Content-Type')) headers['Content-Type'] = `${mime.getType(extname(path))}; charset=utf-8`
 
     let status = res.statusCode || 200
