@@ -14,13 +14,14 @@
 !package.json
 !pnpm-lock.yaml
 !pnpm-workspace.yaml
+!.npmignore
 
 ## Config files
-!*config.ts
-!*config.mjs
-!*config.cjs
-!*config.js
-!*config.json
+!*config*.ts
+!*config*.mjs
+!*config*.cjs
+!*config*.js
+!*config*.json
 !*env.d.ts
 !*env.ts
 !*rc.json
