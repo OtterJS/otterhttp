@@ -15,10 +15,10 @@ import type {
   Handler as RHandler,
   SyncHandler as RSyncHandler
 } from '@otterhttp/router'
-import type { Request } from './request.js'
 import type { Response } from './response.js'
 
+export { Request }
 export type Handler = RHandler<Request, Response>
 export type AsyncHandler = RAsyncHandler<Request, Response>
 export type SyncHandler = RSyncHandler<Request, Response>
-export type { NextFunction, Middleware, Request, Response }
+export type { NextFunction, Middleware, Response }
