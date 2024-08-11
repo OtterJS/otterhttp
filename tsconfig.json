@@ -1,29 +1,5 @@
 {
-  "compilerOptions": {
-    "target": "ES2019",
-    "module": "esnext",
-    "noEmit": true,
-    "declaration": true,
-    "preserveSymlinks": true,
-    "outDir": "dist",
-    "isolatedModules": true,
-    "noImplicitAny": false,
-    "noUnusedParameters": true,
-    "skipLibCheck": true,
-    "moduleResolution": "Bundler",
-    "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "strict": true,
-    "alwaysStrict": true,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["./*"]
-    }
-  },
+  "extends": "./tsconfig.base.json",
   "include": ["**/*.ts", "**/*.json"],
-  "exclude": ["examples", "packages/*/dist", "node_modules"]
+  "exclude": ["examples", "packages/*/dist", "node_modules", "tests", "test_helpers"]
 }
