@@ -78,9 +78,9 @@ importers:
       '@otterhttp/cookie':
         specifier: workspace:*
         version: link:../cookie
-      '@otterhttp/proxy-addr':
+      '@otterhttp/proxy-address':
         specifier: workspace:*
-        version: link:../proxy-addr
+        version: link:../proxy-address
       '@otterhttp/req':
         specifier: workspace:*
         version: link:../req
@@ -125,7 +125,7 @@ importers:
         specifier: workspace:*
         version: link:../app
 
-  packages/proxy-addr:
+  packages/proxy-address:
     dependencies:
       '@otterhttp/forwarded':
         specifier: workspace:*
@@ -145,6 +145,12 @@ importers:
       '@otterhttp/accepts':
         specifier: workspace:*
         version: link:../accepts
+      '@otterhttp/proxy-address':
+        specifier: workspace:*
+        version: link:../proxy-address
+      '@otterhttp/router':
+        specifier: workspace:*
+        version: link:../router
       '@otterhttp/type-is':
         specifier: workspace:*
         version: link:../type-is
