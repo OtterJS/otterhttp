@@ -1,4 +1,9 @@
-import type { ServerResponse as Response } from 'node:http'
+import type { OutgoingMessage } from 'node:http'
+
+type HasHeaders = Pick<
+  OutgoingMessage,
+  'getHeader' | 'getHeaders' | 'setHeader' | 'appendHeader' | 'getHeaderNames' | 'hasHeader' | 'removeHeader'
+>
 
 /**
  * RegExp to match field-name in RFC 7230 sec 3.2
@@ -10,8 +15,14 @@ import type { ServerResponse as Response } from 'node:http'
  *               / DIGIT / ALPHA
  *               ; any VCHAR, except delimiters
  */
-
 const FIELD_NAME_REGEXP = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/
+
+function getVaryHeader(res: HasHeaders): string[] {
+  const vary = res.getHeader('vary')
+  if (Array.isArray(vary)) return vary
+  if (typeof vary === 'string') return parse(vary.toLowerCase())
+  return []
+}
 
 function parse(header: string) {
   let end = 0
@@ -42,51 +53,39 @@ function parse(header: string) {
   return list
 }
 
-export function append(header: string, field: string | string[]) {
-  // get fields array
-  const fields = !Array.isArray(field) ? parse(String(field)) : field
+/**
+ * Mark that a request is varied on a header field.
+ */
+export function vary(res: HasHeaders, field: string | string[]) {
+  // get existing header
+  const val = getVaryHeader(res)
+  const alreadySetHeaderNameLookup = new Set<string>(val)
 
-  // assert on invalid field names
+  // get fields array
+  const fields = Array.isArray(field) ? field : parse(field)
+
+  // ensure field names are valid
   for (const field of fields) {
     if (!FIELD_NAME_REGEXP.test(field)) throw new TypeError('field argument contains an invalid header name')
   }
 
-  // existing, unspecified vary
-  if (header === '*') {
-    return header
+  if (alreadySetHeaderNameLookup.has('*')) {
+    if (val.length > 1) res.setHeader('vary', ['*'])
+    return
   }
 
-  // enumerate current values
-  let val = header
-  const vals = parse(header.toLowerCase())
-
-  // unspecified vary
-  if (fields.indexOf('*') !== -1 || vals.indexOf('*') !== -1) {
-    return '*'
-  }
-
-  for (const field of fields) {
-    const fld = field.toLowerCase()
-
-    // append value (case-preserving)
-    if (vals.indexOf(fld) === -1) {
-      vals.push(fld)
-      val = val ? `${val}, ${field}` : field
+  const unsetHeaderNamesToSet: string[] = []
+  for (const headerName of fields) {
+    if (headerName === '*') {
+      res.setHeader('vary', ['*'])
+      return
     }
+
+    const lowerCaseHeaderName = headerName.toLowerCase()
+    if (alreadySetHeaderNameLookup.has(lowerCaseHeaderName)) continue
+    unsetHeaderNamesToSet.push(headerName)
+    alreadySetHeaderNameLookup.add(lowerCaseHeaderName)
   }
 
-  return val
-}
-/**
- * Mark that a request is varied on a header field.
- */
-export function vary(res: Response, field: string | string[]) {
-  // get existing header
-  let val = res.getHeader('Vary') || ''
-  const header = Array.isArray(val) ? val.join(', ') : String(val)
-
-  // set new header
-  if ((val = append(header, field))) {
-    res.setHeader('Vary', val)
-  }
+  res.appendHeader('vary', unsetHeaderNamesToSet)
 }
