@@ -17,7 +17,7 @@
   "exports": "./dist/index.js",
   "files": ["dist"],
   "engines": {
-    "node": ">=14.21.3"
+    "node": ">=20.16.0"
   },
   "keywords": ["otterhttp", "router", "backend", "http", "framework", "api"],
   "license": "LGPL-3.0-or-later",

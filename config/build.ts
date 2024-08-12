@@ -6,7 +6,7 @@ export const build = () =>
       index: 'src/index.ts'
     },
     format: ['esm'],
-    target: 'node15',
+    target: 'node20',
     clean: true,
     minify: false,
     dts: true,

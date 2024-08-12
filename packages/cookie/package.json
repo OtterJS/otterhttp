@@ -5,7 +5,7 @@
   "description": "HTTP cookie parser and serializer for Node.js",
   "homepage": "https://otterhttp.lordfirespeed.dev",
   "engines": {
-    "node": ">=12.20.0"
+    "node": ">=20.16.0"
   },
   "funding": {
     "type": "individual",
