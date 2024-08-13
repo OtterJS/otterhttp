@@ -17,6 +17,7 @@ import { requestTypeIs } from './util/request-type-is'
 export class Request<Body = unknown> extends IncomingMessage {
   // assigned by node:http
   declare url: string
+  declare method: string
 
   // assigned by App
   declare originalUrl: string
