@@ -1,18 +1,18 @@
-import type { IncomingHttpHeaders } from 'node:http'
-import type { HasHeaders } from './types'
+import type { IncomingHttpHeaders, IncomingMessage } from 'node:http'
+import type { HasHeaders, Omit } from './types'
 
-type Headers = IncomingHttpHeaders & {
+type ExtraHeaders = {
   referrer?: string | undefined
   'if-range'?: string | undefined
 }
 
+type Headers = Omit<IncomingHttpHeaders, keyof ExtraHeaders> & ExtraHeaders
+
 export function getRequestHeader<HeaderName extends string>(
   req: HasHeaders,
   headerName: HeaderName
-): Headers[HeaderName] {
-  const headerNameLowerCase = headerName.toLowerCase()
-
-  switch (headerNameLowerCase) {
+): Headers[Lowercase<HeaderName>] {
+  switch (headerName) {
     case 'referer':
     case 'referrer': {
       return req.headers.referer || (req.headers.referrer as string | undefined)
@@ -23,7 +23,7 @@ export function getRequestHeader<HeaderName extends string>(
       return header
     }
     default: {
-      return req.headers[headerNameLowerCase]
+      return req.headers[headerName]
     }
   }
 }
