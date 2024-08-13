@@ -1,7 +1,7 @@
-import type { OutgoingMessage } from 'node:http'
+import type { ServerResponse } from 'node:http'
 
 type HasHeaders = Pick<
-  OutgoingMessage,
+  ServerResponse,
   'getHeader' | 'getHeaders' | 'setHeader' | 'appendHeader' | 'getHeaderNames' | 'hasHeader' | 'removeHeader'
 >
 
