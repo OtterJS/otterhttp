@@ -1,48 +1,43 @@
-import { type IncomingMessage as Req, type ServerResponse as Res, STATUS_CODES } from 'node:http'
+import { STATUS_CODES } from 'node:http'
 import { escapeHTML } from 'es-escape-html'
+
 import { formatResponse } from './format.js'
-import { setLocationHeader } from './headers.js'
+import { getResponseHeader, setResponseLocationHeader } from './headers'
+import type { HasAccepts, HasMethod, HasOutgoingHeaders, HasReq, HasStatus } from './types'
 
 type next = (err?: any) => void
 
-export const redirect =
-  <Request extends Req = Req, Response extends Res = Res, Next extends next = next>(
-    req: Request,
-    res: Response,
-    next: Next
-  ) =>
-  (url: string, status?: number): Response => {
-    let address = url
-    status = status || 302
+type RedirectResponse = HasOutgoingHeaders & HasStatus & HasReq<HasAccepts & HasMethod> & NodeJS.WritableStream
+export async function redirect(res: RedirectResponse, url: string, status?: number) {
+  let address: string | undefined = url
+  status = status || 302
 
-    let body = ''
+  let body = ''
 
-    address = setLocationHeader(req, res)(address).getHeader('Location') as string
+  setResponseLocationHeader(res, address)
+  address = getResponseHeader(res, 'location')
+  if (!address) throw new Error()
 
-    formatResponse(
-      req,
-      res,
-      next
-    )({
-      text: () => {
-        body = `${STATUS_CODES[status]}. Redirecting to ${address}`
-      },
-      html: () => {
-        const u = escapeHTML(address)
+  await formatResponse(res, {
+    text: () => {
+      body = `${STATUS_CODES[status]}. Redirecting to ${address}`
+    },
+    html: () => {
+      const u = escapeHTML(address)
 
-        body = `<p>${STATUS_CODES[status]}. Redirecting to <a href="${u}">${u}</a></p>`
-      },
-      default: () => {
-        body = ''
-      }
-    })
+      body = `<p>${STATUS_CODES[status]}. Redirecting to <a href="${u}">${u}</a></p>`
+    },
+    default: () => {
+      body = ''
+    }
+  })
 
-    res.setHeader('Content-Length', Buffer.byteLength(body))
+  res.setHeader('Content-Length', Buffer.byteLength(body))
 
-    res.statusCode = status
+  res.statusCode = status
 
-    if (req.method === 'HEAD') res.end()
-    else res.end(body)
+  if (res.req.method === 'HEAD') res.end()
+  else res.end(body)
 
-    return res
-  }
+  return res
+}

@@ -1,6 +1,9 @@
 import type { IncomingHttpHeaders, OutgoingHttpHeaders, ServerResponse } from 'node:http'
+import type { Request } from '@otterhttp/req'
 
 export type HasIncomingHeaders = { headers: IncomingHttpHeaders }
+
+export type HasAccepts = Pick<Request, 'accepts'>
 
 export type HasMethod = { method: string }
 

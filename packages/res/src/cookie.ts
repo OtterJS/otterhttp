@@ -1,7 +1,8 @@
 import type { IncomingMessage as Req, ServerResponse as Res } from 'node:http'
 import * as cookie from '@otterhttp/cookie'
 import { sign } from '@otterhttp/cookie-signature'
-import { append } from './append.js'
+
+import { appendResponseHeader } from './headers'
 
 export const setCookie =
   <Request extends Req = Req, Response extends Res = Res>(
@@ -28,14 +29,15 @@ export const setCookie =
 
     if (signed) val = `s:${sign(val, secret)}`
 
-    if (options.maxAge) {
-      options.expires = new Date(Date.now() + options.maxAge)
-      options.maxAge /= 1000
+    let maxAge = options.maxAge
+    if (maxAge) {
+      options.expires = new Date(Date.now() + maxAge)
+      maxAge /= 1000
     }
 
     if (options.path == null) options.path = '/'
 
-    append(res)('Set-Cookie', `${cookie.serialize(name, String(val), options)}`)
+    appendResponseHeader(res, 'set-cookie', `${cookie.serialize(name, String(val), { ...options, maxAge })}`)
 
     return res
   }
