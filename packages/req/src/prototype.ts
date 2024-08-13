@@ -60,24 +60,32 @@ export class Request extends IncomingMessage {
     return getRange(this, size, options)
   }
 
-  accepts(...types: string[]) {
+  accepts(): string[]
+  accepts(types: string[]): string | false
+  accepts(types?: string[]): string | string[] | false {
     return this._acceptsMeta.types(types)
   }
 
-  acceptsEncodings(...encodings: string[]) {
+  acceptsEncodings(): string[]
+  acceptsEncodings(encodings: string[]): string | false
+  acceptsEncodings(encodings?: string[]): string | string[] | false {
     return this._acceptsMeta.encodings(encodings)
   }
 
-  acceptsCharsets(...charsets: string[]) {
+  acceptsCharsets(): string[]
+  acceptsCharsets(charsets: string[]): string | false
+  acceptsCharsets(charsets?: string[]): string | string[] | false {
     return this._acceptsMeta.charsets(charsets)
   }
 
-  acceptsLanguages(...languages: string[]) {
+  acceptsLanguages(): string[]
+  acceptsLanguages(charsets: string[]): string | false
+  acceptsLanguages(languages?: string[]): string | string[] | false {
     return this._acceptsMeta.languages(languages)
   }
 
-  is(...types: string[]): boolean {
-    return requestTypeIs(this, ...types)
+  is(types: string[]): boolean {
+    return requestTypeIs(this, types)
   }
 
   get query(): ParsedUrlQuery {
