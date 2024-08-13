@@ -1,38 +1,42 @@
 import type { HasOutgoingHeaders, Headers, Input } from '../types'
+import { setCharset } from '../util'
 
 type ResponseHeaderSetter<HeaderName extends string> = (
   res: HasOutgoingHeaders,
   value: Input<Headers[HeaderName]>
-) => void
+) => Input<Headers[HeaderName]>
 
-class ResponseHeaderSpecialCasesMap extends Map<string, ResponseHeaderSetter<string>> {
-  get<Key extends string>(key: Key): ResponseHeaderSetter<Key> | undefined {
-    return super.get(key)
+class ResponseHeaderSpecialCasesMap {
+  private map: Map<string, unknown>
+
+  constructor() {
+    this.map = new Map()
   }
 
-  set<Key extends string>(key: Key, value: ResponseHeaderSetter<Key>) {
-    return super.set(key, value as ResponseHeaderSetter<string>)
+  private valueIsResponseHeaderSetter<Key extends string>(
+    value: unknown | undefined
+  ): value is ResponseHeaderSetter<Key> {
+    return value != null
+  }
+
+  get<Key extends Lowercase<string>>(key: Key): ResponseHeaderSetter<Key> | undefined {
+    const value = this.map.get(key)
+    if (!this.valueIsResponseHeaderSetter<Key>(value)) return undefined
+    return value
+  }
+
+  set<Key extends Lowercase<string>>(key: Key, value: ResponseHeaderSetter<Key>) {
+    this.map.set(key, value)
   }
 }
 
-const setResponseHeaderSpecialCases = new ResponseHeaderSpecialCasesMap()
+export const setResponseHeaderSpecialCases = new ResponseHeaderSpecialCasesMap()
 
 const contentTypeCharsetRegExp = /;\s*charset\s*=/
-setResponseHeaderSpecialCases.set('content-type', (res, value) => {
+setResponseHeaderSpecialCases.set('content-type', (_, value): string => {
   // provide a default charset when the API consumer has omitted one
   if (!contentTypeCharsetRegExp.test(value)) {
-    value += '; charset=utf-8'
+    value = setCharset(value, 'utf-8')
   }
-  res.setHeader('content-type', value)
+  return value
 })
-
-export function setResponseHeader<HeaderName extends string>(
-  res: HasOutgoingHeaders,
-  headerName: HeaderName,
-  value: Input<Headers[HeaderName]>
-): void {
-  const lowerHeaderName = headerName.toLowerCase()
-  const specialCase = setResponseHeaderSpecialCases.get(lowerHeaderName)
-  if (specialCase != null) return specialCase(res, value)
-  res.setHeader(lowerHeaderName, value)
-}

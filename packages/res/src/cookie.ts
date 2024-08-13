@@ -1,49 +1,35 @@
-import type { IncomingMessage as Req, ServerResponse as Res } from 'node:http'
 import * as cookie from '@otterhttp/cookie'
-import { sign } from '@otterhttp/cookie-signature'
 
-import { appendResponseHeader } from './headers'
+import type { HasIncomingHeaders, HasOutgoingHeaders, HasReq } from './types'
 
-export const setCookie =
-  <Request extends Req = Req, Response extends Res = Res>(
-    req: Request & {
-      secret?: string | string[]
-    },
-    res: Response
-  ) =>
-  (
-    name: string,
-    value: string | Record<string, unknown>,
-    options: cookie.SerializeOptions &
-      Partial<{
-        signed: boolean
-      }> = {}
-  ): Response => {
-    const secret = req.secret as string
+type SetCookieResponse = HasOutgoingHeaders & HasReq<HasIncomingHeaders>
+export type SetCookieOptions = cookie.SerializeOptions & {
+  encode?: (value: string) => string
+}
+export async function setCookie(
+  res: SetCookieResponse,
+  name,
+  value: string | Record<string, unknown>,
+  { encode, ...options }: SetCookieOptions = {}
+): Promise<void> {
+  let val = typeof value === 'object' ? `j:${JSON.stringify(value)}` : String(value)
 
-    const signed = options.signed || false
+  if (encode != null) val = encode(val)
 
-    if (signed && !secret) throw new Error('cookieParser("secret") required for signed cookies')
-
-    let val = typeof value === 'object' ? `j:${JSON.stringify(value)}` : String(value)
-
-    if (signed) val = `s:${sign(val, secret)}`
-
-    let maxAge = options.maxAge
-    if (maxAge) {
-      options.expires = new Date(Date.now() + maxAge)
-      maxAge /= 1000
-    }
-
-    if (options.path == null) options.path = '/'
-
-    appendResponseHeader(res, 'set-cookie', `${cookie.serialize(name, String(val), { ...options, maxAge })}`)
-
-    return res
+  if (options.maxAge != null) {
+    options.expires = new Date(Date.now() + options.maxAge)
+    options.maxAge /= 1000
   }
 
-export const clearCookie =
-  <Request extends Req = Req, Response extends Res = Res>(req: Request, res: Response) =>
-  (name: string, options?: cookie.SerializeOptions): Response => {
-    return setCookie(req, res)(name, '', Object.assign({}, { expires: new Date(1), path: '/' }, options))
-  }
+  if (options.path == null) options.path = '/'
+
+  res.appendHeader('set-cookie', `${cookie.serialize(name, String(val), options)}`)
+}
+
+export async function clearCookie(
+  res: SetCookieResponse,
+  name: string,
+  options?: cookie.SerializeOptions
+): Promise<void> {
+  await setCookie(res, name, '', Object.assign({}, { expires: new Date(1), path: '/' }, options))
+}

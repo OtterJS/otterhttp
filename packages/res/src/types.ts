@@ -1,6 +1,8 @@
 import type { IncomingHttpHeaders, OutgoingHttpHeaders, ServerResponse } from 'node:http'
 import type { Request } from '@otterhttp/req'
 
+import type { Response } from './prototype'
+
 export type HasIncomingHeaders = { headers: IncomingHttpHeaders }
 
 export type HasAccepts = Pick<Request, 'accepts'>
@@ -8,7 +10,7 @@ export type HasAccepts = Pick<Request, 'accepts'>
 export type HasMethod = { method: string }
 
 export type HasOutgoingHeaders = Pick<
-  ServerResponse,
+  Response,
   'getHeader' | 'getHeaders' | 'setHeader' | 'appendHeader' | 'getHeaderNames' | 'hasHeader' | 'removeHeader'
 >
 
@@ -26,10 +28,15 @@ export type HasWriteMethods = Pick<
   'writeContinue' | 'writeHead' | 'writeEarlyHints' | 'writeProcessing'
 >
 
-export type Headers = OutgoingHttpHeaders & {
+type ExtraHeaders = {
   'content-type'?: string | undefined
   vary?: string | string[] | undefined
 }
+
+// https://stackoverflow.com/a/76616671
+type Omit<T, K extends PropertyKey> = { [P in keyof T as Exclude<P, K>]: T[P] }
+
+export type Headers = Omit<OutgoingHttpHeaders, keyof ExtraHeaders> & ExtraHeaders
 
 export type AppendHeaders = {
   [Key in keyof Headers]: string[] extends Headers[Key] ? string | readonly string[] : never

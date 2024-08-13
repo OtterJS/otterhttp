@@ -1,6 +1,5 @@
 import { getRequestHeader } from '@otterhttp/req'
 
-import { getResponseHeader } from '../headers'
 import type { HasIncomingHeaders, HasMethod, HasOutgoingHeaders, HasReq, HasStatus } from '../types'
 
 import { someMatch } from './if-match'
@@ -42,7 +41,7 @@ export function validatePreconditions(
    */
   const ifMatch = getRequestHeader(res.req, 'if-match')
   if (ifMatch != null) {
-    if (!Object.hasOwnProperty.call(current, 'etag')) current.etag = getResponseHeader(res, 'etag')
+    if (!Object.hasOwnProperty.call(current, 'etag')) current.etag = res.getHeader('etag')
     if (!someMatch(current.etag, ifMatch)) {
       throw new Error() // todo: use HTTPError with code 412
     }
@@ -54,8 +53,7 @@ export function validatePreconditions(
    */
   const ifUnmodifiedSince = getRequestHeader(res.req, 'if-unmodified-since')
   if (ifMatch == null && ifUnmodifiedSince != null) {
-    if (!Object.hasOwnProperty.call(current, 'lastModified'))
-      current.lastModified = getResponseHeader(res, 'last-modified')
+    if (!Object.hasOwnProperty.call(current, 'lastModified')) current.lastModified = res.getHeader('last-modified')
     if (!isUnmodifiedSince(current.lastModified, ifUnmodifiedSince)) {
       throw new Error() // todo: use HTTPError with code 412
     }
@@ -66,7 +64,7 @@ export function validatePreconditions(
    */
   const ifNoneMatch = getRequestHeader(res.req, 'if-none-match')
   if (ifNoneMatch != null) {
-    if (!Object.hasOwnProperty.call(current, 'etag')) current.etag = getResponseHeader(res, 'etag')
+    if (!Object.hasOwnProperty.call(current, 'etag')) current.etag = res.getHeader('etag')
     const failed = !noneMatch(current.etag, ifNoneMatch)
 
     if (failed && (method === 'GET' || method === 'HEAD')) {
@@ -84,8 +82,7 @@ export function validatePreconditions(
    */
   const ifModifiedSince = getRequestHeader(res.req, 'if-modified-since')
   if ((method === 'GET' || method === 'HEAD') && ifNoneMatch == null && ifModifiedSince != null) {
-    if (!Object.hasOwnProperty.call(current, 'lastModified'))
-      current.lastModified = getResponseHeader(res, 'last-modified')
+    if (!Object.hasOwnProperty.call(current, 'lastModified')) current.lastModified = res.getHeader('last-modified')
     if (!hasBeenModifiedSince(current.lastModified, ifModifiedSince)) {
       throw new Error() // todo: use HTTPError with code 304
     }
@@ -98,9 +95,8 @@ export function validatePreconditions(
   const range = getRequestHeader(res.req, 'range')
   const ifRange = getRequestHeader(res.req, 'if-range')
   if (res.req.method === 'GET' && range != null && ifRange != null) {
-    if (!Object.hasOwnProperty.call(current, 'etag')) current.etag = getResponseHeader(res, 'etag')
-    if (!Object.hasOwnProperty.call(current, 'lastModified'))
-      current.lastModified = getResponseHeader(res, 'last-modified')
+    if (!Object.hasOwnProperty.call(current, 'etag')) current.etag = res.getHeader('etag')
+    if (!Object.hasOwnProperty.call(current, 'lastModified')) current.lastModified = res.getHeader('last-modified')
 
     if (!rangePrecondition(current as Required<typeof current>, ifRange)) {
       res.req.headers.range = undefined

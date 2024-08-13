@@ -2,7 +2,7 @@ import { STATUS_CODES } from 'node:http'
 import { escapeHTML } from 'es-escape-html'
 
 import { formatResponse } from './format.js'
-import { getResponseHeader, setResponseLocationHeader } from './headers'
+import { setResponseLocationHeader } from './headers'
 import type { HasAccepts, HasMethod, HasOutgoingHeaders, HasReq, HasStatus } from './types'
 
 type next = (err?: any) => void
@@ -15,7 +15,7 @@ export async function redirect(res: RedirectResponse, url: string, status?: numb
   let body = ''
 
   setResponseLocationHeader(res, address)
-  address = getResponseHeader(res, 'location')
+  address = res.getHeader('location')
   if (!address) throw new Error()
 
   await formatResponse(res, {

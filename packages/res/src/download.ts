@@ -3,7 +3,7 @@ import { contentDisposition } from '@otterhttp/content-disposition'
 import { sendFile } from '@otterhttp/send'
 import type { SendFileOptions } from '@otterhttp/send'
 
-import { setResponseContentTypeHeader, setResponseHeader } from './headers'
+import { setResponseContentTypeHeader } from './headers'
 import type { HasIncomingHeaders, HasOutgoingHeaders, HasReq, HasStatus, HasWriteMethods } from './types'
 
 export type DownloadOptions = SendFileOptions &
@@ -47,5 +47,5 @@ export function attachment(res: HasOutgoingHeaders, filename?: string) {
     filename = basename(filename)
   }
 
-  setResponseHeader(res, 'Content-Disposition', contentDisposition(filename))
+  res.setHeader('Content-Disposition', contentDisposition(filename))
 }
