@@ -14,7 +14,7 @@ import { getRange } from './range'
 import { isXmlHttpRequest } from './util/is-xml-http-request'
 import { requestTypeIs } from './util/request-type-is'
 
-export class Request extends IncomingMessage {
+export class Request<Body = unknown> extends IncomingMessage {
   // assigned by node:http
   declare url: string
 
@@ -37,7 +37,7 @@ export class Request extends IncomingMessage {
   // common middleware 'slots'
   cookies?: unknown
   signedCookies?: unknown
-  body?: unknown
+  body?: Body
 
   /** @internal */
   populate({ trust, subdomainOffset }: { trust: Trust; subdomainOffset: number | undefined }) {
