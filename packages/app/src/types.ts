@@ -30,9 +30,8 @@ export type TemplateEngineOptions = Record<string, unknown>
 export type TemplateEngine<O extends TemplateEngineOptions = TemplateEngineOptions> = (
   path: string,
   locals: Record<string, unknown>,
-  opts: AppRenderOptions<O>,
-  cb: (err: Error | null, html: unknown) => void
-) => void
+  opts: AppRenderOptions<O>
+) => unknown | Promise<unknown>
 
 export type AppRenderOptions<O extends TemplateEngineOptions = TemplateEngineOptions> = O &
   Partial<{

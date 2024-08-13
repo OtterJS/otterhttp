@@ -50,6 +50,7 @@ export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOp
   engine: TemplateEngine<RenderOptions>
   path: string
   root: string[]
+
   constructor(
     name: string,
     opts: Partial<{
@@ -80,6 +81,7 @@ export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOp
     this.engine = opts.engines[this.ext]
     this.path = this.#lookup(fileName)
   }
+
   #lookup(name: string): string {
     let path: string | undefined = undefined
 
@@ -104,6 +106,7 @@ export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOp
 
     return path
   }
+
   #resolve(dir: string, file: string) {
     const ext = this.ext
 
@@ -123,7 +126,8 @@ export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOp
       return path
     }
   }
-  render(options: RenderOptions, data: Record<string, unknown>, cb: (err: Error | null, html: unknown) => void) {
-    this.engine(this.path, data, options, cb)
+
+  async render(options: RenderOptions, data: Record<string, unknown>): Promise<unknown> {
+    return await this.engine(this.path, data, options)
   }
 }
