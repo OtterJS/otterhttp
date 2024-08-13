@@ -1,10 +1,19 @@
 /*!
- * Ported from https://github.com/expressjs/express/blob/master/lib/view.js
+ * Originally ported from https://github.com/expressjs/express/blob/master/lib/view.js
  * express
  * Copyright(c) 2009-2013 TJ Holowaychuk
  * Copyright(c) 2013 Roman Shtylman
  * Copyright(c) 2014-2015 Douglas Christopher Wilson
  * MIT Licensed
+ *
+ * Forked from https://github.com/tinyhttp/tinyhttp/blob/68df0efdd930f0b6f4237c60e26c89e886067f02/packages/app/src/view.ts
+ * tinyhttp
+ * Copyright (c) 2020 v i r t l
+ * MIT Licensed
+ *
+ * otterhttp
+ * Copyright (c) 2024 Lordfirespeed
+ * Lordfirespeed licenses the contents of this file to you under the terms of the LGPL-3.0-or-later license.
  */
 
 import { statSync } from 'node:fs'
