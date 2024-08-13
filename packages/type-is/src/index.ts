@@ -68,7 +68,7 @@ function normalize(type: string): string | null {
  * a special shortcut like `multipart` or `urlencoded`,
  * or a mime type.
  */
-export const typeIs = (value: string | undefined, types: readonly string[]) => {
+export const typeIs = (value: string | undefined, types?: readonly string[]) => {
   let i: number
   // remove parameters and normalize
   const val = tryNormalizeType(value)
