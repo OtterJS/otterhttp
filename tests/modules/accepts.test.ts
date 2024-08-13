@@ -126,17 +126,17 @@ describe('new Accepts(req)', () => {
       it('when Accept-Encoding is not populated it should return false', () => {
         const req = createRequest()
         const accept = new Accepts(req)
-        expect(accept.encoding(['gzip', 'deflate'])).toStrictEqual(false)
+        expect(accept.encodings(['gzip', 'deflate'])).toStrictEqual(false)
       })
       it('when Accept-Encoding is populated it should prioritize according to the request order', () => {
         const req = createRequest('gzip, deflate, compress')
         const accept = new Accepts(req)
-        expect(accept.encoding(['deflate', 'gzip'])).toStrictEqual('gzip')
+        expect(accept.encodings(['deflate', 'gzip'])).toStrictEqual('gzip')
       })
       it('when Accept-Encodings is populated, it should return false when supplying an invalid encoding value', () => {
         const req = createRequest('gzip, deflate, compress')
         const accept = new Accepts(req)
-        expect(accept.encoding('br')).toStrictEqual(false)
+        expect(accept.encodings('br')).toStrictEqual(false)
       })
     })
     describe('without arguments', () => {
@@ -144,7 +144,7 @@ describe('new Accepts(req)', () => {
         const req = createRequest('gzip, deflate')
         const accept = new Accepts(req)
         // @ts-ignore
-        expect(accept.encoding()).toStrictEqual(['gzip', 'deflate', 'identity'])
+        expect(accept.encodings()).toStrictEqual(['gzip', 'deflate', 'identity'])
       })
     })
   })
@@ -153,7 +153,7 @@ describe('new Accepts(req)', () => {
       const req = createRequest('application/json, text/plain')
       const accept = new Accepts(req)
 
-      expect(accept.lang).toEqual(accept.languages)
+      expect(accept.lang).toBe(accept.languages)
       expect(accept.langs).toEqual(accept.languages)
       expect(accept.language).toEqual(accept.languages)
     })
@@ -162,6 +162,12 @@ describe('new Accepts(req)', () => {
       const accept = new Accepts(req)
 
       expect(accept.charset).toEqual(accept.charsets)
+    })
+    it('all getter aliases for "encoding" should map to accepts.encodings', () => {
+      const req = createRequest('application/json, text/plain')
+      const accept = new Accepts(req)
+
+      expect(accept.encoding).toEqual(accept.encodings)
     })
     it('all getter aliases for "type" should map to accepts.types', () => {
       const req = createRequest('application/json, text/plain')
