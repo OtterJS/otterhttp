@@ -63,8 +63,8 @@ importers:
   packages/accepts:
     dependencies:
       mime:
-        specifier: 4.0.1
-        version: 4.0.1
+        specifier: ^4.0.4
+        version: 4.0.4
       negotiator:
         specifier: ^0.6.3
         version: 0.6.3
@@ -169,12 +169,12 @@ importers:
       '@otterhttp/content-disposition':
         specifier: workspace:*
         version: link:../content-disposition
+      '@otterhttp/content-type':
+        specifier: workspace:*
+        version: link:../content-type
       '@otterhttp/cookie':
         specifier: workspace:*
         version: link:../cookie
-      '@otterhttp/cookie-signature':
-        specifier: workspace:*
-        version: link:../cookie-signature
       '@otterhttp/encode-url':
         specifier: workspace:*
         version: link:../encode-url
@@ -191,22 +191,19 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       mime:
-        specifier: 4.0.0-beta.1
-        version: 4.0.0-beta.1
+        specifier: ^4.0.4
+        version: 4.0.4
 
   packages/router: {}
 
   packages/send:
     dependencies:
-      '@otterhttp/content-type':
-        specifier: ^0.1.4
-        version: link:../content-type
       '@otterhttp/etag':
         specifier: workspace:*
         version: link:../etag
       mime:
-        specifier: 4.0.0-beta.1
-        version: 4.0.0-beta.1
+        specifier: ^4.0.4
+        version: 4.0.4
 
   packages/type-is:
     dependencies:
@@ -214,8 +211,8 @@ importers:
         specifier: ^0.1.4
         version: link:../content-type
       mime:
-        specifier: 4.0.1
-        version: 4.0.1
+        specifier: ^4.0.4
+        version: 4.0.4
 
   packages/url: {}
 
@@ -1697,13 +1694,8 @@ packages:
     resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
     engines: {node: '>= 0.6'}
 
-  mime@4.0.0-beta.1:
-    resolution: {integrity: sha512-8/p99P1RV17prytee/A6D+8shNqdDzyvGJ/CVfiuXwh4cTsv3P3qGyaYSx2hdqnqbKKqYUfTC5zAjCtcd1BShw==}
-    engines: {node: '>=16'}
-    hasBin: true
-
-  mime@4.0.1:
-    resolution: {integrity: sha512-5lZ5tyrIfliMXzFtkYyekWbtRXObT9OWa8IwQ5uxTBDHucNNwniRqo0yInflj+iYi5CBa6qxadGzGarDfuEOxA==}
+  mime@4.0.4:
+    resolution: {integrity: sha512-v8yqInVjhXyqP6+Kw4fV3ZzeMRqEW6FotRsKXjRS5VMTNIuXsdRoAvklpoRgSqXm6o9VNH4/C0mgedko9DdLsQ==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -3761,9 +3753,7 @@ snapshots:
     dependencies:
       mime-db: 1.52.0
 
-  mime@4.0.0-beta.1: {}
-
-  mime@4.0.1: {}
+  mime@4.0.4: {}
 
   mimic-fn@2.1.0: {}
 
