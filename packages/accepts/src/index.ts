@@ -7,45 +7,55 @@ const extToMime = (type: string) => (type.indexOf('/') === -1 ? mime.getType(typ
 const validMime = (type: unknown): type is string => typeof type === 'string'
 
 interface IAccepts {
+  types(types?: undefined): string[]
   types(...types: string[]): string | false
   types(types: string[]): string | false
-  types(types?: undefined): string[]
+  types(firstType?: string | string[] | undefined, ...types: string[]): string[] | string | false
 
+  type(types?: undefined): string[]
   type(...types: string[]): string | false
   type(types: string[]): string | false
-  type(types?: undefined): string[]
+  type(firstType?: string | string[] | undefined, ...types: string[]): string[] | string | false
 
+  encodings(encodings?: undefined): string[]
   encodings(...encodings: string[]): string | false
   encodings(encodings: string[]): string | false
-  encodings(encodings?: undefined): string[]
+  encodings(firstEncodings: string | string[] | undefined, ...encodings: string[]): string | string[] | false
 
+  encoding(encodings?: undefined): string[]
   encoding(...encodings: string[]): string | false
   encoding(encodings: string[]): string | false
-  encoding(encodings?: undefined): string[]
+  encoding(firstEncodings: string | string[] | undefined, ...encodings: string[]): string | string[] | false
 
+  charsets(charsets?: undefined): string[]
   charsets(...charsets: string[]): string | false
   charsets(charsets: string[]): string | false
-  charsets(charsets?: undefined): string[]
+  charsets(firstCharsets?: string | string[] | undefined, ...charsets: string[]): string | string[] | false
 
+  charset(charsets?: undefined): string[]
   charset(...charsets: string[]): string | false
   charset(charsets: string[]): string | false
-  charset(charsets?: undefined): string[]
+  charset(firstCharsets?: string | string[] | undefined, ...charsets: string[]): string | string[] | false
 
+  languages(languages?: undefined): string[]
   languages(...languages: string[]): string | false
   languages(languages: string[]): string | false
-  languages(languages?: undefined): string[]
+  languages(firstLanguages?: string | string[] | undefined, ...languages: string[]): string | string[] | false
 
+  language(languages?: undefined): string[]
   language(...languages: string[]): string | false
   language(languages: string[]): string | false
-  language(languages?: undefined): string[]
+  languages(firstLanguages?: string | string[] | undefined, ...languages: string[]): string | string[] | false
 
+  lang(languages?: undefined): string[]
   lang(...languages: string[]): string | false
   lang(languages: string[]): string | false
-  lang(languages?: undefined): string[]
+  languages(firstLanguages?: string | string[] | undefined, ...languages: string[]): string | string[] | false
 
+  langs(languages?: undefined): string[]
   langs(...languages: string[]): string | false
   langs(languages: string[]): string | false
-  langs(languages?: undefined): string[]
+  languages(firstLanguages?: string | string[] | undefined, ...languages: string[]): string | string[] | false
 }
 
 export class Accepts implements IAccepts {
@@ -67,9 +77,10 @@ export class Accepts implements IAccepts {
    *
    * When no types are given as arguments, returns all types accepted by the client ordered by preference.
    */
+  types(types?: undefined): string[]
   types(...types: string[]): string | false
   types(types: string[]): string | false
-  types(types?: undefined): string[]
+  types(firstMimeType?: string | string[] | undefined, ...mimeTypes: string[]): string[] | string | false
   types(firstMimeType?: string | string[] | undefined, ...mimeTypes: string[]): string[] | string | false {
     // if no types are provided,
     if (firstMimeType == null) {
@@ -106,10 +117,11 @@ export class Accepts implements IAccepts {
    *
    *     ['gzip', 'deflate']
    */
+  encodings(encodings?: undefined): string[]
   encodings(...encodings: string[]): string | false
   encodings(encodings: string[]): string | false
-  encodings(encodings?: undefined): string[]
-  encodings(firstEncodings: string | string[] | undefined, ...encodings: string[]): string | string[] | boolean {
+  encodings(firstEncodings: string | string[] | undefined, ...encodings: string[]): string | string[] | false
+  encodings(firstEncodings: string | string[] | undefined, ...encodings: string[]): string | string[] | false {
     // no encodings, return all requested encodings
     if (firstEncodings == null) {
       return this.negotiator.encodings()
@@ -121,7 +133,7 @@ export class Accepts implements IAccepts {
       encodings.unshift(firstEncodings)
     }
 
-    return this.negotiator.encodings(encodings)[0] || false
+    return this.negotiator.encodings(encodings)[0] ?? false
   }
 
   get encoding() {
@@ -136,10 +148,11 @@ export class Accepts implements IAccepts {
    *
    *     ['utf-8', 'utf-7', 'iso-8859-1']
    */
+  charsets(charsets?: undefined): string[]
   charsets(...charsets: string[]): string | false
   charsets(charsets: string[]): string | false
-  charsets(charsets?: undefined): string[]
-  charsets(firstCharsets?: string | string[] | undefined, ...charsets: string[]): string | string[] | boolean {
+  charsets(firstCharsets?: string | string[] | undefined, ...charsets: string[]): string | string[] | false
+  charsets(firstCharsets?: string | string[] | undefined, ...charsets: string[]): string | string[] | false {
     // no charsets, return all requested charsets
     if (firstCharsets == null) {
       return this.negotiator.charsets()
@@ -151,7 +164,7 @@ export class Accepts implements IAccepts {
       charsets.unshift(firstCharsets)
     }
 
-    return this.negotiator.charsets(charsets)[0] || false
+    return this.negotiator.charsets(charsets)[0] ?? false
   }
 
   get charset() {
@@ -167,9 +180,10 @@ export class Accepts implements IAccepts {
    *     ['es', 'pt', 'en']
    *
    */
+  languages(languages?: undefined): string[]
   languages(...languages: string[]): string | false
   languages(languages: string[]): string | false
-  languages(languages?: undefined): string[]
+  languages(firstLanguages?: string | string[] | undefined, ...languages: string[]): string | string[] | false
   languages(firstLanguages?: string | string[] | undefined, ...languages: string[]): string | string[] | false {
     // no languages, return all requested languages
     if (firstLanguages == null) {
@@ -182,7 +196,7 @@ export class Accepts implements IAccepts {
       languages.unshift(firstLanguages)
     }
 
-    return this.negotiator.languages(languages)[0] || false
+    return this.negotiator.languages(languages)[0] ?? false
   }
 
   get language() {
