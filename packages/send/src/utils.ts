@@ -1,6 +1,7 @@
 import { Stats } from 'node:fs'
-import { format, parse } from '@otterhttp/content-type'
 import { eTag } from '@otterhttp/etag'
+
+import type { JSONLiteral } from './types'
 
 export const createETag = (body: Buffer | string | Stats, encoding: BufferEncoding): string => {
   if (body instanceof Stats) {
@@ -9,9 +10,14 @@ export const createETag = (body: Buffer | string | Stats, encoding: BufferEncodi
   return eTag(!Buffer.isBuffer(body) ? Buffer.from(body, encoding) : body, { weak: true })
 }
 
-export function setCharset(type: string, charset: string): string {
-  const parsed = parse(type)
-  parsed.parameters ??= {}
-  parsed.parameters.charset = charset
-  return format(parsed)
+export function isJSONLiteral(value: unknown): value is JSONLiteral {
+  if (typeof value === 'object') return true // covers arrays, null, objects
+  if (isString(value)) return true
+  if (typeof value === 'number') return true
+  if (typeof value === 'boolean') return true
+  return false
+}
+
+export function isString(something: unknown): something is string {
+  return typeof something === 'string' || something instanceof String
 }

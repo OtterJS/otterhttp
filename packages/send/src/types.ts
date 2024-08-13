@@ -12,6 +12,8 @@ export type HasStatus = {
   statusMessage: string | undefined
 }
 
+export type HasMethod = { method: string }
+
 export type HasReq<Request> = {
   readonly req: Request
 }
@@ -20,3 +22,5 @@ export type HasWriteMethods = Pick<
   ServerResponse,
   'writeContinue' | 'writeHead' | 'writeEarlyHints' | 'writeProcessing'
 >
+
+export type JSONLiteral = never | Record<string, unknown> | Array<unknown> | string | number | boolean | null

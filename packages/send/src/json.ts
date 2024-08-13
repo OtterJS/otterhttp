@@ -1,23 +1,40 @@
-import type { ServerResponse as S } from 'node:http'
+import { send } from './send'
+import type {
+  HasIncomingHeaders,
+  HasMethod,
+  HasOutgoingHeaders,
+  HasReq,
+  HasStatus,
+  HasWriteMethods,
+  JSONLiteral
+} from './types'
+import { isJSONLiteral, isString } from './utils'
 
-type Res = Pick<S, 'setHeader' | 'end' | 'removeHeader'>
+type JsonResponse = HasOutgoingHeaders &
+  HasReq<HasIncomingHeaders & HasMethod> &
+  HasStatus &
+  HasWriteMethods &
+  NodeJS.WritableStream
 
 /**
  * Respond with stringified JSON object
  * @param res Response
+ * @param body
  */
-export const json =
-  <Response extends Res = Res>(res: Response) =>
-  (body: any, ...args: any[]): Response => {
-    res.setHeader('Content-Type', 'application/json')
-    if ((typeof body === 'number' || typeof body === 'boolean' || typeof body === 'object') && body != null)
-      res.end(JSON.stringify(body, null, 2), ...args)
-    else if (typeof body === 'string') res.end(body, ...args)
-    else {
-      res.removeHeader('Content-Length')
-      res.removeHeader('Transfer-Encoding')
-      res.end(null, ...args)
-    }
+export const json = (res: JsonResponse, body: JSONLiteral): void => {
+  res.setHeader('Content-Type', 'application/json')
 
-    return res
+  if (isString(body)) {
+    return send(res, body)
   }
+
+  if (body == null) {
+    return send(res, '')
+  }
+
+  if (isJSONLiteral(body)) {
+    return send(res, JSON.stringify(body, null, 2))
+  }
+
+  return
+}

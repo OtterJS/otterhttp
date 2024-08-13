@@ -1,5 +1,4 @@
 import { createReadStream, statSync } from 'node:fs'
-import type { IncomingMessage as I, ServerResponse as S } from 'node:http'
 import { extname, isAbsolute } from 'node:path'
 import { join } from 'node:path'
 import { Writable } from 'node:stream'
@@ -36,7 +35,11 @@ export type Caching = Partial<{
   immutable: boolean
 }>
 
-type Res = HasOutgoingHeaders & HasReq<HasIncomingHeaders> & HasStatus & HasWriteMethods & NodeJS.WritableStream
+type SendFileResponse = HasOutgoingHeaders &
+  HasReq<HasIncomingHeaders> &
+  HasStatus &
+  HasWriteMethods &
+  NodeJS.WritableStream
 
 export const enableCaching = (res: HasOutgoingHeaders, caching: Caching): void => {
   let cc = caching.maxAge != null && `public,max-age=${caching.maxAge}`
@@ -61,7 +64,7 @@ const makeIndestructible = (stream: NodeJS.WritableStream) => {
  * @param path
  * @param opts
  */
-export async function sendFile(res: Res, path: string, opts: SendFileOptions = {}): Promise<void> {
+export async function sendFile(res: SendFileResponse, path: string, opts: SendFileOptions = {}): Promise<void> {
   const { root, headers = {}, encoding = 'utf-8', caching, ...options } = opts
   const req = res.req
 

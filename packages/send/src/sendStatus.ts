@@ -1,27 +1,28 @@
-import type { IncomingMessage as I, ServerResponse as S } from 'node:http'
 import { STATUS_CODES } from 'node:http'
-import { send } from './send.js'
 
-type Req = Pick<I, 'method'>
+import { send } from './send'
+import type { HasIncomingHeaders, HasMethod, HasOutgoingHeaders, HasReq, HasStatus, HasWriteMethods } from './types'
 
-type Res = Pick<S, 'setHeader' | 'removeHeader' | 'end' | 'getHeader' | 'statusCode'>
+type SendStatusResponse = HasOutgoingHeaders &
+  HasReq<HasIncomingHeaders & HasMethod> &
+  HasStatus &
+  HasWriteMethods &
+  NodeJS.WritableStream
 
 /**
  * Sets the response HTTP status code to statusCode and send its string representation as the response body.
  *
  * If an unsupported status code is specified, the HTTP status is still set to statusCode and the string version of the code is sent as the response body.
  *
- * @param req Request
  * @param res Response
+ * @param statusCode
  */
-export const sendStatus =
-  <Request extends Req = Req, Response extends Res = Res>(req: Request, res: Response) =>
-  (statusCode: number): Response => {
-    const body = STATUS_CODES[statusCode] || String(statusCode)
+export function sendStatus(res: SendStatusResponse, statusCode: number): void {
+  const body = STATUS_CODES[statusCode] ?? String(statusCode)
 
-    res.statusCode = statusCode
+  res.statusCode = statusCode
 
-    res.setHeader('Content-Type', 'text/plain')
+  res.setHeader('Content-Type', 'text/plain')
 
-    return send(req, res)(body)
-  }
+  send(res, body)
+}
