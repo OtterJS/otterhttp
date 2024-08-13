@@ -1,12 +1,4 @@
-import type { IncomingHttpHeaders, IncomingMessage } from 'node:http'
-import type { HasHeaders, Omit } from './types'
-
-type ExtraHeaders = {
-  referrer?: string | undefined
-  'if-range'?: string | undefined
-}
-
-type Headers = Omit<IncomingHttpHeaders, keyof ExtraHeaders> & ExtraHeaders
+import type { HasHeaders, Headers } from './types'
 
 export function getRequestHeader<HeaderName extends string>(
   req: HasHeaders,

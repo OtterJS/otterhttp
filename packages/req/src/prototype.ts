@@ -1,4 +1,4 @@
-import { type IncomingHttpHeaders, IncomingMessage } from 'node:http'
+import { IncomingMessage } from 'node:http'
 import type { ParsedUrlQuery } from 'node:querystring'
 import { Accepts } from '@otterhttp/accepts'
 import type { Trust } from '@otterhttp/proxy-address'
@@ -11,6 +11,7 @@ import { getRequestHeader } from './get-header'
 import { getHost, getSubdomains } from './host'
 import { type Protocol, getProtocol } from './protocol'
 import { getRange } from './range'
+import type { Headers } from './types'
 import { isXmlHttpRequest } from './util/is-xml-http-request'
 import { requestTypeIs } from './util/request-type-is'
 
@@ -53,7 +54,7 @@ export class Request<Body = unknown> extends IncomingMessage {
     this._ips = getIPs(this, trust)
   }
 
-  get<HeaderName extends string>(header: HeaderName): IncomingHttpHeaders[HeaderName] {
+  getHeader<HeaderName extends Lowercase<string>>(header: HeaderName): Headers[HeaderName] {
     return getRequestHeader(this, header)
   }
 
