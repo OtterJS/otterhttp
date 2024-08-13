@@ -5,8 +5,6 @@ import { formatResponse } from './format.js'
 import { setResponseLocationHeader } from './headers'
 import type { HasAccepts, HasMethod, HasOutgoingHeaders, HasReq, HasStatus } from './types'
 
-type next = (err?: any) => void
-
 type RedirectResponse = HasOutgoingHeaders & HasStatus & HasReq<HasAccepts & HasMethod> & NodeJS.WritableStream
 export async function redirect(res: RedirectResponse, url: string, status?: number) {
   let address: string | undefined = url
