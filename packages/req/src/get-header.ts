@@ -2,7 +2,8 @@ import type { IncomingHttpHeaders } from 'node:http'
 import type { HasHeaders } from './types'
 
 type Headers = IncomingHttpHeaders & {
-  referrer: string | undefined
+  referrer?: string | undefined
+  'if-range'?: string | undefined
 }
 
 export function getRequestHeader<HeaderName extends string>(
@@ -13,9 +14,16 @@ export function getRequestHeader<HeaderName extends string>(
 
   switch (headerNameLowerCase) {
     case 'referer':
-    case 'referrer':
+    case 'referrer': {
       return req.headers.referer || (req.headers.referrer as string | undefined)
-    default:
+    }
+    case 'if-range': {
+      const header = req.headers['if-range']
+      if (Array.isArray(header)) return header.join(', ')
+      return header
+    }
+    default: {
       return req.headers[headerNameLowerCase]
+    }
   }
 }
