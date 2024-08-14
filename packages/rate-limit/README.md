@@ -1,6 +1,7 @@
 # @otterhttp/rate-limit
 
-[![npm (scoped)][npm-badge]](https://npmjs.com/package/@otterhttp/rate-limit) [![npm][dl-badge]](https://npmjs.com/package/@otterhttp/rate-limit) [![][web-badge]](https://tinyhttp.v1rtl.site/mw/rate-limit)
+[![npm (scoped)][npm-badge]](https://npmjs.com/package/@otterhttp/rate-limit) 
+[![npm][dl-badge]](https://npmjs.com/package/@otterhttp/rate-limit)
 
 Basic rate-limiting middleware for tinyhttp. Used to limit repeated requests to public APIs and/or endpoints such as password reset.
 
@@ -44,4 +45,3 @@ new App().get('limited-route', rateLimit({ max: 10, windowMs: 60 * 1000 /* 1 min
 
 [npm-badge]: https://img.shields.io/npm/v/@otterhttp/rate-limit?style=flat-square
 [dl-badge]: https://img.shields.io/npm/dt/@otterhttp/rate-limit?style=flat-square
-[web-badge]: https://img.shields.io/badge/website-visit-hotpink?style=flat-square

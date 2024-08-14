@@ -11,10 +11,5 @@ Response extensions for tinyhttp collected in one package. This module itself de
 pnpm i @otterhttp/response
 ```
 
-## API
-
-[tinyhttp Response docs](https://tinyhttp.v1rtl.site/docs#response).
-
 [npm-badge]: https://img.shields.io/npm/v/@otterhttp/response?style=flat-square
 [dl-badge]: https://img.shields.io/npm/dt/@otterhttp/response?style=flat-square
-[web-badge]: https://img.shields.io/badge/website-visit-hotpink?style=flat-square

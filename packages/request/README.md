@@ -17,4 +17,3 @@ pnpm i @otterhttp/request
 
 [npm-badge]: https://img.shields.io/npm/v/@otterhttp/request?style=flat-square
 [dl-badge]: https://img.shields.io/npm/dt/@otterhttp/request?style=flat-square
-[web-badge]: https://img.shields.io/badge/website-visit-hotpink?style=flat-square

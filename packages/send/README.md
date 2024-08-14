@@ -2,10 +2,9 @@
 
 [![npm (scoped)][npm-badge]](https://npmjs.com/package/@otterhttp/send)
 [![npm][dl-badge]](https://npmjs.com/package/@otterhttp/send)
-[![][web-badge]](https://tinyhttp.v1rtl.site/mw/send)
 
-Extensions for sending a response, including `send`, `sendStatus`, `status`,
-`sendFile` and `json`. Works with any backend framework that supports `async`/`await` middleware.
+Extensions for sending a response, including `send`, `sendStatus`, `sendFile` and `json`. 
+Works with any backend framework that supports `async`/`await` middleware.
 
 ## Install
 
@@ -101,10 +100,9 @@ await res.sendFile('song.mp3', { root: process.cwd() })
 import { createServer } from 'node:http'
 import { send } from '@otterhttp/send'
 
-createServer((req, res) => send(req, res)('Hello World')).listen(3000)
+createServer((req, res) => send(res, 'Hello World')).listen(3000)
 ```
 
 [npm-badge]: https://img.shields.io/npm/v/@otterhttp/send?style=flat-square
 [dl-badge]: https://img.shields.io/npm/dt/@otterhttp/send?style=flat-square
-[web-badge]: https://img.shields.io/badge/website-visit-hotpink?style=flat-square
-[doc-badge]: https://img.shields.io/badge/-docs-hotpink?style=flat-square
+[doc-badge]: https://img.shields.io/badge/-docs-blueviolet?style=flat-square

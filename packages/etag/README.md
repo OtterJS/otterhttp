@@ -1,6 +1,7 @@
 # @otterhttp/etag
 
-[![npm (scoped)](https://img.shields.io/npm/v/@otterhttp/etag?style=flat-square)](https://npmjs.com/package/@otterhttp/etag) [![npm](https://img.shields.io/npm/dt/@otterhttp/etag?style=flat-square)](https://npmjs.com/package/@otterhttp/etag) [![](https://img.shields.io/badge/website-visit-hotpink?style=flat-square)](https://tinyhttp.v1rtl.site/mw/etag)
+[![npm (scoped)](https://img.shields.io/npm/v/@otterhttp/etag?style=flat-square)](https://npmjs.com/package/@otterhttp/etag) 
+[![npm](https://img.shields.io/npm/dt/@otterhttp/etag?style=flat-square)](https://npmjs.com/package/@otterhttp/etag)
 
 > A rewrite of [etag](https://www.npmjs.com/package/etag) module.
 
