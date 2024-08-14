@@ -1,5 +1,5 @@
+import { MemoryStore } from '@/packages/rate-limit/src'
 import { describe, expect, it, vi } from 'vitest'
-import { MemoryStore } from '../../../packages/rate-limit/src'
 
 const key = '127.0.0.1'
 
