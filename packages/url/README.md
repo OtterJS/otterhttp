@@ -1,6 +1,7 @@
-# @otterhttp/req
+# @otterhttp/url
 
-[![npm (scoped)][npm-badge]](https://npmjs.com/package/@otterhttp/req) [![npm][dl-badge]](https://npmjs.com/package/@otterhttp/req) [![][web-badge]](https://tinyhttp.v1rtl.site/mw/req)
+[![npm (scoped)][npm-badge]](https://npmjs.com/package/@otterhttp/url) 
+[![npm][dl-badge]](https://npmjs.com/package/@otterhttp/url) 
 
 URL extensions for to parse query parameters, URL parameters, and more.
 
@@ -10,6 +11,5 @@ URL extensions for to parse query parameters, URL parameters, and more.
 pnpm i @otterhttp/url
 ```
 
-[npm-badge]: https://img.shields.io/npm/v/@otterhttp/req?style=flat-square
-[dl-badge]: https://img.shields.io/npm/dt/@otterhttp/req?style=flat-square
-[web-badge]: https://img.shields.io/badge/website-visit-hotpink?style=flat-square
+[npm-badge]: https://img.shields.io/npm/v/@otterhttp/url?style=flat-square
+[dl-badge]: https://img.shields.io/npm/dt/@otterhttp/url?style=flat-square

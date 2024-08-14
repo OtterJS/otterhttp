@@ -1,6 +1,6 @@
 import { IncomingMessage, type Server, ServerResponse, createServer } from 'node:http'
-import { Request } from '@otterhttp/req'
-import { Response } from '@otterhttp/res'
+import { Request } from '@otterhttp/request'
+import { Response } from '@otterhttp/response'
 import type { Handler, Middleware, NextFunction, UseMethodParams } from '@otterhttp/router'
 import { Router, pushMiddleware } from '@otterhttp/router'
 import { type URLParams, getPathname, getURLParams } from '@otterhttp/url'

@@ -1,6 +1,6 @@
 import { STATUS_CODES } from 'node:http'
-import type { Request } from '@otterhttp/req'
-import type { Response } from '@otterhttp/res'
+import type { Request } from '@otterhttp/request'
+import type { Response } from '@otterhttp/response'
 import type { NextFunction } from '@otterhttp/router'
 
 import type { App } from './app'

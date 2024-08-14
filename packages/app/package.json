@@ -24,8 +24,8 @@
   "dependencies": {
     "@otterhttp/cookie": "workspace:*",
     "@otterhttp/proxy-address": "workspace:*",
-    "@otterhttp/req": "workspace:*",
-    "@otterhttp/res": "workspace:*",
+    "@otterhttp/request": "workspace:*",
+    "@otterhttp/response": "workspace:*",
     "@otterhttp/router": "workspace:*",
     "@otterhttp/url": "workspace:*",
     "header-range-parser": "1.1.3",

@@ -1,6 +1,6 @@
 import { ServerResponse } from 'node:http'
 import { HttpError } from '@otterhttp/errors'
-import type { Request } from '@otterhttp/req'
+import type { Request } from '@otterhttp/request'
 import { type JSONLiteral, type SendFileOptions, json, send, sendFile, sendStatus } from '@otterhttp/send'
 
 import { type SetCookieOptions, clearCookie, setCookie } from './cookie'

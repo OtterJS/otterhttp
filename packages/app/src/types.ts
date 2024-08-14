@@ -1,7 +1,7 @@
 /* c8 ignore start*/
 import type { Trust } from '@otterhttp/proxy-address'
-import type { Request } from '@otterhttp/req'
-import type { Response } from '@otterhttp/res'
+import type { Request } from '@otterhttp/request'
+import type { Response } from '@otterhttp/response'
 import type { Handler } from '@otterhttp/router'
 
 import type { ErrorHandler } from './onError'

@@ -12,14 +12,15 @@
 "@otterhttp/jsonp": major
 "@otterhttp/proxy-address": major
 "@otterhttp/rate-limit": major
-"@otterhttp/req": major
-"@otterhttp/res": major
+"@otterhttp/request": major
+"@otterhttp/response": major
 "@otterhttp/router": major
 "@otterhttp/send": major
 "@otterhttp/type-is": major
 "@otterhttp/url": major
 "@otterhttp/content-type": minor
 "@otterhttp/vary": minor
+"@otterhttp/errors": minor
 ---
 
 Initial release of @otterhttp

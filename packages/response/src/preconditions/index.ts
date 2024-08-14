@@ -1,5 +1,5 @@
 import { ClientError, HttpStatus, NotModifiedError } from '@otterhttp/errors'
-import { getRequestHeader } from '@otterhttp/req'
+import { getRequestHeader } from '@otterhttp/request'
 
 import type { HasIncomingHeaders, HasMethod, HasOutgoingHeaders, HasReq, HasStatus } from '../types'
 

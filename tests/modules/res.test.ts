@@ -3,8 +3,8 @@ import { makeFetch } from 'supertest-fetch'
 import { describe, expect, it } from 'vitest'
 
 import { sign } from '@/packages/cookie-signature/src'
-import type { Response } from '@/packages/res/src'
 import { runServer } from '@/test_helpers/runServer'
+import type { Response } from '../../packages/response/src'
 
 function writeError(res: Response, err: unknown) {
   if (err instanceof Error && 'status' in err) {

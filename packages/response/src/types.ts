@@ -1,5 +1,5 @@
 import type { IncomingHttpHeaders, OutgoingHttpHeaders, ServerResponse } from 'node:http'
-import type { Request } from '@otterhttp/req'
+import type { Request } from '@otterhttp/request'
 
 import type { Response } from './prototype'
 

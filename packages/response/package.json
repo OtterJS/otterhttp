@@ -1,5 +1,5 @@
 {
-  "name": "@otterhttp/res",
+  "name": "@otterhttp/response",
   "version": "2.2.3",
   "type": "module",
   "description": "response extensions for tinyhttp",
@@ -7,7 +7,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/otterjs/otterhttp.git",
-    "directory": "packages/res"
+    "directory": "packages/response"
   },
   "types": "./dist/index.d.ts",
   "exports": "./dist/index.js",
@@ -26,7 +26,7 @@
     "@otterhttp/cookie": "workspace:*",
     "@otterhttp/encode-url": "workspace:*",
     "@otterhttp/errors": "workspace:*",
-    "@otterhttp/req": "workspace:*",
+    "@otterhttp/request": "workspace:*",
     "@otterhttp/send": "workspace:*",
     "@otterhttp/vary": "workspace:*",
     "es-escape-html": "^0.1.1",

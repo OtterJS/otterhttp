@@ -1,5 +1,5 @@
-import { Request } from '@otterhttp/req'
-import { Response } from '@otterhttp/res'
+import { Request } from '@otterhttp/request'
+import { Response } from '@otterhttp/response'
 
 export { App } from './app.js'
 export { getExtendMiddleware } from './extend.js'

@@ -3,10 +3,10 @@ import { makeFetch } from 'supertest-fetch'
 import { assert, afterEach, describe, expect, it, vi } from 'vitest'
 
 import { App, type Request, type Response } from '@/packages/app/src'
-import * as reqGetHeader from '@/packages/req/src/get-header'
 import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
+import * as reqGetHeader from '../../packages/request/src/get-header'
 
-vi.mock<typeof reqGetHeader>(import('@/packages/req/src/get-header'), async (importOriginal) => {
+vi.mock<typeof reqGetHeader>(import('../../packages/request/src/get-header'), async (importOriginal) => {
   const module = await importOriginal()
 
   return {
