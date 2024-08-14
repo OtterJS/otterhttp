@@ -24,6 +24,7 @@ export default defineConfig({
       '@otterhttp/cookie-signature': relative('packages/cookie-signature/src'),
       '@otterhttp/dotenv': relative('packages/dotenv/src'),
       '@otterhttp/encode-url': relative('packages/encode-url/src'),
+      '@otterhttp/errors': relative('packages/errors/src'),
       '@otterhttp/etag': relative('packages/etag/src'),
       '@otterhttp/forwarded': relative('packages/forwarded/src'),
       '@otterhttp/ip-filter': relative('packages/ip-filter/src'),
