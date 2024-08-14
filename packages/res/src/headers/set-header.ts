@@ -1,5 +1,5 @@
 import type { HasOutgoingHeaders, Headers, Input } from '../types'
-import { setCharset } from '../util'
+import { ensureCharsetOnPlaintextTypes } from '../util'
 
 type ResponseHeaderSetter<HeaderName extends string> = (
   res: HasOutgoingHeaders,
@@ -32,11 +32,8 @@ class ResponseHeaderSpecialCasesMap {
 
 export const setResponseHeaderSpecialCases = new ResponseHeaderSpecialCasesMap()
 
-const contentTypeCharsetRegExp = /;\s*charset\s*=/
 setResponseHeaderSpecialCases.set('content-type', (_, value): string => {
   // provide a default charset when the API consumer has omitted one
-  if (!contentTypeCharsetRegExp.test(value)) {
-    value = setCharset(value, 'utf-8')
-  }
+  value = ensureCharsetOnPlaintextTypes(value, 'utf-8')
   return value
 })

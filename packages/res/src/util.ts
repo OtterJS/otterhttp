@@ -1,4 +1,4 @@
-import { format, parse } from '@otterhttp/content-type'
+import { format, isPlainText, parse } from '@otterhttp/content-type'
 import mime from 'mime'
 
 export type NormalizedType = {
@@ -39,8 +39,10 @@ export function normalizeTypes(types: string[]): NormalizedType[] {
   return ret
 }
 
-export function setCharset(type: string, charset: string): string {
+export function ensureCharsetOnPlaintextTypes(type: string, charset: string): string {
   const parsed = parse(type)
+  if (parsed.parameters?.charset != null) return type
+  if (!isPlainText(parsed)) return type
   parsed.parameters ??= {}
   parsed.parameters.charset = charset
   return format(parsed)
