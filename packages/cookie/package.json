@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/cookie",
-  "version": "2.1.1",
+  "version": "3.0.0",
   "type": "module",
   "description": "HTTP cookie parser and serializer for Node.js",
   "homepage": "https://otterhttp.lordfirespeed.dev",
