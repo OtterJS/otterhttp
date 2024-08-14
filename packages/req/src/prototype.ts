@@ -86,8 +86,10 @@ export class Request<Body = unknown> extends IncomingMessage {
     return this._acceptsMeta.languages(languages)
   }
 
-  is(types: string[]): boolean {
-    return requestTypeIs(this, types)
+  is(type: string): boolean
+  is(types: string[]): boolean
+  is(types: string | string[]): boolean {
+    return requestTypeIs(this, Array.isArray(types) ? types : [types])
   }
 
   get query(): ParsedUrlQuery {
