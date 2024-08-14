@@ -11,7 +11,14 @@ export type HasMethod = { method: string }
 
 export type HasOutgoingHeaders = Pick<
   Response,
-  'getHeader' | 'getHeaders' | 'setHeader' | 'appendHeader' | 'getHeaderNames' | 'hasHeader' | 'removeHeader'
+  | 'getHeader'
+  | 'getHeaders'
+  | 'setHeader'
+  | 'appendHeader'
+  | 'getHeaderNames'
+  | 'hasHeader'
+  | 'removeHeader'
+  | 'headersSent'
 >
 
 export type HasStatus = {

@@ -4,7 +4,14 @@ export type HasIncomingHeaders = { headers: IncomingHttpHeaders }
 
 export type HasOutgoingHeaders = Pick<
   ServerResponse,
-  'getHeader' | 'getHeaders' | 'setHeader' | 'appendHeader' | 'getHeaderNames' | 'hasHeader' | 'removeHeader'
+  | 'getHeader'
+  | 'getHeaders'
+  | 'setHeader'
+  | 'appendHeader'
+  | 'getHeaderNames'
+  | 'hasHeader'
+  | 'removeHeader'
+  | 'headersSent'
 >
 
 export type HasStatus = {
