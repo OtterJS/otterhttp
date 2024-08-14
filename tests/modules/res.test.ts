@@ -2,29 +2,22 @@ import path from 'node:path'
 import { makeFetch } from 'supertest-fetch'
 import { describe, expect, it } from 'vitest'
 
-import type { Request, Response } from '@/packages/app/src'
-import {
-  append,
-  attachment,
-  clearCookie,
-  download,
-  formatResponse,
-  getResponseHeader,
-  redirect,
-  setContentType,
-  setCookie,
-  setHeader,
-  setLinksHeader,
-  setLocationHeader,
-  setVaryHeader
-} from '@/packages/res/src'
+import { sign } from '@/packages/cookie-signature'
+import type { Response } from '@/packages/res/src'
 import { runServer } from '@/test_helpers/runServer'
 
+function writeError(res: Response, err: unknown) {
+  if (err instanceof Error && 'status' in err) {
+    return res.writeHead(err.status as number).end(err.message)
+  }
+  return res.writeHead(500).end('unknown error occurred')
+}
+
 describe('Response extensions', () => {
-  describe('res.set(field, val)', () => {
+  describe('res.setHeader(field, val)', () => {
     it('should set a string header with a string value', async () => {
       const app = runServer((_, res) => {
-        setHeader(res)('hello', 'World')
+        res.setHeader('hello', 'World')
         res.end()
       })
 
@@ -32,45 +25,44 @@ describe('Response extensions', () => {
     })
     it('should set an array of header values', async () => {
       const app = runServer((_, res) => {
-        setHeader(res)('foo', ['bar', 'baz'])
+        res.setHeader('foo', ['bar', 'baz'])
         res.end()
       })
 
       await makeFetch(app)('/').expectHeader('foo', 'bar, baz')
     })
-    it('should throw if `Content-Type` header is passed as an array', async () => {
+    it('should set a charset if one is not already set', async () => {
       const app = runServer((_, res) => {
-        try {
-          setHeader(res)('content-type', ['foo', 'bar'])
-        } catch (e) {
-          res.statusCode = 500
-          res.end((e as TypeError).message)
-        }
+        res.setHeader('content-type', 'text/plain')
+        res.end()
       })
-      await makeFetch(app)('/').expect(500, 'Content-Type cannot be set to an Array')
+
+      await makeFetch(app)('/').expectHeader('content-type', 'text/plain; charset=utf-8')
     })
-    it('if the first argument is object, then map keys to values', async () => {
+    it('should not set a charset if one is already set', async () => {
       const app = runServer((_, res) => {
-        setHeader(res)({ foo: 'bar' })
+        res.setHeader('content-type', 'text/plain; charset=utf-8')
+        res.end()
+      })
+
+      await makeFetch(app)('/').expectHeader('content-type', 'text/plain; charset=utf-8')
+    })
+  })
+  describe('res.setHeaders(fields)', () => {
+    it('maps keys to values', async () => {
+      const app = runServer((_, res) => {
+        res.setHeaders({ foo: 'bar' })
         res.end()
       })
 
       await makeFetch(app)('/').expectHeader('foo', 'bar')
     })
-    it('should not set a charset of one is already set', async () => {
-      const app = runServer((_, res) => {
-        setHeader(res)('content-type', 'text/plain; charset=UTF-8')
-        res.end()
-      })
-
-      await makeFetch(app)('/').expectHeader('content-type', 'text/plain; charset=UTF-8')
-    })
   })
-  describe('res.get(field)', () => {
+  describe('res.getHeader(field)', () => {
     it('should get a header with a specified field', async () => {
       const app = runServer((_, res) => {
-        setHeader(res)('hello', 'World')
-        res.end(getResponseHeader(res)('hello'))
+        res.setHeader('hello', 'World')
+        res.end(res.getHeader('hello'))
       })
 
       await makeFetch(app)('/').expect('World')
@@ -79,7 +71,7 @@ describe('Response extensions', () => {
   describe('res.vary(field)', () => {
     it('should set a "Vary" header properly', async () => {
       const app = runServer((_, res) => {
-        setVaryHeader(res)('User-Agent').end()
+        res.vary('User-Agent').end()
       })
 
       await makeFetch(app)('/').expect('Vary', 'User-Agent')
@@ -87,8 +79,9 @@ describe('Response extensions', () => {
   })
   describe('res.redirect(url, status)', () => {
     it('should set 302 status and message about redirecting', async () => {
-      const app = runServer((req, res) => {
-        redirect(req, res, () => {})('/abc').end()
+      const app = runServer(async (_req, res) => {
+        await res.redirect('/abc')
+        res.end()
       })
 
       await makeFetch(app)('/', {
@@ -96,11 +89,12 @@ describe('Response extensions', () => {
       }).expect(302, 'Found. Redirecting to /abc')
     })
     it('should follow the redirect', async () => {
-      const app = runServer((req, res) => {
+      const app = runServer(async (req, res) => {
         if (req.url === '/abc') {
           res.writeHead(200).end('Hello World')
         } else {
-          redirect(req, res, () => {})('/abc').end()
+          await res.redirect('/abc')
+          res.end()
         }
       })
 
@@ -109,11 +103,12 @@ describe('Response extensions', () => {
       }).expect(200, 'Hello World')
     })
     it('should send an HTML link to redirect to', async () => {
-      const app = runServer((req, res) => {
+      const app = runServer(async (req, res) => {
         if (req.url === '/abc') {
           res.writeHead(200).end('Hello World')
         } else {
-          redirect(req, res, () => {})('/abc').end()
+          await res.redirect('/abc')
+          res.end()
         }
       })
 
@@ -125,8 +120,13 @@ describe('Response extensions', () => {
       }).expect(302, '<p>Found. Redirecting to <a href="/abc">/abc</a></p>')
     })
     it('should send an empty response for unsupported MIME types', async () => {
-      const app = runServer((req, res) => {
-        redirect(req, res, (err) => res.writeHead(err.status).end(err.message))('/abc').end()
+      const app = runServer(async (_req, res) => {
+        try {
+          await res.redirect('/abc')
+          res.end()
+        } catch (err) {
+          writeError(res, err)
+        }
       })
 
       await makeFetch(app)('/', {
@@ -139,20 +139,20 @@ describe('Response extensions', () => {
   })
   describe('res.format(obj)', () => {
     it('should send text by default', async () => {
-      const app = runServer((req, res) => {
-        formatResponse(req, res, () => {})({
-          text: (_: Request, res: Response) => res.end('Hello World')
-        }).end()
+      const app = runServer(async (_req, res) => {
+        await res.format({
+          text: () => void res.end('Hello World')
+        })
       })
 
       await makeFetch(app)('/').expect(200, 'Hello World')
     })
     it('should send HTML if specified in "Accepts" header', async () => {
-      const app = runServer((req, res) => {
-        formatResponse(req, res, () => {})({
-          text: (_: Request, res: Response) => res.end('Hello World'),
-          html: (_: Request, res: Response) => res.end('<h1>Hello World</h1>')
-        }).end()
+      const app = runServer(async (_req, res) => {
+        await res.format({
+          text: () => void res.end('Hello World'),
+          html: () => void res.end('<h1>Hello World</h1>')
+        })
       })
 
       await makeFetch(app)('/', {
@@ -161,14 +161,17 @@ describe('Response extensions', () => {
         }
       })
         .expect(200, '<h1>Hello World</h1>')
-        .expectHeader('Content-Type', 'text/html')
+        .expectHeader('Content-Type', 'text/html; charset=utf-8')
     })
     it('should throw 406 status when invalid MIME is specified', async () => {
-      const app = runServer((req, res) => {
-        // biome-ignore lint/style/noNonNullAssertion: it's just a test
-        formatResponse(req, res, (err) => res.writeHead(err!.status!).end(err!.message))({
-          text: (_: Request, res: Response) => res.end('Hello World')
-        }).end()
+      const app = runServer(async (_req, res) => {
+        try {
+          await res.format({
+            text: () => void res.end('Hello World')
+          })
+        } catch (err) {
+          writeError(res, err)
+        }
       })
 
       await makeFetch(app)('/', {
@@ -178,10 +181,11 @@ describe('Response extensions', () => {
       }).expect(406, 'Not Acceptable')
     })
     it('should call `default` as a function if specified', async () => {
-      const app = runServer((req, res) => {
-        formatResponse(req, res, () => {})({
-          default: () => res.end('Hello World')
-        }).end()
+      const app = runServer(async (_req, res) => {
+        await res.format({
+          default: () => void res.end('Hello World')
+        })
+        res.end()
       })
 
       await makeFetch(app)('/').expect(200, 'Hello World')
@@ -190,14 +194,14 @@ describe('Response extensions', () => {
   describe('res.type(type)', () => {
     it('should detect MIME type', async () => {
       const app = runServer((_, res) => {
-        setContentType(res)('html').end()
+        res.contentType('html').end()
       })
 
       await makeFetch(app)('/').expect('Content-Type', 'text/html; charset=utf-8')
     })
     it('should detect MIME type by extension', async () => {
       const app = runServer((_, res) => {
-        setContentType(res)('.html').end()
+        res.contentType('.html').end()
       })
 
       await makeFetch(app)('/').expect('Content-Type', 'text/html; charset=utf-8')
@@ -206,14 +210,14 @@ describe('Response extensions', () => {
   describe('res.attachment(filename)', () => {
     it('should set Content-Disposition without a filename specified', async () => {
       const app = runServer((_, res) => {
-        attachment(res)().end()
+        res.attachment().end()
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment')
     })
     it('should set Content-Disposition with a filename specified', async () => {
       const app = runServer((_, res) => {
-        attachment(res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico')).end()
+        res.attachment(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico')).end()
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
@@ -221,31 +225,31 @@ describe('Response extensions', () => {
   })
   describe('res.download(filename)', () => {
     it('should set Content-Disposition based on path', async () => {
-      const app = runServer(async (req, res) => {
-        await download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'))
+      const app = runServer(async (_req, res) => {
+        await res.download(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'))
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
     })
     it('should set Content-Disposition based on filename', async () => {
-      const app = runServer(async (req, res) => {
-        await download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.icon')
+      const app = runServer(async (_req, res) => {
+        await res.download(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.icon')
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.icon"')
     })
     it('should raise errors without closing response socket', async () => {
-      const app = runServer(async (req, res) => {
+      const app = runServer(async (_req, res) => {
         await expect(
-          download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures'), 'some_file.png')
+          res.download(path.resolve(import.meta.dirname, '..', 'fixtures'), 'some_file.png')
         ).rejects.toThrow(/EISDIR/)
       })
 
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="some_file.png"')
     })
     it('should set "root" from options', async () => {
-      const app = runServer(async (req, res) => {
-        await download(req, res)('favicon.ico', 'favicon.ico', {
+      const app = runServer(async (_req, res) => {
+        await res.download('favicon.ico', 'favicon.ico', {
           root: path.resolve(import.meta.dirname, '..', 'fixtures')
         })
       })
@@ -253,8 +257,8 @@ describe('Response extensions', () => {
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
     })
     it(`'should pass options to sendFile's ReadStream'`, async () => {
-      const app = runServer(async (req, res) => {
-        await download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.ico', {
+      const app = runServer(async (_req, res) => {
+        await res.download(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.ico', {
           encoding: 'ascii'
         })
       })
@@ -262,8 +266,8 @@ describe('Response extensions', () => {
       await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
     })
     it('should set headers from options', async () => {
-      const app = runServer(async (req, res) => {
-        await download(req, res)(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.ico', {
+      const app = runServer(async (_req, res) => {
+        await res.download(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.ico', {
           headers: {
             'X-Custom-Header': 'Value'
           }
@@ -277,8 +281,9 @@ describe('Response extensions', () => {
   })
   describe('res.cookie(name, value, options)', () => {
     it('serializes the cookie and puts it in a Set-Cookie header', async () => {
-      const app = runServer((req, res) => {
-        setCookie(req, res)('hello', 'world').end()
+      const app = runServer(async (_req, res) => {
+        await res.cookie('hello', 'world')
+        res.end()
 
         expect(res.getHeader('Set-Cookie')).toBe('hello=world; Path=/')
       })
@@ -286,34 +291,34 @@ describe('Response extensions', () => {
       await makeFetch(app)('/').expect(200)
     })
     it('sets default path to "/" if not specified in options', async () => {
-      const app = runServer((req, res) => {
-        setCookie(req, res)('hello', 'world').end()
+      const app = runServer(async (_req, res) => {
+        await res.cookie('hello', 'world')
+        res.end()
 
         expect(res.getHeader('Set-Cookie')).toContain('Path=/')
       })
 
       await makeFetch(app)('/').expect(200)
     })
-    it('should throw if it is signed and and no secret is provided', async () => {
-      const app = runServer((req, res) => {
-        try {
-          setCookie(req, res)('hello', 'world', {
-            signed: true
-          }).end()
-        } catch (e) {
-          res.end((e as TypeError).message)
-        }
+    it('should use encode function if provided', async () => {
+      const encode = (value: string) => `s:${sign(value, 'foo')}`
+      const app = runServer(async (_req, res) => {
+        await res.cookie('hello', 'world', { encode })
+        res.end()
       })
 
-      await makeFetch(app)('/').expect('cookieParser("secret") required for signed cookies')
+      const response = await makeFetch(app)('/')
+      const cookies = new Headers(response.headers).getSetCookie()
+      expect(cookies).toContain(`hello=${encodeURIComponent(encode('world'))}; Path=/`)
     })
     it('should set "maxAge" and "expires" from options', async () => {
       const maxAge = 3600 * 24 * 365
 
-      const app = runServer((req, res) => {
-        setCookie(req, res)('hello', 'world', {
+      const app = runServer(async (_req, res) => {
+        await res.cookie('hello', 'world', {
           maxAge
-        }).end()
+        })
+        res.end()
 
         expect(res.getHeader('Set-Cookie')).toContain(`Max-Age=${maxAge / 1000}; Path=/; Expires=`)
       })
@@ -321,9 +326,10 @@ describe('Response extensions', () => {
       await makeFetch(app)('/').expect(200)
     })
     it('should append to Set-Cookie if called multiple times', async () => {
-      const app = runServer((req, res) => {
-        setCookie(req, res)('hello', 'world')
-        setCookie(req, res)('foo', 'bar').end()
+      const app = runServer(async (_req, res) => {
+        await res.cookie('hello', 'world')
+        await res.cookie('foo', 'bar')
+        res.end()
       })
 
       await makeFetch(app)('/').expect(200).expectHeader('Set-Cookie', 'hello=world; Path=/, foo=bar; Path=/')
@@ -331,8 +337,9 @@ describe('Response extensions', () => {
   })
   describe('res.clearCookie(name, options)', () => {
     it('sets path to "/" if not specified in options', async () => {
-      const app = runServer((req, res) => {
-        clearCookie(req, res)('cookie').end()
+      const app = runServer(async (_req, res) => {
+        await res.clearCookie('cookie')
+        res.end()
 
         expect(res.getHeader('Set-Cookie')).toContain('Path=/;')
       })
@@ -340,10 +347,10 @@ describe('Response extensions', () => {
       await makeFetch(app)('/').expect(200)
     })
   })
-  describe('res.append(field,value)', () => {
+  describe('res.appendHeader(field,value)', () => {
     it('sets new header if header not present', async () => {
       const app = runServer((_, res) => {
-        append(res)('hello', 'World')
+        res.appendHeader('hello', 'World')
         res.end()
       })
 
@@ -351,8 +358,8 @@ describe('Response extensions', () => {
     })
     it('appends value to existing header value', async () => {
       const app = runServer((_, res) => {
-        setHeader(res)('hello', 'World1')
-        append(res)('hello', 'World2')
+        res.setHeader('hello', 'World1')
+        res.appendHeader('hello', 'World2')
         res.end()
       })
 
@@ -360,8 +367,8 @@ describe('Response extensions', () => {
     })
     it('appends value to existing header array', async () => {
       const app = runServer((_, res) => {
-        setHeader(res)('hello', ['World1', 'World2'])
-        append(res)('hello', 'World3')
+        res.setHeader('hello', ['World1', 'World2'])
+        res.appendHeader('hello', 'World3')
         res.end()
       })
 
@@ -369,8 +376,8 @@ describe('Response extensions', () => {
     })
     it('appends value array to existing header value', async () => {
       const app = runServer((_, res) => {
-        setHeader(res)('hello', 'World1')
-        append(res)('hello', ['World2', 'World3'])
+        res.setHeader('hello', 'World1')
+        res.appendHeader('hello', ['World2', 'World3'])
         res.end()
       })
 
@@ -380,10 +387,12 @@ describe('Response extensions', () => {
   describe('res.links(obj)', () => {
     it('should set "Links" header field', async () => {
       const app = runServer((_, res) => {
-        setLinksHeader(res)({
-          next: 'http://api.example.com/users?page=2',
-          last: 'http://api.example.com/users?page=5'
-        }).end()
+        res
+          .links({
+            next: 'http://api.example.com/users?page=2',
+            last: 'http://api.example.com/users?page=5'
+          })
+          .end()
       })
 
       await makeFetch(app)('/')
@@ -395,12 +404,12 @@ describe('Response extensions', () => {
     })
     it('should set "Links" for multiple calls', async () => {
       const app = runServer((_, res) => {
-        setLinksHeader(res)({
+        res.links({
           next: 'http://api.example.com/users?page=2',
           last: 'http://api.example.com/users?page=5'
         })
 
-        setLinksHeader(res)({
+        res.links({
           prev: 'http://api.example.com/users?page=1'
         })
 
@@ -418,74 +427,75 @@ describe('Response extensions', () => {
 
   describe('res.location(url)', () => {
     it('sets the "Location" header', async () => {
-      const app = runServer((req, res) => {
-        setLocationHeader(req, res)('https://example.com').end()
+      const app = runServer((_, res) => {
+        res.location('https://example.com').end()
       })
 
       await makeFetch(app)('/').expectHeader('Location', 'https://example.com').expectStatus(200)
     })
     it('should encode URL', async () => {
-      const app = runServer((req, res) => {
-        setLocationHeader(req, res)('https://google.com?q=\u2603 §10').end()
+      const app = runServer((_req, res) => {
+        res.location('https://google.com?q=\u2603 §10').end()
       })
 
       await makeFetch(app)('/').expectHeader('Location', 'https://google.com?q=%E2%98%83%20%C2%A710').expectStatus(200)
     })
     it('should not touch encoded sequences', async () => {
-      const app = runServer((req, res) => {
-        setLocationHeader(req, res)('https://google.com?q=%A710').end()
+      const app = runServer((_req, res) => {
+        res.location('https://google.com?q=%A710').end()
       })
 
       await makeFetch(app)('/').expectHeader('Location', 'https://google.com?q=%A710').expectStatus(200)
     })
-    describe('"url" is back', () => {
-      it('should set location from "Referer" header', async () => {
-        const app = runServer((req, res) => {
-          setLocationHeader(req, res)('back').end()
-        })
+  })
 
-        await makeFetch(app)('/', {
-          headers: {
-            Referer: '/some/page.html'
-          }
-        })
-          .expect('Location', '/some/page.html')
-          .expectStatus(200)
+  describe('res.fresh', () => {
+    it('returns false if method is neither GET nor HEAD', async () => {
+      const app = runServer((_req, res) => {
+        res.end(res.isFresh() ? 'fresh' : 'stale')
       })
-      it('should set location from "Referrer" header', async () => {
-        const app = runServer((req, res) => {
-          setLocationHeader(req, res)('back').end()
-        })
 
-        await makeFetch(app)('/', {
-          headers: {
-            Referrer: '/some/page.html'
-          }
-        })
-          .expect('Location', '/some/page.html')
-          .expectStatus(200)
-      })
-      it('should prefer "Referrer" header', async () => {
-        const app = runServer((req, res) => {
-          setLocationHeader(req, res)('back').end()
-        })
+      await makeFetch(app)('/', {
+        method: 'POST',
+        body: 'Hello World'
+      }).expect('stale')
+    })
+    it('returns true when the resource is not modified', async () => {
+      const etag = '123'
+      const app = runServer((_req, res) => {
+        res.setHeader('ETag', etag)
 
-        await makeFetch(app)('/', {
-          headers: {
-            Referer: '/some/page1.html',
-            Referrer: '/some/page2.html'
-          }
-        })
-          .expect('Location', '/some/page2.html')
-          .expectStatus(200)
+        res.end(res.isFresh() ? 'fresh' : 'stale')
       })
-      it('should set the header to "/" without referrer', async () => {
-        const app = runServer((req, res) => {
-          setLocationHeader(req, res)('back').end()
-        })
 
-        await makeFetch(app)('/').expect('Location', '/').expectStatus(200)
+      await makeFetch(app)('/', {
+        headers: {
+          'If-None-Match': etag
+        }
+      }).expect('fresh')
+    })
+    it('should return false when the resource is modified', async () => {
+      const etag = '123'
+      const app = runServer((_req, res) => {
+        res.setHeader('ETag', etag)
+
+        res.end(res.isFresh() ? 'fresh' : 'stale')
       })
+
+      await makeFetch(app)('/', {
+        headers: {
+          'If-None-Match': '12345'
+        }
+      }).expect('stale')
+    })
+    it('returns false if status code is neither >=200 nor < 300, nor 304', async () => {
+      const app = runServer((_req, res) => {
+        res.statusCode = 418
+
+        res.end(res.isFresh() ? 'fresh' : 'stale')
+      })
+
+      await makeFetch(app)('/').expect('stale')
     })
   })
 })
