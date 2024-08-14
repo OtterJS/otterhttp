@@ -249,7 +249,7 @@ describe('Request properties', () => {
       assert(!response.ok)
     })
     it('should derive hostname from the :authority header and assign it to req.hostname', async () => {
-      const { getRequestHeader }: typeof reqGetHeader = await vi.importActual('@/packages/req/src/get-header')
+      const { getRequestHeader }: typeof reqGetHeader = await vi.importActual('@/packages/request/src/get-header')
       vi.mocked(reqGetHeader.getRequestHeader).mockImplementation((req: Request, header: string) => {
         if (header === 'host') return undefined
         if (header === ':authority') return 'userinfo@bar.baz:8080'
@@ -273,7 +273,7 @@ describe('Request properties', () => {
       await fetch('/', { headers: { Host: 'foo.bar:8080' } }).expect(200, { port: 8080 })
     })
     it('should derive port from the :authority header and assign it to req.port', async () => {
-      const { getRequestHeader }: typeof reqGetHeader = await vi.importActual('@/packages/req/src/get-header')
+      const { getRequestHeader }: typeof reqGetHeader = await vi.importActual('@/packages/request/src/get-header')
       vi.mocked(reqGetHeader.getRequestHeader).mockImplementation((req: Request, header: string) => {
         if (header === 'host') return undefined
         if (header === ':authority') return 'bar.baz:8080'
@@ -291,7 +291,7 @@ describe('Request properties', () => {
       await expect(response.json()).resolves.toEqual({ port: 8080 })
     })
     it('should reject request when the :authority header disagrees with the host header', async () => {
-      const { getRequestHeader }: typeof reqGetHeader = await vi.importActual('@/packages/req/src/get-header')
+      const { getRequestHeader }: typeof reqGetHeader = await vi.importActual('@/packages/request/src/get-header')
       vi.mocked(reqGetHeader.getRequestHeader).mockImplementation((req: Request, header: string) => {
         if (header === 'host') return 'foo.bar'
         if (header === ':authority') return 'bar.baz'
