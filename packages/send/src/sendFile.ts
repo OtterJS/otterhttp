@@ -84,7 +84,10 @@ export async function sendFile(res: SendFileResponse, path: string, opts: SendFi
 
   // TODO: add freshness check here
 
-  if (!res.getHeader('Content-Type')) headers['Content-Type'] = `${mime.getType(extname(path))}; charset=utf-8`
+  if (!res.getHeader('Content-Type')) {
+    const inferredType = mime.getType(extname(path))
+    if (inferredType != null) headers['Content-Type'] = inferredType
+  }
 
   let status = res.statusCode || 200
 
