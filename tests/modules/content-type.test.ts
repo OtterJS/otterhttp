@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import * as contentType from '@/packages/content-type/src/index'
-import { isPlainText, parse } from '@/packages/content-type/src/index'
+import * as contentType from '@/packages/content-type/src'
+import { isPlainText, parse } from '@/packages/content-type/src'
 
 it('should help me', () => {
   const parsed = parse('application/manifest+json')

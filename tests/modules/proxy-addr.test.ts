@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { allAddresses, compile, proxyAddress } from '@/packages/proxy-address'
+import { allAddresses, compile, proxyAddress } from '@/packages/proxy-address/src'
 import { createReq } from '@/test_helpers/createReq'
 
 const trustAll = () => true
