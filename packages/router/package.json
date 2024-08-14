@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/router",
-  "version": "2.2.2",
+  "version": "3.0.0",
   "type": "module",
   "description": "Router for tinyhttp",
   "homepage": "https://otterhttp.lordfirespeed.dev",

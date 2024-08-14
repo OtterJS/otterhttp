@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/response",
-  "version": "2.2.3",
+  "version": "3.0.0",
   "type": "module",
   "description": "response extensions for tinyhttp",
   "homepage": "https://otterhttp.lordfirespeed.dev",

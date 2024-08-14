@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/cookie-signature",
-  "version": "2.1.1",
+  "version": "3.0.0",
   "description": "HTTP cookie signing and unsigning",
   "homepage": "https://otterhttp.lordfirespeed.dev",
   "repository": {

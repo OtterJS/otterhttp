@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/ip-filter",
-  "version": "2.1.2",
+  "version": "3.0.0",
   "description": "tinyhttp IP filtering middleware",
   "types": "./dist/index.d.ts",
   "type": "module",
