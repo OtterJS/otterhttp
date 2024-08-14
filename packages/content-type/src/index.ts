@@ -158,3 +158,28 @@ export function parse(string: string | Request | Response): ContentType {
 
   return obj
 }
+
+/**
+ * `application` MIME subtypes that are plaintext
+ */
+const applicationPlaintextWhitelist = new Set<string>([
+  'ecmascript',
+  'javascript',
+  'json',
+  'xml',
+  'x-httpd-php',
+  'x-sh',
+  'node'
+])
+
+export function isPlainText({ type }: ContentType) {
+  if (type.startsWith('text/')) return true
+  if (!type.startsWith('application/')) return false
+  let index = 12
+  let start = index
+  for (; index < type.length; ++index) {
+    if (type.charAt(index) === '+') start = index + 1
+  }
+  const subtype = type.slice(start)
+  return applicationPlaintextWhitelist.has(subtype)
+}

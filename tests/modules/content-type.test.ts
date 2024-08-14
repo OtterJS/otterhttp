@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import * as contentType from '@/packages/content-type/src/index'
+import { isPlainText, parse } from '@/packages/content-type/src/index'
+
+it('should help me', () => {
+  const parsed = parse('application/manifest+json')
+})
 
 describe('format', () => {
   it('should format basic type', () => {
@@ -260,5 +265,57 @@ describe('parse', () => {
         expect(type.type).toBe('text/html')
       })
     })
+  })
+})
+
+describe('isPlainText(contentType)', () => {
+  describe('with text/ types', () => {
+    it.each([
+      'text/markdown',
+      'text/plain',
+      'text/subformat+plain',
+      'text/html',
+      'text/tsx',
+      'text/typescript',
+      'text/jsx'
+    ])("should match '%s'", (value: string) => {
+      const type = parse(value)
+      expect(isPlainText(type)).toBe(true)
+    })
+  })
+
+  describe('with application/ types', () => {
+    it.each([
+      'application/ecmascript',
+      'application/javascript',
+      'application/json',
+      'application/subformat+json',
+      'application/xml',
+      'application/rdf+xml',
+      'application/x-httpd-php',
+      'application/x-sh',
+      'application/node'
+    ])("should match '%s'", (value: string) => {
+      const type = parse(value)
+      expect(isPlainText(type)).toBe(true)
+    })
+
+    it.each(['application/hypotheticalxml', 'application/pdf', 'application/octet-stream', 'application/zip'])(
+      "should not match '%s'",
+      (value: string) => {
+        const type = parse(value)
+        expect(isPlainText(type)).toBe(false)
+      }
+    )
+  })
+
+  describe('with other types', () => {
+    it.each(['audio/mp3', 'video/mp4', 'image/webp', 'font/otf', 'audio/json', 'audio/subtype+json'])(
+      "should not match '%s'",
+      (value: string) => {
+        const type = parse(value)
+        expect(isPlainText(type)).toBe(false)
+      }
+    )
   })
 })
