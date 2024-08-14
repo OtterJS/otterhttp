@@ -54,6 +54,7 @@ export class NotModifiedError extends HttpError {
 export class ClientError extends HttpError {
   constructor(message?: string, options: HttpErrorOptions = {}) {
     options.expected ??= true
+    options.statusCode ??= 400
 
     super(message, options)
 
