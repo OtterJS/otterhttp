@@ -2,7 +2,7 @@ import { Agent } from 'node:http'
 import { makeFetch } from 'supertest-fetch'
 import { assert, afterEach, describe, expect, it, vi } from 'vitest'
 
-import { App, type Request } from '@/packages/app/src'
+import { App, type Request, type Response } from '@/packages/app/src'
 import * as reqGetHeader from '@/packages/req/src/get-header'
 import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
@@ -33,7 +33,7 @@ describe('Request properties', () => {
 
   describe('URL extensions', () => {
     it('req.query is being parsed properly', async () => {
-      const { fetch } = InitAppAndTest((req, res) => void res.send(req.query))
+      const { fetch } = InitAppAndTest((req, res) => void res.json(req.query))
 
       await fetch('/?param1=val1&param2=val2').expect(200, {
         param1: 'val1',
@@ -41,7 +41,7 @@ describe('Request properties', () => {
       })
     })
     it('req.params is being parsed properly', async () => {
-      const { fetch } = InitAppAndTest((req, res) => void res.send(req.params), '/:param1/:param2')
+      const { fetch } = InitAppAndTest((req, res) => void res.json(req.params), '/:param1/:param2')
 
       await fetch('/val1/val2').expect(200, {
         param1: 'val1',
@@ -60,7 +60,7 @@ describe('Request properties', () => {
       await fetch('/abc/def').expect(200, '/def')
     })
     it('should set the correct req.url on routes even in a subapp', async () => {
-      const echo = (req, res) => res.send({ url: req.url, params: req.params })
+      const echo = (req: Request, res: Response) => res.json({ url: req.url, params: req.params })
       const makeApp = () => new App().get('/a1/b/*', echo).get('/a2/b/:pat', echo)
 
       const app = makeApp()
@@ -88,7 +88,7 @@ describe('Request properties', () => {
       })
     })
     it('should set the correct req.url on middlewares even in a subapp', async () => {
-      const echo = (req, res) => res.send({ url: req.url, params: req.params })
+      const echo = (req: Request, res: Response) => res.json({ url: req.url, params: req.params })
       const mw = (req, _res, next) => {
         req.urls ||= []
         req.urls.push(req.url)
@@ -98,7 +98,7 @@ describe('Request properties', () => {
         new App<Request & { urls?: string[] }>()
           .get('/', echo)
           .use('/a1/b', echo)
-          .use('/a2/b', mw, mw, mw, (req, res) => res.send({ urls: req.urls, params: req.params }))
+          .use('/a2/b', mw, mw, mw, (req, res) => res.json({ urls: req.urls, params: req.params }))
           .use('/a3/:pat1/:pat2', echo)
           .use('/a4/:pat1/*', echo)
 
@@ -147,7 +147,7 @@ describe('Request properties', () => {
       })
     })
     it('should set the correct req.url on a subapp mounted on a wildcard route, for both route and mw', async () => {
-      const echo = (req, res) => res.send({ url: req.url, params: req.params })
+      const echo = (req: Request, res: Response) => res.json({ url: req.url, params: req.params })
       // Only possible route on subapps below * is / since * is greedy
       const subAppRoute = new App().get('/', echo)
       const subAppMw = new App().use('/', echo)
@@ -257,7 +257,7 @@ describe('Request properties', () => {
       })
 
       const { fetch } = InitAppAndTest((req, res) => {
-        expect(req.get('host')).toBeUndefined()
+        expect(req.getHeader('host')).toBeUndefined()
         res.send(`hostname: ${req.hostname}`)
       })
 
