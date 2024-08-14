@@ -6,17 +6,17 @@ import { App } from '@/packages/app/src'
 import { runServer } from '@/test_helpers/runServer'
 
 describe('Request extensions', () => {
-  describe('req.get(header)', () => {
+  describe('req.getHeader(header)', () => {
     it('should return a specified header', async () => {
       const app = runServer((req, res) => {
-        res.end(req.get('accept'))
+        res.end(req.getHeader('accept'))
       })
 
       await makeFetch(app)('/').expect('*/*')
     })
     it('should handle "referer"', async () => {
       const app = runServer((req, res) => {
-        res.end(req.get('referrer'))
+        res.end(req.getHeader('referrer'))
       })
 
       await makeFetch(app)('/', {
@@ -28,7 +28,7 @@ describe('Request extensions', () => {
     })
     it('should handle "referrer"', async () => {
       const app = runServer((req, res) => {
-        res.end(req.get('referrer'))
+        res.end(req.getHeader('referrer'))
       })
 
       await makeFetch(app)('/', {
