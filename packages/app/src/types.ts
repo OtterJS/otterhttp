@@ -1,11 +1,11 @@
 /* c8 ignore start*/
 import type { Trust } from '@otterhttp/proxy-address'
 import type { Request } from '@otterhttp/req'
+import type { Response } from '@otterhttp/res'
 import type { Handler } from '@otterhttp/router'
 
-import type { ErrorHandler } from './onError.js'
-import type { Response } from './response.js'
-import type { View } from './view.js'
+import type { ErrorHandler } from './onError'
+import type { IViewPrototype } from './view'
 
 /**
  * tinyhttp App has a few settings for toggling features
@@ -16,7 +16,7 @@ export type AppSettings = Partial<{
   xPoweredBy: string | boolean
   enableReqRoute: boolean
   views: string | string[]
-  view: typeof View
+  view: IViewPrototype
   'view cache': boolean
   'view engine': string
   'trust proxy': Trust
@@ -41,7 +41,7 @@ export type AppRenderOptions<O extends TemplateEngineOptions = TemplateEngineOpt
     _locals: Record<string, unknown>
   }>
 
-export type AppConstructor<Req extends Request = Request, Res extends Response = Response> = Partial<{
+export type AppConstructor<Req extends Request = Request, Res extends Response<Req> = Response<Req>> = Partial<{
   noMatchHandler: Handler<Req, Res>
   onError: ErrorHandler<Req, Res>
   settings: AppSettings

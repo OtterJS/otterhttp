@@ -1,8 +1,8 @@
 import { Request } from '@otterhttp/req'
+import { Response } from '@otterhttp/res'
 
 export { App } from './app.js'
-export * from './response.js'
-export { extendMiddleware } from './extend.js'
+export { getExtendMiddleware } from './extend.js'
 export { onErrorHandler, type ErrorHandler } from './onError.js'
 export { View } from './view.js'
 
@@ -15,10 +15,9 @@ import type {
   Handler as RHandler,
   SyncHandler as RSyncHandler
 } from '@otterhttp/router'
-import type { Response } from './response.js'
 
-export { Request }
+export { Request, Response }
 export type Handler = RHandler<Request, Response>
 export type AsyncHandler = RAsyncHandler<Request, Response>
 export type SyncHandler = RSyncHandler<Request, Response>
-export type { NextFunction, Middleware, Response }
+export type { NextFunction, Middleware }

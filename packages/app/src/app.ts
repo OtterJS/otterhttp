@@ -1,18 +1,18 @@
-import { type Server, createServer } from 'node:http'
+import { IncomingMessage, type Server, ServerResponse, createServer } from 'node:http'
 import { Request } from '@otterhttp/req'
+import { Response } from '@otterhttp/res'
 import type { Handler, Middleware, NextFunction, UseMethodParams } from '@otterhttp/router'
 import { Router, pushMiddleware } from '@otterhttp/router'
 import { type URLParams, getPathname, getURLParams } from '@otterhttp/url'
 import { parse as rg } from 'regexparam'
 
-import { extendMiddleware } from './extend.js'
+import { getExtendMiddleware } from './extend.js'
 import type { TemplateEngineOptions } from './index.js'
 import type { ErrorHandler } from './onError.js'
 import { onErrorHandler } from './onError.js'
-import type { Response } from './response.js'
 import { isString, isStringArray } from './type-guards'
 import type { AppConstructor, AppRenderOptions, AppSettings, TemplateEngine } from './types.js'
-import { View } from './view.js'
+import { type IViewPrototype, View } from './view.js'
 
 /**
  * Add leading slash if not present (e.g. path -> /path, /path -> /path)
@@ -20,7 +20,7 @@ import { View } from './view.js'
  */
 const lead = (x: string) => (x.charCodeAt(0) === 47 ? x : `/${x}`)
 
-const mount = <Req extends Request = Request, Res extends Response = Response>(
+const mount = <Req extends Request = Request, Res extends Response<Req> = Response<Req>>(
   fn: App<Req, Res> | Handler<Req, Res>
 ) => (fn instanceof App ? fn.attach : fn)
 
@@ -58,7 +58,7 @@ const applyHandler =
  * const app = App<any, CoolReq, Response>()
  * ```
  */
-export class App<Req extends Request = Request, Res extends Response = Response> extends Router<
+export class App<Req extends Request = Request, Res extends Response<Req> = Response<Req>> extends Router<
   App<Req, Res>,
   Req,
   Res
@@ -160,15 +160,13 @@ export class App<Req extends Request = Request, Res extends Response = Response>
    * @param name What to render
    * @param data data that is passed to a template
    * @param options Template engine options
-   * @param cb Callback that consumes error and html
    */
-  render<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions>(
+  async render<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions>(
     name: string,
     data: Record<string, unknown>,
-    options?: AppRenderOptions<RenderOptions>,
-    cb: (err: unknown, html?: unknown) => void = () => {}
-  ): void {
-    let view: View | undefined
+    options?: AppRenderOptions<RenderOptions>
+  ): Promise<unknown> {
+    let view: InstanceType<IViewPrototype> | undefined
 
     const { _locals, ...opts }: AppRenderOptions = options ?? {}
 
@@ -187,26 +185,19 @@ export class App<Req extends Request = Request, Res extends Response = Response>
     if (!view) {
       const View = this.settings.view
       if (View == null) throw new TypeError(`No app-wide default view engine is configured, cannot render '${name}'`)
-      try {
-        view = new View(name, {
-          defaultEngine: this.settings['view engine'],
-          root: this.settings.views,
-          engines: this.engines
-        })
-      } catch (err) {
-        return cb(err)
-      }
+
+      view = new View(name, {
+        defaultEngine: this.settings['view engine'],
+        root: this.settings.views,
+        engines: this.engines
+      })
 
       if (opts.cache) {
         this.cache[name] = view
       }
     }
 
-    try {
-      view.render(opts, locals, cb)
-    } catch (err) {
-      cb(err)
-    }
+    return await view.render(opts, locals)
   }
 
   use(...args: UseMethodParams<Req, Res, App<Req, Res>>): this {
@@ -298,16 +289,12 @@ export class App<Req extends Request = Request, Res extends Response = Response>
    * @param res Res object
    * @param next 'Next' function
    */
-  handler<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions>(
-    req: Req,
-    res: Res,
-    next?: NextFunction
-  ): void {
+  handler(req: Req, res: Res, next?: NextFunction): void {
     /* Set X-Powered-By header */
     const { xPoweredBy } = this.settings
     if (xPoweredBy) res.setHeader('X-Powered-By', typeof xPoweredBy === 'string' ? xPoweredBy : 'otterhttp')
 
-    const exts = this.applyExtensions || extendMiddleware<RenderOptions, Req, Res>(this)
+    const exts = this.applyExtensions || getExtendMiddleware<Req, Res>(this)
 
     req.originalUrl = req.url || req.originalUrl
 
@@ -412,7 +399,14 @@ export class App<Req extends Request = Request, Res extends Response = Response>
    * @param cb callback to be invoked after server starts listening
    * @param host server listening host
    */
-  listen(port?: number, cb?: () => void, host?: string): Server {
-    return createServer({ IncomingMessage: Request }).on('request', this.attach).listen(port, host, cb)
+  // @ts-ignore https://github.com/DefinitelyTyped/DefinitelyTyped/pull/70289
+  listen(port?: number, cb?: () => void, host?: string): Server<typeof Request, typeof Response<Request>> {
+    // @ts-ignore https://github.com/DefinitelyTyped/DefinitelyTyped/pull/70289
+    return createServer<typeof Request, typeof Response<Request>>({
+      IncomingMessage: Request,
+      ServerResponse: Response
+    })
+      .on('request', this.attach)
+      .listen(port, host, cb)
   }
 }

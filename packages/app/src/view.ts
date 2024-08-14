@@ -29,6 +29,16 @@ function tryStat(path: string) {
   }
 }
 
+type Renderable<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions> = Pick<
+  (typeof View<RenderOptions>)['prototype'],
+  'render'
+>
+
+export type IViewPrototype<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions> = {
+  new (...args: ConstructorParameters<typeof View<RenderOptions>>): Renderable<RenderOptions>
+  prototype: Renderable<RenderOptions>
+}
+
 /**
  * Initialize a new `View` with the given `name`.
  *
