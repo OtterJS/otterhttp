@@ -17,6 +17,10 @@ export abstract class HttpError extends ModuleError {
   exposeMessage: boolean
   headers: OutgoingHttpHeaders
 
+  static {
+    HttpError.prototype.name = 'HttpError'
+  }
+
   protected constructor(message?: string, options?: HttpErrorOptions) {
     super(message || '', options)
 
@@ -42,16 +46,24 @@ export abstract class HttpError extends ModuleError {
 }
 
 export class NotModifiedError extends HttpError {
+  static {
+    NotModifiedError.prototype.name = 'NotModifiedError'
+  }
+
   constructor(message?: string, options?: Omit<HttpErrorOptions, 'statusCode'>) {
     const superOptions: HttpErrorOptions = options ?? {}
     superOptions.statusCode = HttpStatus.NotModified
     superOptions.expected ??= true
 
-    super(message, options)
+    super(message, superOptions)
   }
 }
 
 export class ClientError extends HttpError {
+  static {
+    ClientError.prototype.name = 'ClientError'
+  }
+
   constructor(message?: string, options: HttpErrorOptions = {}) {
     options.expected ??= true
     options.statusCode ??= 400
@@ -68,6 +80,10 @@ export class ClientError extends HttpError {
 }
 
 export class ServerError extends HttpError {
+  static {
+    ServerError.prototype.name = 'ServerError'
+  }
+
   constructor(message?: string, options?: HttpErrorOptions) {
     super(message, options)
     if (this.statusCode < 500) {
