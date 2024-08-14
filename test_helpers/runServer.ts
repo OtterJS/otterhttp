@@ -1,8 +1,9 @@
-import { type Server, type ServerResponse, createServer } from 'node:http'
+import { type Server, createServer } from 'node:http'
 import { Request } from '@/packages/app/src'
+import { Response } from '@/packages/res/src'
 
-export const runServer = (func: (req: Request, res: ServerResponse) => void | Promise<void>): Server => {
-  const listener = async (req: Request, res: ServerResponse) => {
+export const runServer = (func: (req: Request, res: Response) => void | Promise<void>): Server => {
+  const listener = async (req: Request, res: Response) => {
     req.populate({ trust: 0, subdomainOffset: undefined })
     try {
       await func(req, res)
@@ -11,5 +12,6 @@ export const runServer = (func: (req: Request, res: ServerResponse) => void | Pr
     }
   }
 
-  return createServer({ IncomingMessage: Request }, listener)
+  // @ts-ignore https://github.com/DefinitelyTyped/DefinitelyTyped/pull/70289
+  return createServer({ IncomingMessage: Request, ServerResponse: Response }, listener)
 }
