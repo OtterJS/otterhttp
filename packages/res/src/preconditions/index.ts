@@ -1,3 +1,4 @@
+import { ClientError, HttpStatus, NotModifiedError } from '@otterhttp/errors'
 import { getRequestHeader } from '@otterhttp/req'
 
 import type { HasIncomingHeaders, HasMethod, HasOutgoingHeaders, HasReq, HasStatus } from '../types'
@@ -43,7 +44,11 @@ export function validatePreconditions(
   if (ifMatch != null) {
     if (!Object.hasOwnProperty.call(current, 'etag')) current.etag = res.getHeader('etag')
     if (!someMatch(current.etag, ifMatch)) {
-      throw new Error() // todo: use HTTPError with code 412
+      throw new ClientError('If-Match Precondition Failed', {
+        statusCode: HttpStatus.PreconditionFailed,
+        code: 'ERR_PRECONDITION_FAILED_IF_MATCH',
+        expected: true
+      })
     }
   }
 
@@ -55,7 +60,11 @@ export function validatePreconditions(
   if (ifMatch == null && ifUnmodifiedSince != null) {
     if (!Object.hasOwnProperty.call(current, 'lastModified')) current.lastModified = res.getHeader('last-modified')
     if (!isUnmodifiedSince(current.lastModified, ifUnmodifiedSince)) {
-      throw new Error() // todo: use HTTPError with code 412
+      throw new ClientError('If-Unmodified-Since Precondition Failed', {
+        statusCode: HttpStatus.PreconditionFailed,
+        code: 'ERR_PRECONDITION_FAILED_IF_UNMODIFIED_SINCE',
+        expected: true
+      })
     }
   }
 
@@ -68,11 +77,18 @@ export function validatePreconditions(
     const failed = !noneMatch(current.etag, ifNoneMatch)
 
     if (failed && (method === 'GET' || method === 'HEAD')) {
-      throw new Error() // todo: use HTTPError with code 304
+      throw new NotModifiedError('If-None-Match Precondition Failed', {
+        code: 'ERR_PRECONDITION_FAILED_IF_NONE_MATCH',
+        expected: true
+      })
     }
 
     if (failed) {
-      throw new Error() // todo: use HTTPError with code 412
+      throw new ClientError('If-None-Match Precondition Failed', {
+        statusCode: HttpStatus.PreconditionFailed,
+        code: 'ERR_PRECONDITION_FAILED_IF_NONE_MATCH',
+        expected: true
+      })
     }
   }
 
@@ -84,7 +100,10 @@ export function validatePreconditions(
   if ((method === 'GET' || method === 'HEAD') && ifNoneMatch == null && ifModifiedSince != null) {
     if (!Object.hasOwnProperty.call(current, 'lastModified')) current.lastModified = res.getHeader('last-modified')
     if (!hasBeenModifiedSince(current.lastModified, ifModifiedSince)) {
-      throw new Error() // todo: use HTTPError with code 304
+      throw new NotModifiedError('If-Modified-Since Precondition Failed', {
+        code: 'ERR_PRECONDITION_FAILED_IF_MODIFIED_SINCE',
+        expected: true
+      })
     }
   }
 

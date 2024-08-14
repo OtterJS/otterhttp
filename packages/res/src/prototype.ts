@@ -1,4 +1,5 @@
 import { ServerResponse } from 'node:http'
+import { HttpError } from '@otterhttp/errors'
 import type { Request } from '@otterhttp/req'
 import { type JSONLiteral, type SendFileOptions, json, send, sendFile, sendStatus } from '@otterhttp/send'
 
@@ -14,6 +15,7 @@ import {
   setResponseLinkHeader,
   setResponseLocationHeader
 } from './headers'
+import { validatePreconditions } from './preconditions'
 import { redirect } from './redirect'
 import type { AppendHeaders, Headers, Input } from './types'
 
@@ -104,7 +106,7 @@ export class Response<Req extends Request = Request> extends ServerResponse<Req>
     return this
   }
 
-  async redirect(url: string, statusCode: number): Promise<this> {
+  async redirect(url: string, statusCode?: number): Promise<this> {
     await redirect(this, url, statusCode)
     return this
   }
@@ -136,4 +138,23 @@ export class Response<Req extends Request = Request> extends ServerResponse<Req>
   }
 
   // preconditions/caching
+  validatePreconditions(): this {
+    validatePreconditions(this)
+    return this
+  }
+
+  isFresh(): boolean {
+    try {
+      this.validatePreconditions()
+    } catch (error) {
+      if (error instanceof HttpError && error.code != null && error.code.startsWith('ERR_PRECONDITION_FAILED'))
+        return true
+      throw error
+    }
+    return false
+  }
+
+  isStale(): boolean {
+    return !this.isFresh()
+  }
 }
