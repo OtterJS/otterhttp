@@ -25,6 +25,7 @@
     "@otterhttp/content-type": "workspace:*",
     "@otterhttp/cookie": "workspace:*",
     "@otterhttp/encode-url": "workspace:*",
+    "@otterhttp/errors": "workspace:*",
     "@otterhttp/req": "workspace:*",
     "@otterhttp/send": "workspace:*",
     "@otterhttp/vary": "workspace:*",

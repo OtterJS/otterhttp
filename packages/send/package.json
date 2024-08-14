@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@otterhttp/etag": "workspace:*",
+    "@otterhttp/errors": "workspace:*",
     "mime": "^4.0.4"
   }
 }
