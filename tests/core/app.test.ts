@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 
 import { App, Request, type Response, type View } from '@/packages/app/src'
 import type { RouterMethod } from '@/packages/router/src'
+import type { JSONLiteral } from '@/packages/send/src'
 import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
 describe('Testing App', () => {
@@ -72,7 +73,7 @@ describe('Testing App', () => {
         next()
       })
       .use((req, res) => {
-        res.json(req.body)
+        res.json(req.body as JSONLiteral)
       })
 
     const server = app.listen()
@@ -535,7 +536,7 @@ describe('Route handlers', () => {
         n()
       },
       (req, res) => {
-        res.send(req.body)
+        res.send(req.body as string)
       }
     ])
 
@@ -562,7 +563,7 @@ describe('Route handlers', () => {
         n()
       },
       (req, res) => {
-        res.send(req.body)
+        res.send(req.body as string)
       }
     ])
 
@@ -589,7 +590,7 @@ describe('Route handlers', () => {
         n()
       },
       (req, res) => {
-        res.send(req.body)
+        res.send(req.body as string)
       }
     )
 
@@ -622,7 +623,7 @@ describe('Route handlers', () => {
           n()
         },
         (req, res) => {
-          res.send(req.body)
+          res.send(req.body as string)
         }
       ]
     )
@@ -946,7 +947,7 @@ describe('Subapps', () => {
   it('sends bad request on malformed params', async () => {
     const app = new App()
 
-    app.get('/:id', (req, res) => res.send(req.params))
+    app.get('/:id', (req, res) => res.json(req.params))
 
     const server = app.listen()
 
@@ -1021,18 +1022,16 @@ describe('Template engines', () => {
 
   // Ported from https://github.com/expressjs/express/blob/3531987844e533742f1159b0c3f1e07fad2e4597/test/app.render.js
   describe('app.render', async () => {
-    it('should support absolute paths', () => {
+    it('should support absolute paths', async () => {
       const app = new App()
 
       app.engine('eta', renderFile)
       app.locals.name = 'v1rtl'
 
-      app.render(`${process.cwd()}/tests/fixtures/views/index.eta`, {}, {}, (err, str) => {
-        if (err) throw err
-        expect(str).toEqual('Hello from v1rtl')
-      })
+      const render = await app.render(`${process.cwd()}/tests/fixtures/views/index.eta`, {})
+      expect(render).toEqual('Hello from v1rtl')
     })
-    it('should expose app.locals', () => {
+    it('should expose app.locals', async () => {
       const app = new App({
         settings: {
           views: `${process.cwd()}/tests/fixtures/views`
@@ -1041,12 +1040,10 @@ describe('Template engines', () => {
       app.engine('eta', renderFile)
       app.locals.name = 'v1rtl'
 
-      app.render('index.eta', {}, {}, (err, str) => {
-        if (err) throw err
-        expect(str).toEqual('Hello from v1rtl')
-      })
+      const render = await app.render('index.eta', {})
+      expect(render).toEqual('Hello from v1rtl')
     })
-    it('should support index files', () => {
+    it('should support index files', async () => {
       const app = new App({
         settings: {
           views: `${process.cwd()}/tests/fixtures`
@@ -1056,13 +1053,11 @@ describe('Template engines', () => {
       app.set('view engine', 'eta')
       app.locals.name = 'v1rtl'
 
-      app.render('views', {}, {}, (err, str) => {
-        if (err) throw err
-        expect(str).toEqual('Hello from v1rtl')
-      })
+      const render = await app.render('views', {})
+      expect(render).toEqual('Hello from v1rtl')
     })
     describe('errors', () => {
-      it('should catch errors', () => {
+      it('should catch errors', async () => {
         const app = new App({
           settings: {
             views: `${process.cwd()}/tests/fixtures`
@@ -1077,39 +1072,33 @@ describe('Template engines', () => {
 
         app.set('view', TestView as unknown as typeof View)
 
-        app.render('nothing', {}, {}, (err) => {
-          expect((err as Error).message, 'err!')
-        })
+        await expect(app.render('nothing', {})).rejects.toThrow()
       })
-      it('when the file does not exist should provide a helpful error', () => {
+      it('when the file does not exist should provide a helpful error', async () => {
         const app = new App({
           settings: {
             views: `${process.cwd()}/tests/fixtures`
           }
         })
         app.engine('eta', renderFile)
-        app.render('ate.eta', {}, {}, (err) => {
-          expect((err as Error).message).toEqual(
-            `Failed to lookup view "ate.eta" in views directory "${process.cwd()}/tests/fixtures"`
-          )
-        })
+
+        await expect(app.render('ate.eta', {})).rejects.toThrow(
+          `Failed to lookup view "ate.eta" in views directory "${process.cwd()}/tests/fixtures"`
+        )
       })
-      it('when error occurs should trigger a callback', () => {
+      it('when error occurs should trigger a callback', async () => {
         const app = new App({
           settings: {
             views: `${process.cwd()}/tests/fixtures/views`
           }
         })
         app.engine('eta', renderFile)
-        app.render('error.eta', {}, {}, (err, str) => {
-          expect(err).toBeInstanceOf(ReferenceError)
-          expect(str).toBeUndefined()
-        })
+        await expect(app.render('error.eta', {})).rejects.toThrow(ReferenceError)
       })
     })
 
     describe('multiple roots', () => {
-      it('should lookup the file in paths', () => {
+      it('should lookup the file in paths', async () => {
         const app = new App({
           settings: {
             views: [`${process.cwd()}/tests/fixtures/views/root1`, `${process.cwd()}/tests/fixtures/views/root2`]
@@ -1118,11 +1107,10 @@ describe('Template engines', () => {
         app.engine('eta', renderFile)
         app.locals.user = { name: 'v1rtl' }
 
-        app.render('user.eta', {}, {}, (_, str) => {
-          expect(str).toEqual('<p>v1rtl</p>')
-        })
+        const render = await app.render('user.eta', {})
+        expect(render).toEqual('<p>v1rtl</p>')
       })
-      it('should look until the file is found', () => {
+      it('should look until the file is found', async () => {
         const app = new App({
           settings: {
             views: [`${process.cwd()}/tests/fixtures/views/root1`, `${process.cwd()}/tests/fixtures/views/root2`]
@@ -1130,11 +1118,10 @@ describe('Template engines', () => {
         })
         app.engine('eta', renderFile)
 
-        app.render('home.eta', {}, {}, (_, str) => {
-          expect(str).toEqual('this is a home page')
-        })
+        const render = await app.render('home.eta', {})
+        expect(render).toEqual('this is a home page')
       })
-      it('should error if could not find the file', () => {
+      it('should error if could not find the file', async () => {
         const app = new App({
           settings: {
             views: [`${process.cwd()}/tests/fixtures/views/root1`, `${process.cwd()}/tests/fixtures/views/root2`]
@@ -1142,13 +1129,13 @@ describe('Template engines', () => {
         })
         app.engine('eta', renderFile)
 
-        app.render('uknown.eta', {}, {}, (err) => {
-          expect((err as Error).message).toMatch(/Failed to lookup view "uknown.eta" in views directories/)
-        })
+        await expect(app.render('uknown.eta', {})).rejects.toThrow(
+          /Failed to lookup view "uknown.eta" in views directories/
+        )
       })
     })
 
-    it('supports custom View', () => {
+    it('supports custom View', async () => {
       const app = new App()
 
       class TestView {
@@ -1157,20 +1144,19 @@ describe('Template engines', () => {
         constructor(name: string) {
           this.name = name
         }
-        render(_options: never, _data: never, fn: (err: null, msg: string) => void) {
-          fn(null, 'testing')
+        async render(_options: never, _data: never) {
+          return 'testing'
         }
       }
 
-      app.set('view', TestView as unknown as typeof View)
+      app.set('view', TestView)
 
-      app.render('something', {}, {}, (_err, str) => {
-        expect(str).toEqual('testing')
-      })
+      const render = await app.render('something', {})
+      expect(render).toEqual('testing')
     })
 
     describe('caching', () => {
-      it('should always lookup view without cache', () => {
+      it('should always lookup view without cache', async () => {
         const app = new App()
 
         let count = 0
@@ -1182,25 +1168,23 @@ describe('Template engines', () => {
             this.name = name
             count++
           }
-          render(_options: never, _data: never, fn: (err: null, msg: string) => void) {
-            fn(null, 'testing')
+          async render(_options: never, _data: never) {
+            return 'testing'
           }
         }
 
         app.set('view cache', false)
-        app.set('view', TestView as unknown as typeof View)
+        app.set('view', TestView)
 
-        app.render('something', {}, {}, (_, str) => {
-          expect(count).toEqual(1)
-          expect(str).toEqual('testing')
+        const firstRender = await app.render('something', {})
+        expect(count).toEqual(1)
+        expect(firstRender).toEqual('testing')
 
-          app.render('something', {}, {}, (_, str) => {
-            expect(count).toEqual(2)
-            expect(str).toEqual('testing')
-          })
-        })
+        const secondRender = await app.render('something', {})
+        expect(count).toEqual(2)
+        expect(secondRender).toEqual('testing')
       })
-      it('should cache with "view cache" setting', () => {
+      it('should cache with "view cache" setting', async () => {
         const app = new App()
 
         let count = 0
@@ -1212,23 +1196,21 @@ describe('Template engines', () => {
             this.name = name
             count++
           }
-          render(_options: never, _data: never, fn: (err: null, msg: string) => void) {
-            fn(null, 'testing')
+          async render(_options: never, _data: never) {
+            return 'testing'
           }
         }
 
         app.set('view cache', true)
-        app.set('view', TestView as unknown as typeof View)
+        app.set('view', TestView)
 
-        app.render('something', {}, {}, (_, str) => {
-          expect(count).toEqual(1)
-          expect(str).toEqual('testing')
+        const firstRender = await app.render('something', {})
+        expect(count).toEqual(1)
+        expect(firstRender).toEqual('testing')
 
-          app.render('something', {}, {}, (_, str) => {
-            expect(count).toEqual(1)
-            expect(str).toEqual('testing')
-          })
-        })
+        const secondRender = await app.render('something', {})
+        expect(count).toEqual(1)
+        expect(secondRender).toEqual('testing')
       })
     })
   })

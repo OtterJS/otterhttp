@@ -1,8 +1,5 @@
-import { type EtaConfig, renderFile } from 'eta'
-import { makeFetch } from 'supertest-fetch'
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
-import { App } from '@/packages/app/src'
 import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
 describe('Response properties', () => {
@@ -36,13 +33,6 @@ describe('Response methods', () => {
 
     await fetch('/').expect('Hello world')
   })
-  it('res.send falls back to res.json when sending objects', async () => {
-    const { fetch } = InitAppAndTest((_req, res) => {
-      res.send({ hello: 'world' })
-    })
-
-    await fetch('/').expect({ hello: 'world' })
-  })
   it('res.status sends status', async () => {
     const { fetch } = InitAppAndTest((_req, res) => {
       res.status(418).end()
@@ -64,19 +54,19 @@ describe('Response methods', () => {
 
     await fetch('/').expect('Location', 'example.com')
   })
-  it('res.set sets headers', async () => {
+  it('res.setHeader sets headers', async () => {
     const { fetch } = InitAppAndTest((_req, res) => {
-      res.set('X-Header', 'Hello World').end()
+      res.setHeader('X-Header', 'Hello World').end()
     })
 
     await fetch('/').expect('X-Header', 'Hello World')
   })
   it('res.send sets proper headers', async () => {
     const { fetch } = InitAppAndTest((_req, res) => {
-      res.send({ hello: 'world' })
+      res.json({ hello: 'world' })
     })
 
-    await fetch('/').expect('Content-Type', 'application/json').expect('Content-Length', '22')
+    await fetch('/').expect('Content-Type', 'application/json; charset=utf-8').expect('Content-Length', '22')
   })
   it('res.links sends links', async () => {
     const { fetch } = InitAppAndTest((_req, res) => {
@@ -94,141 +84,27 @@ describe('Response methods', () => {
     )
   })
   it('res.cookie sends cookies to client', async () => {
-    const { fetch } = InitAppAndTest((_req, res) => {
-      res.cookie('Hello', 'World').end()
+    const { fetch } = InitAppAndTest(async (_req, res) => {
+      await res.cookie('Hello', 'World')
+      res.end()
     })
 
     await fetch('/').expect('Set-Cookie', 'Hello=World; Path=/')
   })
-  describe('res.type(type)', () => {
+  describe('res.contentType(type)', () => {
     it('should detect MIME type', async () => {
       const { fetch } = InitAppAndTest((_req, res) => {
-        res.type('html').end()
+        res.contentType('html').end()
       })
 
       await fetch('/').expect('Content-Type', 'text/html; charset=utf-8')
     })
     it('should detect MIME type by extension', async () => {
       const { fetch } = InitAppAndTest((_req, res) => {
-        res.type('.html').end()
+        res.contentType('.html').end()
       })
 
       await fetch('/').expect('Content-Type', 'text/html; charset=utf-8')
-    })
-  })
-  describe('res.render', async () => {
-    // https://github.com/expressjs/express/blob/3531987844e533742f1159b0c3f1e07fad2e4597/test/res.render.js
-    it('should support absolute paths', async () => {
-      const { fetch, app } = InitAppAndTest((_req, res) => {
-        app.engine('eta', renderFile)
-        app.locals.name = 'v1rtl'
-        res.render(`${process.cwd()}/tests/fixtures/views/index.eta`)
-      })
-
-      await fetch('/').expect('Hello from v1rtl')
-    })
-    it('should support absolute paths with "view engine"', async () => {
-      const { fetch, app } = InitAppAndTest((_req, res) => {
-        app.engine('eta', renderFile)
-        app.set('view engine', 'eta')
-        app.locals.name = 'v1rtl'
-        res.render(`${process.cwd()}/tests/fixtures/views/index`)
-      })
-
-      await fetch('/').expect('Hello from v1rtl')
-    })
-    it('should error without "view engine" set and file extension to a non-engine module', async () => {
-      const { fetch, app } = InitAppAndTest((_req, res) => {
-        app.engine('eta', renderFile)
-        app.locals.name = 'v1rtl'
-        res.render(`${process.cwd()}/tests/fixtures/views/not.found`)
-      })
-
-      await fetch('/').expect(500, 'No engine was found for .found')
-    })
-    it('should error without "view engine" set and no file extension', async () => {
-      const { fetch, app } = InitAppAndTest((_req, res) => {
-        app.engine('eta', renderFile)
-        app.locals.name = 'v1rtl'
-        res.render(`${process.cwd()}/tests/fixtures/views/index`)
-      })
-
-      await fetch('/').expect(500, 'No default engine was specified and no extension was provided.')
-    })
-    it('should support index files', async () => {
-      const { fetch, app } = InitAppAndTest((_req, res) => {
-        app.engine('eta', renderFile)
-        app.set('views', `${process.cwd()}/tests/fixtures`)
-        app.set('view engine', 'eta')
-        app.locals.name = 'v1rtl'
-        res.render('views')
-      })
-
-      await fetch('/').expect(200, 'Hello from v1rtl')
-    })
-    it('should give precedence to res.locals over app.locals', async () => {
-      const app = new App()
-
-      app.engine('eta', renderFile)
-      app.set('views', `${process.cwd()}/tests/fixtures/views`)
-      app.locals.name = 'v1rtl'
-
-      app.use((_req, res) => {
-        res.locals.name = 'v2rtl'
-        res.render('index.eta', {})
-      })
-
-      const fetch = makeFetch(app.listen())
-
-      await fetch('/').expect(200, 'Hello from v2rtl')
-    })
-    it('should give precedence to res.render() locals over res.locals', async () => {
-      const app = new App()
-
-      app.engine('eta', renderFile)
-      app.set('views', `${process.cwd()}/tests/fixtures/views`)
-
-      app.use((_req, res) => {
-        res.locals.name = 'v1rtl'
-        res.render('index.eta', { name: 'v2rtl' })
-      })
-
-      const fetch = makeFetch(app.listen())
-
-      await fetch('/').expect(200, 'Hello from v2rtl')
-    })
-    it('should give precedence to res.render() locals over app.locals', async () => {
-      const app = new App()
-
-      app.engine('eta', renderFile)
-      app.set('views', `${process.cwd()}/tests/fixtures/views`)
-
-      app.locals.name = 'v1rtl'
-
-      app.use((_req, res) => {
-        res.render('index.eta', { name: 'v2rtl' })
-      })
-
-      const fetch = makeFetch(app.listen())
-
-      await fetch('/').expect(200, 'Hello from v2rtl')
-    })
-    it('should allow passing custom engine options via res.render()', async () => {
-      const app = new App()
-
-      app.engine('eta', (name, locals, opts, cb) => {
-        expect(opts.autoEscape).toEqual(false)
-        return renderFile(name, locals, opts, cb)
-      })
-      app.set('views', `${process.cwd()}/tests/fixtures/views`)
-
-      app.use((_req, res) => {
-        res.render<Partial<EtaConfig>>('index.eta', { name: 'v1rtl' }, { autoEscape: false })
-      })
-
-      const fetch = makeFetch(app.listen())
-
-      await fetch('/').expect(200, 'Hello from v1rtl')
     })
   })
 
@@ -236,7 +112,7 @@ describe('Response methods', () => {
     const etag = '123'
     const { fetch } = InitAppAndTest(
       (_req, res) => {
-        res.set('ETag', etag).send('stale')
+        res.setHeader('ETag', etag).send('stale')
       },
       '/',
       'GET'
