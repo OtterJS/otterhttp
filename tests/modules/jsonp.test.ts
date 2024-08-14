@@ -5,12 +5,12 @@ import { InitAppAndTest } from '@/test_helpers/initAppAndTest'
 
 describe('jsonp', () => {
   it('when no callback is defined', async () => {
-    const { fetch } = InitAppAndTest((req, res) => jsonp(req, res)({ jsonp: 'value' }))
+    const { fetch } = InitAppAndTest((_, res) => jsonp(res, { jsonp: 'value' }))
     await fetch('/').expect('Content-Type', 'application/json; charset=utf-8').expect(200, '{"jsonp":"value"}')
   })
 
   it('should use callback with jsonp when defined', async () => {
-    const { fetch } = InitAppAndTest((req, res) => jsonp(req, res)({ jsonp: 'value' }))
+    const { fetch } = InitAppAndTest((_, res) => jsonp(res, { jsonp: 'value' }))
 
     await fetch('/?callback=something')
       .expect('Content-Type', 'text/javascript; charset=utf-8')
@@ -18,9 +18,7 @@ describe('jsonp', () => {
   })
 
   it('should change <>& into UTF', async () => {
-    const { fetch } = InitAppAndTest((req, res) =>
-      jsonp(req, res)({ jsonp: '<value>& value' }, { escape: true, spaces: 1 })
-    )
+    const { fetch } = InitAppAndTest((_, res) => jsonp(res, { jsonp: '<value>& value' }, { escape: true, spaces: 1 }))
 
     await fetch('/?callback=something')
       .expect('Content-Type', 'text/javascript; charset=utf-8')
