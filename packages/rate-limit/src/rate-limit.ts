@@ -1,8 +1,10 @@
 import type { IncomingMessage as Request, ServerResponse as Response } from 'node:http'
-import { send, status } from '@otterhttp/send'
+import { send } from '@otterhttp/send'
+
 import { MemoryStore, type Store } from './memory-store.js'
 
 export interface RequestWithRateLimit extends Request {
+  method: string
   rateLimit?: {
     limit: number
     current: number
@@ -43,7 +45,7 @@ const defaultOptions: RateLimitOptions = {
 
 export function rateLimit(options?: Partial<RateLimitOptions>): ((
   req: RequestWithRateLimit,
-  res: Response,
+  res: Response<RequestWithRateLimit>,
   next: (err?: any) => void
 ) => Promise<void>) & {
   resetKey: (key: string) => void
@@ -76,7 +78,7 @@ export function rateLimit(options?: Partial<RateLimitOptions>): ((
     })
   }
 
-  async function middleware(req: RequestWithRateLimit, res: Response, next: (err?: any) => void) {
+  async function middleware(req: RequestWithRateLimit, res: Response<RequestWithRateLimit>, next: (err?: any) => void) {
     if (shouldSkip(req, res)) return next()
 
     const key = keyGenerator(req)
@@ -146,8 +148,8 @@ export function rateLimit(options?: Partial<RateLimitOptions>): ((
         if (headers && !res.headersSent) {
           res.setHeader('Retry-After', Math.ceil(windowMs / 1000))
         }
-        status(res)(statusCode)
-        send(req, res)(message)
+        res.statusCode = statusCode
+        send(res, message)
         return
       }
 
