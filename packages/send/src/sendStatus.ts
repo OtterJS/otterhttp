@@ -1,11 +1,20 @@
 import { STATUS_CODES } from 'node:http'
 
 import { send } from './send'
-import type { HasIncomingHeaders, HasMethod, HasOutgoingHeaders, HasReq, HasStatus, HasWriteMethods } from './types'
+import type {
+  HasFreshness,
+  HasIncomingHeaders,
+  HasMethod,
+  HasOutgoingHeaders,
+  HasReq,
+  HasStatus,
+  HasWriteMethods
+} from './types'
 
 type SendStatusResponse = HasOutgoingHeaders &
   HasReq<HasIncomingHeaders & HasMethod> &
   HasStatus &
+  HasFreshness &
   HasWriteMethods &
   NodeJS.WritableStream
 

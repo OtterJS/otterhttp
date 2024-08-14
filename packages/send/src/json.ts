@@ -1,5 +1,6 @@
 import { send } from './send'
 import type {
+  HasFreshness,
   HasIncomingHeaders,
   HasMethod,
   HasOutgoingHeaders,
@@ -13,6 +14,7 @@ import { isJSONLiteral, isString } from './utils'
 type JsonResponse = HasOutgoingHeaders &
   HasReq<HasIncomingHeaders & HasMethod> &
   HasStatus &
+  HasFreshness &
   HasWriteMethods &
   NodeJS.WritableStream
 

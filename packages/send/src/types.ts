@@ -12,6 +12,8 @@ export type HasStatus = {
   statusMessage: string | undefined
 }
 
+export type HasFreshness = { validatePreconditions(): unknown }
+
 export type HasMethod = { method: string }
 
 export type HasReq<Request> = {

@@ -1,9 +1,19 @@
-import type { HasIncomingHeaders, HasMethod, HasOutgoingHeaders, HasReq, HasStatus, HasWriteMethods } from './types'
+import { NotModifiedError } from '@otterhttp/errors'
+import type {
+  HasFreshness,
+  HasIncomingHeaders,
+  HasMethod,
+  HasOutgoingHeaders,
+  HasReq,
+  HasStatus,
+  HasWriteMethods
+} from './types'
 import { createETag, isString } from './utils'
 
 type SendResponse = HasOutgoingHeaders &
   HasReq<HasIncomingHeaders & HasMethod> &
   HasStatus &
+  HasFreshness &
   HasWriteMethods &
   NodeJS.WritableStream
 
@@ -57,17 +67,24 @@ export function send(res: SendResponse, body: string | Buffer | null): void {
   if (body != null) populateETag(res, body)
 
   // freshness
-  // Todo: apply response preconditions here
+  try {
+    res.validatePreconditions()
+  } catch (error) {
+    if (error instanceof NotModifiedError) res.statusCode = 304
+    else throw error
+  }
 
   // strip irrelevant headers
   if (res.statusCode === 204 || res.statusCode === 304) {
     res.removeHeader('Content-Type')
     res.removeHeader('Content-Length')
     res.removeHeader('Transfer-Encoding')
+    res.end()
+    return
   }
 
   if (res.req.method === 'HEAD' || body == null || body === '') {
-    res.end('')
+    res.end()
     return
   }
 
