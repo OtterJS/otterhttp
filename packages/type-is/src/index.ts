@@ -1,15 +1,15 @@
-import * as typer from '@otterhttp/content-type'
+import { type TypeParseable, format as formatType, parse as parseType } from '@otterhttp/content-type'
 import mime from 'mime'
 
-function normalizeType(value: string) {
+function normalizeType(value: TypeParseable) {
   // parse the type
-  const type = typer.parse(value)
+  const type = parseType(value)
   type.parameters = {}
   // reformat it
-  return typer.format(type)
+  return formatType(type)
 }
 
-function tryNormalizeType(value: string | undefined) {
+function tryNormalizeType(value: TypeParseable | undefined) {
   if (!value) return null
 
   try {
@@ -22,10 +22,11 @@ function tryNormalizeType(value: string | undefined) {
 function mimeMatch(expected: string | null, actual: string | null): boolean {
   // invalid type
   if (expected == null) return false
+  if (actual == null) return false
 
   // split types
-  const actualParts = (actual as string).split('/')
-  const expectedParts = (expected as string).split('/')
+  const actualParts = actual.split('/')
+  const expectedParts = expected.split('/')
 
   // invalid format
   if (actualParts.length !== 2 || expectedParts.length !== 2) return false
@@ -68,7 +69,7 @@ function normalize(type: string): string | null {
  * a special shortcut like `multipart` or `urlencoded`,
  * or a mime type.
  */
-export const typeIs = (value: string | undefined, types?: readonly string[]) => {
+export function typeIs(value: TypeParseable | undefined, types?: readonly string[]) {
   let i: number
   // remove parameters and normalize
   const val = tryNormalizeType(value)
