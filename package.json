@@ -29,7 +29,7 @@
   "scripts": {
     "prerelease": "pnpm lint && pnpm build && pnpm test",
     "changeset": "changeset",
-    "ci:version": "pnpm exec changeset version && pnpm check:fix && pnpm install --no-frozen--lockfile",
+    "ci:version": "pnpm exec changeset version && pnpm check:fix && pnpm install --no-frozen-lockfile",
     "test:dev": "vitest --dir tests",
     "test:coverage": "vitest run --dir tests --coverage --silent",
     "test": "vitest run --dir tests",
