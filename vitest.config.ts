@@ -29,6 +29,7 @@ export default defineConfig({
       '@otterhttp/forwarded': relative('packages/forwarded/src'),
       '@otterhttp/ip-filter': relative('packages/ip-filter/src'),
       '@otterhttp/jsonp': relative('packages/jsonp/src'),
+      '@otterhttp/parameters': relative('packages/parameters/src'),
       '@otterhttp/proxy-address': relative('packages/proxy-address/src'),
       '@otterhttp/rate-limit': relative('packages/rate-limit/src'),
       '@otterhttp/request': relative('packages/request/src'),
