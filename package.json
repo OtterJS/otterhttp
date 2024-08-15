@@ -30,6 +30,7 @@
     "prerelease": "pnpm lint && pnpm build && pnpm test",
     "changeset": "changeset",
     "ci:version": "pnpm exec changeset version && pnpm check:fix && pnpm install --no-frozen-lockfile",
+    "ci:publish": "pnpm build && pnpm exec changeset publish",
     "test:dev": "vitest --dir tests",
     "test:coverage": "vitest run --dir tests --coverage --silent",
     "test": "vitest run --dir tests",
