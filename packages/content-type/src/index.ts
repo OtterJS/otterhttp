@@ -2,6 +2,8 @@ import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'node:http'
 
 type Request = { headers: IncomingHttpHeaders }
 type Response = { getHeader: <HeaderName extends string>(name: HeaderName) => OutgoingHttpHeaders[HeaderName] }
+export type TypeParseableObject = Request | Response
+export type TypeParseable = string | TypeParseableObject
 
 /**
  * RegExp to match *( ";" parameter ) in RFC 7231 sec 3.1.1.1
@@ -55,7 +57,7 @@ function qstring(val: unknown) {
   return `"${str.replace(QUOTE_REGEXP, '\\$1')}"`
 }
 
-function getContentType(obj: Request | Response) {
+function getContentType(obj: TypeParseableObject) {
   let header: number | string | string[] | undefined
 
   if ('getHeader' in obj && typeof obj.getHeader === 'function') {
@@ -63,8 +65,7 @@ function getContentType(obj: Request | Response) {
     header = obj.getHeader('content-type')
   } else if ('headers' in obj && typeof obj.headers === 'object') {
     // req-like
-    const h = obj.headers
-    header = h?.['content-type']
+    header = obj.headers['content-type']
   }
 
   if (typeof header !== 'string') {
@@ -115,11 +116,11 @@ export function format(obj: { type: string; parameters?: Record<string, unknown>
 /**
  * Parse media type to object.
  */
-export function parse(string: string | Request | Response): ContentType {
-  if (!string) throw new TypeError('argument string is required')
+export function parse(value: TypeParseable): ContentType {
+  if (!value) throw new TypeError('argument string is required')
 
   // support req/res-like objects as argument
-  const header = typeof string === 'object' ? getContentType(string) : string
+  const header = typeof value === 'object' ? getContentType(value) : value
 
   if (typeof header !== 'string') throw new TypeError('argument string is required to be a string')
 
