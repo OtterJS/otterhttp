@@ -40,19 +40,12 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
+          version: "pnpm ci:version"
           commit: "chore: version packages"
           publish: pnpm exec changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - if: steps.changesets.outputs.published == 'false'
-        run: |
-          pnpm check:fix
-          pnpm install --no-frozen-lockfile
-          git add . 
-          git commit --amend --no-edit
-          git push origin HEAD:changeset-release/main --force
 
       - if: steps.changesets.outputs.published == 'true'
         run: echo "(a) new version(s) was/were published!"
