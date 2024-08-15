@@ -46,8 +46,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - run: pnpm check:fix
-      - run: |
+      - if: steps.changesets.outputs.published == 'false'
+        run: |
+          pnpm check:fix
+          pnpm install --no-frozen-lockfile
           git add . 
           git commit --amend --no-edit
           git push origin HEAD:changeset-release/main --force
