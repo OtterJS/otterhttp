@@ -1,4 +1,5 @@
 import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'node:http'
+import { formatParameters, parseParameters, validateParameterNames } from '@otterhttp/parameters'
 
 type Request = { headers: IncomingHttpHeaders }
 type Response = { getHeader: <HeaderName extends string>(name: HeaderName) => OutgoingHttpHeaders[HeaderName] }
@@ -6,56 +7,45 @@ export type TypeParseableObject = Request | Response
 export type TypeParseable = string | TypeParseableObject
 
 /**
- * RegExp to match *( ";" parameter ) in RFC 7231 sec 3.1.1.1
+ * RegExp to a single whitespace character
  *
- * parameter     = token "=" ( token / quoted-string )
- * token         = 1*tchar
+ * ```
+ * WS = SP / HTAB
+ * ```
+ */
+const WHITESPACE_CHAR_REGEXP = /[\u0009\u0020]/
+
+/**
+ * RegExp to match a single token character
+ *
+ * ```
  * tchar         = "!" / "#" / "$" / "%" / "&" / "'" / "*"
  *               / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
  *               / DIGIT / ALPHA
  *               ; any VCHAR, except delimiters
- * quoted-string = DQUOTE *( qdtext / quoted-pair ) DQUOTE
- * qdtext        = HTAB / SP / %x21 / %x23-5B / %x5D-7E / obs-text
- * obs-text      = %x80-FF
- * quoted-pair   = "\" ( HTAB / SP / VCHAR / obs-text )
+ * ```
  */
-const PARAM_REGEXP =
-  /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u0009\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u0009\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g
-const TEXT_REGEXP = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/
-const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
+const TOKEN_CHAR_REGEXP = /[!#$%&'*+.^_`|~0-9A-Za-z-]/
 
 /**
- * RegExp to match quoted-pair in RFC 7230 sec 3.2.6
+ * RegExp to match values entirely consisting of token characters.
  *
- * quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
- * obs-text    = %x80-FF
+ * ```
+ * token = 1*tchar
+ * ```
  */
-const QESC_REGEXP = /\\([\u0009\u0020-\u00ff])/g
-
-/**
- * RegExp to match chars that must be quoted-pair in RFC 7230 sec 3.2.6
- */
-const QUOTE_REGEXP = /([\\"])/g
+const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
 
 /**
  * RegExp to match type in RFC 7231 sec 3.1.1.1
  *
+ * ```
  * media-type = type "/" subtype
  * type       = token
  * subtype    = token
+ * ```
  */
 const TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
-
-function qstring(val: unknown) {
-  const str = String(val)
-
-  // no need to quote tokens
-  if (TOKEN_REGEXP.test(str)) return str
-
-  if (str.length > 0 && !TEXT_REGEXP.test(str)) throw new TypeError('invalid parameter value')
-
-  return `"${str.replace(QUOTE_REGEXP, '\\$1')}"`
-}
 
 function getContentType(obj: TypeParseableObject) {
   let header: number | string | string[] | undefined
@@ -76,38 +66,89 @@ function getContentType(obj: TypeParseableObject) {
 }
 
 /**
- * Class to represent a content type.
+ * Representation of a parsed MIME type.
  */
-class ContentType {
-  parameters: Record<string, unknown>
-  type: string
-  constructor(type: string) {
+export class ContentType {
+  /**
+   * The top-level media type into which the data type falls, such as `video` or `text`.
+   * e.g. in `application/json`, the type is `application`.
+   */
+  readonly type: string
+
+  /**
+   * The whole subtype, such as `manifest+json` or `plain`.
+   * e.g. in `text/conf+plain`, the subtype is `conf+plain`.
+   */
+  readonly subtype: string
+
+  /**
+   * The subtype suffix, such as `json` or `plain`.
+   * e.g. in `text/conf+plain`, the subtype suffix is `plain`.
+   */
+  readonly subtypeSuffix: string
+
+  /**
+   * Optional parameters added to provide additional details.
+   * For example, the `charset` parameter is often provided in HTTP contexts, e.g.
+   * `Content-Type: application/json; charset=utf-8`
+   */
+  parameters: Record<string, string>
+
+  static parse(contentType: string): ContentType {
+    return parse(contentType)
+  }
+
+  /**
+   * @internal
+   */
+  static fromValidatedInput(type: string, subtype: string, subtypeSuffix: string) {
+    return new ContentType(type, subtype, subtypeSuffix)
+  }
+
+  protected constructor(type: string, subtype: string, subtypeSuffix: string) {
     this.parameters = {}
     this.type = type
+    this.subtype = subtype
+    this.subtypeSuffix = subtypeSuffix
+  }
+
+  toString() {
+    return `${this.type}/${this.subtype}${formatParameters(this.parameters)}`
+  }
+
+  hasWildcard() {
+    return this.type.indexOf('*') !== -1 || this.subtype.indexOf('*') !== -1
+  }
+
+  isPlainText() {
+    return isPlainText(this)
+  }
+
+  /**
+   * The whole media type excluding parameters, such as `application/json` or `text/plain`.
+   */
+  get mediaType() {
+    return `${this.type}/${this.subtype}`
   }
 }
 
 /**
  * Format object to media type.
  */
-export function format(obj: { type: string; parameters?: Record<string, unknown> }) {
+export function format(obj: { type: string; subtype: string; parameters?: Record<string, string> }) {
   if (!obj || typeof obj !== 'object') throw new TypeError('argument obj is required')
 
-  const { parameters, type } = obj
+  const { parameters, type, subtype } = obj
 
-  if (!type || !TYPE_REGEXP.test(type)) throw new TypeError('invalid type')
+  if (!type || !subtype) throw new TypeError('invalid type')
 
-  let string = type
+  let string = `${type}/${subtype}`
+  if (!TYPE_REGEXP.test(string)) throw new TypeError('invalid type')
 
   // append parameters
   if (parameters && typeof parameters === 'object') {
-    const params = Object.keys(parameters).sort()
-
-    for (const param of params) {
-      if (!TOKEN_REGEXP.test(param)) throw new TypeError('invalid parameter name')
-
-      string += `; ${param}=${qstring(parameters[param])}`
-    }
+    validateParameterNames(Object.keys(parameters))
+    string += formatParameters(parameters)
   }
 
   return string
@@ -117,47 +158,56 @@ export function format(obj: { type: string; parameters?: Record<string, unknown>
  * Parse media type to object.
  */
 export function parse(value: TypeParseable): ContentType {
-  if (!value) throw new TypeError('argument string is required')
+  if (!value) throw new TypeError('argument `value` is required')
 
   // support req/res-like objects as argument
-  const header = typeof value === 'object' ? getContentType(value) : value
+  let header = typeof value === 'object' ? getContentType(value) : value
 
-  if (typeof header !== 'string') throw new TypeError('argument string is required to be a string')
+  if (typeof header !== 'string') throw new TypeError('argument `value` must be string, request-like or response-like')
+  header = header.trim()
 
-  let index = header.indexOf(';')
-  const type = index !== -1 ? header.slice(0, index).trim() : header.trim()
-
-  if (!TYPE_REGEXP.test(type)) throw new TypeError('invalid media type')
-
-  const obj = new ContentType(type.toLowerCase())
-
-  // parse parameters
-  if (index !== -1) {
-    let key: string
-    let match: RegExpExecArray | null
-    let value: string
-
-    PARAM_REGEXP.lastIndex = index
-
-    while ((match = PARAM_REGEXP.exec(header))) {
-      if (match.index !== index) throw new TypeError('invalid parameter format')
-
-      index += match[0].length
-      key = match[1].toLowerCase()
-      value = match[2]
-
-      if (value[0] === '"') {
-        // remove quotes and escapes
-        value = value.slice(1, value.length - 1).replace(QESC_REGEXP, '$1')
-      }
-
-      obj.parameters[key] = value
+  let currentIndex = 0
+  let slashIndex: number | undefined
+  for (; currentIndex < header.length; ++currentIndex) {
+    const currentChar = header.charAt(currentIndex)
+    if (currentChar === '/') {
+      slashIndex = currentIndex
+      break
     }
-
-    if (index !== header.length) throw new TypeError('invalid parameter format')
+    if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError('invalid media type')
   }
 
-  return obj
+  if (typeof slashIndex === 'undefined') throw new TypeError('invalid media type')
+  if (slashIndex === 0) throw new TypeError('invalid media type')
+
+  currentIndex += 1
+  let plusIndex: number | undefined
+  let endIndex: number | undefined
+  for (; currentIndex < header.length; ++currentIndex) {
+    const currentChar = header.charAt(currentIndex)
+    if (currentChar === ';' || WHITESPACE_CHAR_REGEXP.test(currentChar)) {
+      if (currentIndex === slashIndex + 1) throw new TypeError('invalid media type')
+      endIndex = currentIndex
+      break
+    }
+    if (currentChar === '+') {
+      if (currentIndex === slashIndex + 1) throw new TypeError('invalid media type')
+      plusIndex = currentIndex
+      continue
+    }
+    if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError('invalid media type')
+  }
+
+  const lowercaseHeader = header.toLowerCase()
+  const type = lowercaseHeader.slice(0, slashIndex)
+  const subtype = lowercaseHeader.slice(slashIndex + 1, endIndex)
+  const subtypeSuffix = plusIndex == null ? subtype : lowercaseHeader.slice(plusIndex + 1, endIndex)
+
+  const parsedRepresentation = ContentType.fromValidatedInput(type, subtype, subtypeSuffix)
+  if (endIndex === undefined) return parsedRepresentation
+
+  parsedRepresentation.parameters = parseParameters(header.slice(endIndex))
+  return parsedRepresentation
 }
 
 /**
@@ -173,14 +223,8 @@ const applicationPlaintextWhitelist = new Set<string>([
   'node'
 ])
 
-export function isPlainText({ type }: ContentType) {
-  if (type.startsWith('text/')) return true
-  if (!type.startsWith('application/')) return false
-  let index = 12
-  let start = index
-  for (; index < type.length; ++index) {
-    if (type.charAt(index) === '+') start = index + 1
-  }
-  const subtype = type.slice(start)
-  return applicationPlaintextWhitelist.has(subtype)
+export function isPlainText({ type, subtypeSuffix }: ContentType) {
+  if (type === 'text') return true
+  if (type !== 'application') return false
+  return applicationPlaintextWhitelist.has(subtypeSuffix)
 }
