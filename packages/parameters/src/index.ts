@@ -1,3 +1,5 @@
+import { encodeUtf8ExtendedFieldValue, getLatin1Fallback } from './extended-fields'
+
 /**
  * RegExp for values that can be escaped to create a valid quoted-string
  *
@@ -61,20 +63,46 @@ const CAN_QUOTE_REGEXP = /[\u0009\u0020-\u00ff]/
  */
 const MUST_QUOTE_REGEXP = /([\\"])/g
 
-export function qstring(val: string) {
+export function encodeFieldValue(val: string) {
   // no need to quote tokens
   if (TOKEN_REGEXP.test(val)) return val
 
   if (val.length > 0 && !TEXT_REGEXP.test(val)) throw new TypeError('invalid parameter value')
 
+  MUST_QUOTE_REGEXP.lastIndex = 0
   return `"${val.replace(MUST_QUOTE_REGEXP, '\\$1')}"`
 }
 
-export function formatParameters(parameters: Record<string, string>): string {
-  return Object.entries(parameters)
-    .sort()
-    .map(([parameterName, parameterValue]) => `; ${parameterName}=${qstring(parameterValue)}`)
-    .join('')
+function formatParameter([parameterName, encodedParameterValue]: [string, string]): string {
+  return `; ${parameterName}=${encodedParameterValue}`
+}
+
+export function formatParameters(
+  parameters: Record<string, string>,
+  { addFallbacks = true }: { addFallbacks?: boolean } = {}
+): string {
+  const expandedParameters: Map<string, string> = new Map()
+
+  for (const [parameterName, parameterValue] of Object.entries(parameters)) {
+    if (!parameterName.endsWith('*')) {
+      expandedParameters.set(parameterName, encodeFieldValue(parameterValue))
+      continue
+    }
+
+    expandedParameters.set(parameterName, encodeUtf8ExtendedFieldValue(parameterValue))
+    if (!addFallbacks) continue
+    const fallbackParameterName = parameterName.slice(0, -1)
+    if (Object.prototype.hasOwnProperty.call(parameters, fallbackParameterName)) continue
+    const fallbackValue = getLatin1Fallback(parameterValue)
+    expandedParameters.set(fallbackParameterName, fallbackValue)
+  }
+
+  return Array.from(expandedParameters.entries()).sort().map(formatParameter).join('')
+}
+
+export function validateParameterNames(parameterNames: readonly string[]): void {
+  if (parameterNames.every((parameterName) => TOKEN_REGEXP.test(parameterName))) return
+  throw new TypeError('invalid parameter name')
 }
 
 /**
@@ -93,6 +121,7 @@ export function parseParameters(value: string): Record<string, string> {
   let equalsIndex: number | undefined
 
   let quotedParameterValue: string[] | undefined
+  let extendedParameterValue: string[] | undefined
   let currentCharEscaped = false
 
   const parsedParameters: Record<string, string> = {}
@@ -103,16 +132,24 @@ export function parseParameters(value: string): Record<string, string> {
     equalsIndex = undefined
 
     quotedParameterValue = undefined
+    extendedParameterValue = undefined
     currentCharEscaped = false
+  }
+
+  function getParameterValue() {
+    if (quotedParameterValue != null) return quotedParameterValue.join('')
+    if (extendedParameterValue != null) return extendedParameterValue.join('')
+    if (equalsIndex == null) throw new Error()
+    return value.slice(equalsIndex + 1, currentIndex)
   }
 
   function pop() {
     if (parameterNameIndex == null) return
-    if (equalsIndex == null) throw new Error()
 
     const parameterName = value.slice(parameterNameIndex, equalsIndex).toLowerCase()
-    const parameterValue =
-      quotedParameterValue != null ? quotedParameterValue.join('') : value.slice(equalsIndex + 1, currentIndex)
+    const parameterValue = getParameterValue()
+    if (Object.prototype.hasOwnProperty.call(parsedParameters, parameterName))
+      throw new TypeError('duplicate parameter name')
     parsedParameters[parameterName] = parameterValue
   }
 
@@ -151,15 +188,19 @@ export function parseParameters(value: string): Record<string, string> {
     if (equalsIndex == null) {
       if (currentChar === '=') {
         equalsIndex = currentIndex
+
+        const previousIsAsterisk = value.charAt(currentIndex - 1) === '*'
+        const nextIsDoubleQuote = value.charAt(currentIndex + 1) === '"'
+
+        if (previousIsAsterisk && nextIsDoubleQuote) throw new TypeError('invalid extended parameter value')
+        if (nextIsDoubleQuote) {
+          quotedParameterValue = []
+          currentIndex++
+        }
+
         continue
       }
       if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError('invalid parameter format')
-      continue
-    }
-
-    // initialize quotedParameterValue and consume the "\"" if the parameter value is quoted
-    if (equalsIndex === currentIndex - 1 && currentChar === '"') {
-      quotedParameterValue = []
       continue
     }
 
@@ -208,3 +249,5 @@ export function parseParameters(value: string): Record<string, string> {
   pop()
   return parsedParameters
 }
+
+export * from './extended-fields'
