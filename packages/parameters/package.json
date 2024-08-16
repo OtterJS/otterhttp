@@ -1,7 +1,7 @@
 {
-  "name": "@otterhttp/content-type",
-  "description": "content-type rewrite in TypeScript",
-  "version": "0.3.0",
+  "name": "@otterhttp/parameters",
+  "description": "Utilities pertaining to HTTP parameters",
+  "version": "0.0.0",
   "license": "LGPL-3.0-or-later",
   "homepage": "https://otterhttp.lordfirespeed.dev",
   "funding": {
@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/otterjs/otterhttp.git",
-    "directory": "packages/content-type"
+    "directory": "packages/parameters"
   },
   "engines": {
     "node": ">=20.16.0"
@@ -24,7 +24,5 @@
     "build": "tsup",
     "prepack": "pnpm build"
   },
-  "dependencies": {
-    "@otterhttp/parameters": "workspace:*"
-  }
+  "dependencies": {}
 }

@@ -3,24 +3,21 @@ import { describe, expect, it } from 'vitest'
 import * as contentType from '@/packages/content-type/src'
 import { isPlainText, parse } from '@/packages/content-type/src'
 
-it('should help me', () => {
-  const parsed = parse('application/manifest+json')
-})
-
 describe('format', () => {
   it('should format basic type', () => {
-    const str = contentType.format({ type: 'text/html' })
+    const str = contentType.format({ type: 'text', subtype: 'html' })
     expect(str).toEqual('text/html')
   })
 
   it('should format type with suffix', () => {
-    const str = contentType.format({ type: 'image/svg+xml' })
+    const str = contentType.format({ type: 'image', subtype: 'svg+xml' })
     expect(str).toBe('image/svg+xml')
   })
 
   it('should format type with parameter', () => {
     const str = contentType.format({
-      type: 'text/html',
+      type: 'text',
+      subtype: 'html',
       parameters: { charset: 'utf-8' }
     })
     expect(str).toBe('text/html; charset=utf-8')
@@ -28,7 +25,8 @@ describe('format', () => {
 
   it('should format type with parameter that needs quotes', () => {
     const str = contentType.format({
-      type: 'text/html',
+      type: 'text',
+      subtype: 'html',
       parameters: { foo: 'bar or "baz"' }
     })
     expect(str).toBe('text/html; foo="bar or \\"baz\\""')
@@ -36,7 +34,8 @@ describe('format', () => {
 
   it('should format type with parameter with empty value', () => {
     const str = contentType.format({
-      type: 'text/html',
+      type: 'text',
+      subtype: 'html',
       parameters: { foo: '' }
     })
     expect(str).toBe('text/html; foo=""')
@@ -44,7 +43,8 @@ describe('format', () => {
 
   it('should format type with multiple parameters', () => {
     const str = contentType.format({
-      type: 'text/html',
+      type: 'text',
+      subtype: 'html',
       parameters: { charset: 'utf-8', foo: 'bar', bar: 'baz' }
     })
     expect(str).toBe('text/html; bar=baz; charset=utf-8; foo=bar')
@@ -70,25 +70,25 @@ describe('format', () => {
 
   it('should reject invalid type', () => {
     expect(() => {
-      contentType.format({ type: 'text/' } as any)
+      contentType.format({ type: 'text/', subtype: '' })
     }).toThrow(/invalid type/)
   })
 
   it('should reject invalid type with LWS', () => {
     expect(() => {
-      contentType.format({ type: ' text/html' } as any)
+      contentType.format({ type: ' text', subtype: 'html' })
     }).toThrow(/invalid type/)
   })
 
   it('should reject invalid parameter name', () => {
     expect(() => {
-      contentType.format({ type: 'image/svg', parameters: { 'foo/': 'bar' } })
+      contentType.format({ type: 'image', subtype: 'svg', parameters: { 'foo/': 'bar' } })
     }).toThrow(/invalid parameter name/)
   })
 
   it('should reject invalid parameter value', () => {
     expect(() => {
-      contentType.format({ type: 'image/svg', parameters: { foo: 'bar\u0000' } })
+      contentType.format({ type: 'image', subtype: 'svg', parameters: { foo: 'bar\u0000' } })
     }).toThrow(/invalid parameter value/)
   })
 })
@@ -97,78 +97,90 @@ describe('parse', () => {
   describe('contentType.parse(string)', () => {
     it('should parse basic type', () => {
       const type = contentType.parse('text/html')
-      expect(type.type).toBe('text/html')
+      expect(type).toMatchObject({ type: 'text', subtype: 'html' })
     })
 
     it('should parse with suffix', () => {
       const type = contentType.parse('image/svg+xml')
-      expect(type.type).toBe('image/svg+xml')
+      expect(type).toMatchObject({ type: 'image', subtype: 'svg+xml' })
     })
 
     it('should parse basic type with surrounding OWS', () => {
       const type = contentType.parse(' text/html ')
-      expect(type.type).toBe('text/html')
+      expect(type).toMatchObject({ type: 'text', subtype: 'html' })
     })
 
     it('should parse parameters', () => {
       const type = contentType.parse('text/html; charset=utf-8; foo=bar')
-      expect(type.type).toBe('text/html')
-
-      expect(type.parameters).toEqual({
-        charset: 'utf-8',
-        foo: 'bar'
+      expect(type).toMatchObject({
+        type: 'text',
+        subtype: 'html',
+        parameters: {
+          charset: 'utf-8',
+          foo: 'bar'
+        }
       })
     })
 
     it('should parse parameters with extra LWS', () => {
       const type = contentType.parse('text/html ; charset=utf-8 ; foo=bar')
-      expect(type.type).toBe('text/html')
-
-      expect(type.parameters).toEqual({
-        charset: 'utf-8',
-        foo: 'bar'
+      expect(type).toMatchObject({
+        type: 'text',
+        subtype: 'html',
+        parameters: {
+          charset: 'utf-8',
+          foo: 'bar'
+        }
       })
     })
 
     it('should lower-case type', () => {
       const type = contentType.parse('IMAGE/SVG+XML')
-      expect(type.type).toBe('image/svg+xml')
+      expect(type).toMatchObject({ type: 'image', subtype: 'svg+xml' })
     })
 
     it('should lower-case parameter names', () => {
       const type = contentType.parse('text/html; Charset=UTF-8')
-      expect(type.type).toBe('text/html')
-
-      expect(type.parameters).toEqual({
-        charset: 'UTF-8'
+      expect(type).toMatchObject({
+        type: 'text',
+        subtype: 'html',
+        parameters: {
+          charset: 'UTF-8'
+        }
       })
     })
 
     it('should unquote parameter values', () => {
       const type = contentType.parse('text/html; charset="UTF-8"')
-      expect(type.type).toBe('text/html')
-
-      expect(type.parameters).toEqual({
-        charset: 'UTF-8'
+      expect(type).toMatchObject({
+        type: 'text',
+        subtype: 'html',
+        parameters: {
+          charset: 'UTF-8'
+        }
       })
     })
 
     it('should unquote parameter values with escapes', () => {
-      const type = contentType.parse('text/html; charset = "UT\\F-\\\\\\"8\\""')
-      expect(type.type).toBe('text/html')
-
-      expect(type.parameters).toEqual({
-        charset: 'UTF-\\"8"'
+      const type = contentType.parse('text/html; charset="UT\\F-\\\\\\"8\\""')
+      expect(type).toMatchObject({
+        type: 'text',
+        subtype: 'html',
+        parameters: {
+          charset: 'UTF-\\"8"'
+        }
       })
     })
 
     it('should handle balanced quotes', () => {
       const type = contentType.parse('text/html; param="charset=\\"utf-8\\"; foo=bar"; bar=foo')
-      expect(type.type).toBe('text/html')
-
-      expect(type.parameters).toEqual({
-        param: 'charset="utf-8"; foo=bar',
-        bar: 'foo'
+      expect(type).toMatchObject({
+        type: 'text',
+        subtype: 'html',
+        parameters: {
+          param: 'charset="utf-8"; foo=bar',
+          bar: 'foo'
+        }
       })
     })
 
@@ -183,7 +195,8 @@ describe('parse', () => {
       'text/p£ain',
       'text/(plain)',
       'text/@plain',
-      'text/plain,wrong'
+      'text/plain,wrong',
+      'text/+plain'
     ]
 
     describe.each(invalidTypes)("'invalid media type '%s'", (type: string) => {
@@ -197,7 +210,9 @@ describe('parse', () => {
     const incorrectlyFormattedTypes = [
       'text/plain; foo="bar',
       'text/plain; profile=http://localhost; foo=bar',
-      'text/plain; profile=http://localhost'
+      'text/plain; profile=http://localhost',
+      'text/plain; charset =utf-8',
+      'text/plain; charset= utf-8'
     ]
 
     it.each(incorrectlyFormattedTypes)("should throw on invalid parameter format '%s'", (type: string) => {
@@ -209,13 +224,13 @@ describe('parse', () => {
     it('should require argument', () => {
       expect(() => {
         contentType.parse(undefined as any)
-      }).toThrow(/string.*required/)
+      }).toThrow(/argument.*is required/)
     })
 
     it('should reject non-strings', () => {
       expect(() => {
         contentType.parse(7 as any)
-      }).toThrow(/string.*required/)
+      }).toThrow(/argument.*must be string/)
     })
   })
 
@@ -223,7 +238,7 @@ describe('parse', () => {
     it('should parse content-type header', () => {
       const req = { headers: { 'content-type': 'text/html' } }
       const type = contentType.parse(req)
-      expect(type.type).toBe('text/html')
+      expect(type).toMatchObject({ type: 'text', subtype: 'html' })
     })
 
     it('should reject objects without either `headers` or `getHeaders` property', () => {
@@ -244,7 +259,7 @@ describe('parse', () => {
           headers: { 'content-type': 'text/html' }
         }
         const type = contentType.parse(res)
-        expect(type.type).toBe('text/html')
+        expect(type).toMatchObject({ type: 'text', subtype: 'html' })
       })
     })
 
@@ -262,7 +277,7 @@ describe('parse', () => {
           }
         }
         const type = contentType.parse(res)
-        expect(type.type).toBe('text/html')
+        expect(type).toMatchObject({ type: 'text', subtype: 'html' })
       })
     })
   })

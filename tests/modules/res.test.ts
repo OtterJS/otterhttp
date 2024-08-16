@@ -220,7 +220,7 @@ describe('Response extensions', () => {
         res.attachment(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico')).end()
       })
 
-      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
+      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename=favicon.ico')
     })
   })
   describe('res.download(filename)', () => {
@@ -229,14 +229,14 @@ describe('Response extensions', () => {
         await res.download(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'))
       })
 
-      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
+      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename=favicon.ico')
     })
     it('should set Content-Disposition based on filename', async () => {
       const app = runServer(async (_req, res) => {
         await res.download(path.resolve(import.meta.dirname, '..', 'fixtures', 'favicon.ico'), 'favicon.icon')
       })
 
-      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.icon"')
+      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename=favicon.icon')
     })
     it('should raise errors without closing response socket', async () => {
       const app = runServer(async (_req, res) => {
@@ -245,7 +245,7 @@ describe('Response extensions', () => {
         ).rejects.toThrow(/EISDIR/)
       })
 
-      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="some_file.png"')
+      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename=some_file.png')
     })
     it('should set "root" from options', async () => {
       const app = runServer(async (_req, res) => {
@@ -254,7 +254,7 @@ describe('Response extensions', () => {
         })
       })
 
-      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
+      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename=favicon.ico')
     })
     it(`'should pass options to sendFile's ReadStream'`, async () => {
       const app = runServer(async (_req, res) => {
@@ -263,7 +263,7 @@ describe('Response extensions', () => {
         })
       })
 
-      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename="favicon.ico"')
+      await makeFetch(app)('/').expect('Content-Disposition', 'attachment; filename=favicon.ico')
     })
     it('should set headers from options', async () => {
       const app = runServer(async (_req, res) => {
@@ -275,7 +275,7 @@ describe('Response extensions', () => {
       })
 
       await makeFetch(app)('/')
-        .expect('Content-Disposition', 'attachment; filename="favicon.ico"')
+        .expect('Content-Disposition', 'attachment; filename=favicon.ico')
         .expect('X-Custom-Header', 'Value')
     })
   })
