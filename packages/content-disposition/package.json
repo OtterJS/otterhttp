@@ -24,5 +24,7 @@
     "build": "tsup",
     "prepack": "pnpm build"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@otterhttp/parameters": "workspace:*"
+  }
 }
