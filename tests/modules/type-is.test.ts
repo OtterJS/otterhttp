@@ -8,19 +8,23 @@ describe('typeIs', () => {
   })
 
   it('should return value if types are empty', () => {
-    expect(typeIs('application/json')).toBe('application/json')
+    expect(typeIs('application/json')).toMatchObject({ mediaType: 'application/json' })
   })
 
   it("shouldn't depend on case", () => {
-    expect(typeIs('Application/Json')).toBe('application/json')
+    expect(typeIs('Application/Json')).toMatchObject({ mediaType: 'application/json' })
   })
 
-  it('should return value if types are empty', () => {
-    expect(typeIs('application/json', ['application/json'])).toBe('application/json')
+  it('should return first matched value', () => {
+    expect(typeIs('application/json', ['application/json'])).toMatchObject({ mediaType: 'application/json' })
   })
 
   it('should return value if matched type starts with plus', () => {
-    expect(typeIs('application/ld+json', ['+json'])).toBe('application/ld+json')
+    expect(typeIs('application/json', ['+json'])).toMatchObject({ mediaType: 'application/json' })
+  })
+
+  it('should return value if matched type starts with plus', () => {
+    expect(typeIs('application/ld+json', ['+json'])).toMatchObject({ mediaType: 'application/ld+json' })
   })
 
   it('should return false if there is no match', () => {
@@ -32,11 +36,13 @@ describe('typeIs', () => {
   })
 
   it('should return matched value for urlencoded shorthand', () => {
-    expect(typeIs('application/x-www-form-urlencoded', ['urlencoded'])).toBe('urlencoded')
+    expect(typeIs('application/x-www-form-urlencoded', ['urlencoded'])).toMatchObject({
+      mediaType: 'application/x-www-form-urlencoded'
+    })
   })
 
-  it('should return matched value for urlencoded shorthand', () => {
-    expect(typeIs('multipart/form-data', ['multipart'])).toBe('multipart')
+  it('should return matched value for multipart shorthand', () => {
+    expect(typeIs('multipart/form-data', ['multipart'])).toMatchObject({ mediaType: 'multipart/form-data' })
   })
 
   it.each(['', false, null, undefined])(
@@ -46,14 +52,14 @@ describe('typeIs', () => {
     }
   )
 
-  it('should return false if expected type has wrong format', () => {
-    expect(typeIs('multipart/form-data', ['application/javascript/wrong'])).toBe(false)
+  it('should throw error if expected type has wrong format', () => {
+    expect(() => {
+      typeIs('multipart/form-data', ['application/javascript/wrong'])
+    }).toThrowError()
   })
+
   it('should return false if the input is not a string', () => {
     const value: Record<number, string> = { 1: 'test' }
     expect(typeIs(value as any)).toBe(false)
-  })
-  it('should return the same type as input if the type is not normalized', () => {
-    expect(typeIs('text/html', ['file.html'])).toBe('file.html')
   })
 })
