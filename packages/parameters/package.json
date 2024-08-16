@@ -1,7 +1,7 @@
 {
   "name": "@otterhttp/parameters",
   "description": "Utilities pertaining to HTTP parameters",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "LGPL-3.0-or-later",
   "homepage": "https://otterhttp.lordfirespeed.dev",
   "funding": {
