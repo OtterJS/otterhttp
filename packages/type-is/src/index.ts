@@ -35,6 +35,8 @@ function normalize(type: string): ContentType | null {
   switch (type) {
     case 'urlencoded':
       return ContentType.parse('application/x-www-form-urlencoded')
+    case '+urlencoded':
+      return ContentType.parse('application/*+x-www-form-urlencoded')
     case 'multipart':
       return ContentType.parse('multipart/*')
   }

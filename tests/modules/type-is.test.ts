@@ -41,6 +41,12 @@ describe('typeIs', () => {
     })
   })
 
+  it('should return matched value for +urlencoded shorthand', () => {
+    expect(typeIs('application/foobar+x-www-form-urlencoded', ['+urlencoded'])).toMatchObject({
+      mediaType: 'application/foobar+x-www-form-urlencoded'
+    })
+  })
+
   it('should return matched value for multipart shorthand', () => {
     expect(typeIs('multipart/form-data', ['multipart'])).toMatchObject({ mediaType: 'multipart/form-data' })
   })
