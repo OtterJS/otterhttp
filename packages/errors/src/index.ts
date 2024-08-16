@@ -4,7 +4,7 @@ import ModuleError from 'module-error'
 import { HttpStatus, type StatusCode, isValidStatusCode, statusMessages } from './status-codes'
 
 type ModuleErrorOptions = ConstructorParameters<typeof ModuleError>[1]
-type HttpErrorOptions = ModuleErrorOptions & {
+export type HttpErrorOptions = ModuleErrorOptions & {
   statusCode?: StatusCode
   statusMessage?: string
   exposeMessage?: boolean
