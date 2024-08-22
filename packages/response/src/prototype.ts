@@ -96,6 +96,8 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
   }
 
   async cookie(name: string, value: string, options?: SetCookieOptions): Promise<this> {
+    if (options == null) options = this.appSettings.setCookieOptions
+    else options = Object.assign({}, this.appSettings.setCookieOptions, options)
     await setCookie(this, name, value, options)
     return this
   }
