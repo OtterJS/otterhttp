@@ -1,5 +1,6 @@
 export * from './accepts'
 export * from './addresses'
+export * from './cookies'
 export * from './get-header'
 export * from './host'
 export * from './protocol'
