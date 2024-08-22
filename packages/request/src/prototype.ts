@@ -8,7 +8,7 @@ import { type URLParams, getQueryParams } from '@otterhttp/url'
 import type { Result as RangeParseResult, Options as RangeParsingOptions, Ranges } from 'header-range-parser'
 
 import { getIP, getIPs } from './addresses'
-import { parseCookieHeader } from './cookies'
+import { type Cookie, parseCookieHeader } from './cookies'
 import { getRequestHeader } from './get-header'
 import { getHost, getSubdomains } from './host'
 import { type Protocol, getProtocol } from './protocol'
@@ -40,7 +40,7 @@ export class Request<Body = unknown> extends IncomingMessage {
   private declare _ips: (string | undefined)[]
 
   // own members
-  private _cookies?: Record<string, string>
+  private _cookies?: Record<string, Cookie>
   body?: Body
 
   /** @internal */
@@ -121,7 +121,7 @@ export class Request<Body = unknown> extends IncomingMessage {
   get secure(): boolean {
     return this.protocol === 'https'
   }
-  get cookies(): Record<string, string> {
+  get cookies(): Record<string, Cookie> {
     this._cookies ??= parseCookieHeader(this)
     return this._cookies
   }
