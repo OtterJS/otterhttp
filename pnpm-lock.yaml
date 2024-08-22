@@ -230,7 +230,7 @@ importers:
   packages/type-is:
     dependencies:
       '@otterhttp/content-type':
-        specifier: ^0.4.0
+        specifier: ^0.5.0
         version: link:../content-type
       mime:
         specifier: ^4.0.4
