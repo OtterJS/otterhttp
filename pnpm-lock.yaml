@@ -158,6 +158,12 @@ importers:
       '@otterhttp/accepts':
         specifier: workspace:*
         version: link:../accepts
+      '@otterhttp/content-type':
+        specifier: workspace:*
+        version: link:../content-type
+      '@otterhttp/cookie':
+        specifier: workspace:*
+        version: link:../cookie
       '@otterhttp/proxy-address':
         specifier: workspace:*
         version: link:../proxy-address

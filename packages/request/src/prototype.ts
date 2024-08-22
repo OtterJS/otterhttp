@@ -130,6 +130,10 @@ export class Request<Body = unknown> extends IncomingMessage {
     return this._cookies
   }
   get contentType(): ContentType | undefined {
-    return ContentType.parse(this)
+    try {
+      return ContentType.parse(this)
+    } catch {
+      return undefined
+    }
   }
 }

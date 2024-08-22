@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "@otterhttp/accepts": "workspace:*",
+    "@otterhttp/cookie": "workspace:*",
+    "@otterhttp/content-type": "workspace:*",
     "@otterhttp/proxy-address": "workspace:*",
     "@otterhttp/type-is": "workspace:*",
     "@otterhttp/url": "workspace:*",
