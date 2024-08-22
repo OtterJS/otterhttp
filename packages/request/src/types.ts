@@ -13,3 +13,5 @@ type ExtraHeaders = {
 }
 
 export type Headers = Omit<IncomingHttpHeaders, keyof ExtraHeaders> & ExtraHeaders
+
+export type RequestAppSettings = Record<never, never>

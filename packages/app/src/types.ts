@@ -1,7 +1,7 @@
 /* c8 ignore start*/
 import type { Trust } from '@otterhttp/proxy-address'
-import type { Request } from '@otterhttp/request'
-import type { Response } from '@otterhttp/response'
+import type { Request, RequestAppSettings } from '@otterhttp/request'
+import type { Response, ResponseAppSettings } from '@otterhttp/response'
 import type { Handler } from '@otterhttp/router'
 
 import type { ErrorHandler } from './onError'
@@ -10,16 +10,18 @@ import type { IViewPrototype } from './view'
 /**
  * tinyhttp App has a few settings for toggling features
  */
-export type AppSettings = Partial<{
-  subdomainOffset: number
-  xPoweredBy: string | boolean
-  enableReqRoute: boolean
-  views: string | string[]
-  view: IViewPrototype
-  'view cache': boolean
-  'view engine': string
-  'trust proxy': Trust
-}>
+export type AppSettings = RequestAppSettings &
+  ResponseAppSettings &
+  Partial<{
+    subdomainOffset: number
+    xPoweredBy: string | boolean
+    enableReqRoute: boolean
+    views: string | string[]
+    view: IViewPrototype
+    'view cache': boolean
+    'view engine': string
+    'trust proxy': Trust
+  }>
 
 export type TemplateEngineOptions = Record<string, unknown>
 

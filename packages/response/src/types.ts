@@ -1,6 +1,7 @@
 import type { IncomingHttpHeaders, OutgoingHttpHeaders, ServerResponse } from 'node:http'
 import type { Request } from '@otterhttp/request'
 
+import type { SetCookieOptions } from './cookie'
 import type { Response } from './prototype'
 
 export type HasIncomingHeaders = { headers: IncomingHttpHeaders }
@@ -50,3 +51,7 @@ export type AppendHeaders = {
 }
 
 export type Input<T> = Exclude<T, undefined>
+
+export type ResponseAppSettings = {
+  setCookieDefaults?: SetCookieOptions
+}
