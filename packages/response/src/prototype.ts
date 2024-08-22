@@ -27,6 +27,7 @@ export class Response<Req extends Request = Request> extends ServerResponse<Req>
 
     this.locals = {}
   }
+
   // header-related overrides/extensions
   getHeader<HeaderName extends string>(headerName: HeaderName): Headers[Lowercase<HeaderName>] {
     return super.getHeader(headerName)
