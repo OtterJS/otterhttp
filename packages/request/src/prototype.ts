@@ -1,6 +1,7 @@
 import { IncomingMessage } from 'node:http'
 import type { ParsedUrlQuery } from 'node:querystring'
 import { Accepts } from '@otterhttp/accepts'
+import { ContentType } from '@otterhttp/content-type'
 import { parse as parseCookie } from '@otterhttp/cookie'
 import type { Trust } from '@otterhttp/proxy-address'
 import type { Middleware } from '@otterhttp/router'
@@ -127,5 +128,8 @@ export class Request<Body = unknown> extends IncomingMessage {
     }
     this._cookies ??= parseCookie(this.headers.cookie)
     return this._cookies
+  }
+  get contentType(): ContentType | undefined {
+    return ContentType.parse(this)
   }
 }
