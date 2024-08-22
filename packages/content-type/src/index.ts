@@ -1,7 +1,9 @@
 import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'node:http'
 import { formatParameters, parseParameters, validateParameterNames } from '@otterhttp/parameters'
 
-type Request = { headers: IncomingHttpHeaders }
+const alreadyParsed = Symbol('already parsed content-type')
+
+type Request = { headers: IncomingHttpHeaders; [alreadyParsed]?: ContentType }
 type Response = { getHeader: <HeaderName extends string>(name: HeaderName) => OutgoingHttpHeaders[HeaderName] }
 export type TypeParseableObject = Request | Response
 export type TypeParseable = string | TypeParseableObject
@@ -47,13 +49,21 @@ const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
  */
 const TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
 
-function getContentType(obj: TypeParseableObject) {
+function isRequest(obj: TypeParseableObject): obj is Request {
+  return 'headers' in obj && typeof obj.headers === 'object'
+}
+
+function isResponse(obj: TypeParseableObject): obj is Response {
+  return 'getHeader' in obj && typeof obj.getHeader === 'function'
+}
+
+function getContentType(obj: TypeParseableObject): string {
   let header: number | string | string[] | undefined
 
-  if ('getHeader' in obj && typeof obj.getHeader === 'function') {
+  if (isResponse(obj)) {
     // res-like
     header = obj.getHeader('content-type')
-  } else if ('headers' in obj && typeof obj.headers === 'object') {
+  } else if (isRequest(obj)) {
     // req-like
     header = obj.headers['content-type']
   }
@@ -94,7 +104,7 @@ export class ContentType {
    */
   parameters: Record<string, string>
 
-  static parse(contentType: string): ContentType {
+  static parse(contentType: TypeParseable): ContentType {
     return parse(contentType)
   }
 
@@ -160,8 +170,12 @@ export function format(obj: { type: string; subtype: string; parameters?: Record
 export function parse(value: TypeParseable): ContentType {
   if (!value) throw new TypeError('argument `value` is required')
 
+  let header: string
   // support req/res-like objects as argument
-  let header = typeof value === 'object' ? getContentType(value) : value
+  if (typeof value === 'object') {
+    if (value[alreadyParsed] != null) return value[alreadyParsed]
+    header = getContentType(value)
+  } else header = value
 
   if (typeof header !== 'string') throw new TypeError('argument `value` must be string, request-like or response-like')
   header = header.trim()
@@ -204,6 +218,8 @@ export function parse(value: TypeParseable): ContentType {
   const subtypeSuffix = plusIndex == null ? subtype : lowercaseHeader.slice(plusIndex + 1, endIndex)
 
   const parsedRepresentation = ContentType.fromValidatedInput(type, subtype, subtypeSuffix)
+  // cache the parse result for request-like objects
+  if (typeof value === 'object' && isRequest(value)) value[alreadyParsed] = parsedRepresentation
   if (endIndex === undefined) return parsedRepresentation
 
   parsedRepresentation.parameters = parseParameters(header.slice(endIndex))
