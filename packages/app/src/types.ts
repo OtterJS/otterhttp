@@ -12,7 +12,6 @@ import type { IViewPrototype } from './view'
  */
 export type AppSettings = Partial<{
   subdomainOffset: number
-  bindAppToReqRes: boolean
   xPoweredBy: string | boolean
   enableReqRoute: boolean
   views: string | string[]
