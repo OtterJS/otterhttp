@@ -95,15 +95,15 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
     return this
   }
 
-  async cookie(name: string, value: string, options?: SetCookieOptions): Promise<this> {
+  cookie(name: string, value: string, options?: SetCookieOptions): this {
     if (options == null) options = this.appSettings?.setCookieOptions
     else options = Object.assign({}, this.appSettings?.setCookieOptions, options)
-    await setCookie(this, name, value, options)
+    setCookie(this, name, value, options)
     return this
   }
 
-  async clearCookie(name: string, options?: SetCookieOptions): Promise<this> {
-    await clearCookie(this, name, options)
+  clearCookie(name: string, options?: SetCookieOptions): this {
+    clearCookie(this, name, options)
     return this
   }
 
