@@ -6,3 +6,4 @@ export * from './protocol'
 export * from './range'
 
 export { Request } from './prototype'
+export type { RequestAppSettings } from './types'

@@ -11,7 +11,7 @@ import type { App } from './app'
 export function getExtendMiddleware<Req extends Request = Request, Res extends Response<Req> = Response<Req>>(
   app: App<Req, Res>
 ) {
-  return (req: Req, _res: Res, next: NextFunction): void => {
+  return (req: Req, res: Res, next: NextFunction): void => {
     const { settings } = app
 
     let trust = settings?.['trust proxy'] ?? 0
@@ -21,6 +21,7 @@ export function getExtendMiddleware<Req extends Request = Request, Res extends R
     }
     const { subdomainOffset } = settings
 
+    req.appSettings = res.appSettings = settings
     req.populate({ trust, subdomainOffset })
 
     next()

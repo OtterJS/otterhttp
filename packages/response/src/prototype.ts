@@ -17,9 +17,13 @@ import {
 } from './headers'
 import { validatePreconditions } from './preconditions'
 import { redirect } from './redirect'
-import type { AppendHeaders, Headers, Input } from './types'
+import type { AppendHeaders, Headers, Input, ResponseAppSettings } from './types'
 
-export class Response<Req extends Request = Request> extends ServerResponse<Req> {
+export class Response<Req extends Request<unknown> = Request<unknown>> extends ServerResponse<Req> {
+  // assigned by App
+  declare appSettings: ResponseAppSettings
+
+  // own members (assigned by constructor)
   locals: Record<string, unknown>
 
   constructor(request: Req) {

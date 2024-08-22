@@ -11,7 +11,7 @@ import { getRequestHeader } from './get-header'
 import { getHost, getSubdomains } from './host'
 import { type Protocol, getProtocol } from './protocol'
 import { getRange } from './range'
-import type { Headers } from './types'
+import type { Headers, RequestAppSettings } from './types'
 import { isXmlHttpRequest } from './util/is-xml-http-request'
 import { requestTypeIs } from './util/request-type-is'
 
@@ -25,6 +25,7 @@ export class Request<Body = unknown> extends IncomingMessage {
   declare path: string
   declare route?: Middleware<never, never>
   declare params: URLParams
+  declare appSettings: RequestAppSettings
 
   // extension backing fields (assigned by populate)
   private declare _acceptsMeta: Accepts
@@ -36,9 +37,6 @@ export class Request<Body = unknown> extends IncomingMessage {
   private declare _ip: string | undefined
   private declare _ips: (string | undefined)[]
 
-  // common middleware 'slots'
-  cookies?: unknown
-  signedCookies?: unknown
   body?: Body
 
   /** @internal */
