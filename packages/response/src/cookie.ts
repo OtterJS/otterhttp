@@ -9,12 +9,10 @@ export type SetCookieOptions = cookie.SerializeOptions & {
 export async function setCookie(
   res: SetCookieResponse,
   name,
-  value: string | Record<string, unknown>,
+  value: string,
   { encode, ...options }: SetCookieOptions = {}
 ): Promise<void> {
-  let val = typeof value === 'object' ? `j:${JSON.stringify(value)}` : String(value)
-
-  if (encode != null) val = encode(val)
+  if (encode != null) value = encode(value)
 
   if (options.maxAge != null) {
     options.expires = new Date(Date.now() + options.maxAge)
@@ -23,7 +21,7 @@ export async function setCookie(
 
   if (options.path == null) options.path = '/'
 
-  res.appendHeader('set-cookie', `${cookie.serialize(name, String(val), options)}`)
+  res.appendHeader('set-cookie', cookie.serialize(name, value, options))
 }
 
 export async function clearCookie(
