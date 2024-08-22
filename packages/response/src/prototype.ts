@@ -95,7 +95,7 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
     return this
   }
 
-  async cookie(name: string, value: string | Record<string, unknown>, options?: SetCookieOptions): Promise<this> {
+  async cookie(name: string, value: string, options?: SetCookieOptions): Promise<this> {
     await setCookie(this, name, value, options)
     return this
   }
