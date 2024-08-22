@@ -14,4 +14,34 @@ type ExtraHeaders = {
 
 export type Headers = Omit<IncomingHttpHeaders, keyof ExtraHeaders> & ExtraHeaders
 
-export type RequestAppSettings = Record<never, never>
+export type CookieParsingSettings =
+  | {
+      /**
+       * Predicate used to determine whether a cookie is 'encoded'.
+       * @see cookieDecoder
+       */
+      encodedCookieMatcher: (cookie: string) => boolean
+
+      /**
+       * Transform function used to decode encoded cookies.
+       * @see encodedCookieMatcher
+       */
+      cookieDecoder: (encodedCookie: string) => string
+    }
+  | {
+      /**
+       * Predicate used to determine whether a cookie is 'encoded'.
+       * @see cookieDecoder
+       */
+      encodedCookieMatcher?: undefined
+
+      /**
+       * Transform function used to decode encoded cookies.
+       * @see encodedCookieMatcher
+       */
+      cookieDecoder?: undefined
+    }
+
+export type RequestAppSettings = {
+  cookieParsing?: CookieParsingSettings
+}
