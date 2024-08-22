@@ -27,7 +27,7 @@ export class Request<Body = unknown> extends IncomingMessage {
   declare path: string
   declare route?: Middleware<never, never>
   declare params: URLParams
-  declare appSettings: RequestAppSettings
+  declare appSettings: RequestAppSettings | undefined
 
   // extension backing fields (assigned by populate)
   private declare _acceptsMeta: Accepts
