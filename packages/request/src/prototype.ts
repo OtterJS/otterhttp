@@ -1,6 +1,7 @@
 import { IncomingMessage } from 'node:http'
 import type { ParsedUrlQuery } from 'node:querystring'
 import { Accepts } from '@otterhttp/accepts'
+import { parse as parseCookie } from '@otterhttp/cookie'
 import type { Trust } from '@otterhttp/proxy-address'
 import type { Middleware } from '@otterhttp/router'
 import { type URLParams, getQueryParams } from '@otterhttp/url'
@@ -37,6 +38,8 @@ export class Request<Body = unknown> extends IncomingMessage {
   private declare _ip: string | undefined
   private declare _ips: (string | undefined)[]
 
+  // own members
+  private _cookies?: Record<string, string>
   body?: Body
 
   /** @internal */
@@ -116,5 +119,13 @@ export class Request<Body = unknown> extends IncomingMessage {
   }
   get secure(): boolean {
     return this.protocol === 'https'
+  }
+  get cookies(): Record<string, string> {
+    if (this.headers.cookie == null) {
+      this._cookies ??= {}
+      return this._cookies
+    }
+    this._cookies ??= parseCookie(this.headers.cookie)
+    return this._cookies
   }
 }
