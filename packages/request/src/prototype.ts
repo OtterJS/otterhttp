@@ -122,7 +122,7 @@ export class Request<Body = unknown> extends IncomingMessage {
     return this.protocol === 'https'
   }
   get cookies(): Record<string, Cookie> {
-    this._cookies ??= parseCookieHeader(this)
+    this._cookies ??= parseCookieHeader(this, this.appSettings?.cookieParsing)
     return this._cookies
   }
   get contentType(): ContentType | undefined {
