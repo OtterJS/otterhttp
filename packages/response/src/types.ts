@@ -53,5 +53,5 @@ export type AppendHeaders = {
 export type Input<T> = Exclude<T, undefined>
 
 export type ResponseAppSettings = {
-  setCookieDefaults?: SetCookieOptions
+  setCookieOptions?: SetCookieOptions
 }
