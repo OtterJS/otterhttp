@@ -1,4 +1,5 @@
-import { IncomingMessage, type Server, ServerResponse, createServer } from 'node:http'
+import { type Server, createServer } from 'node:http'
+import { ClientError } from '@otterhttp/errors'
 import { Request } from '@otterhttp/request'
 import { Response } from '@otterhttp/response'
 import type { Handler, Middleware, NextFunction, UseMethodParams } from '@otterhttp/router'
@@ -63,21 +64,22 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
   Req,
   Res
 > {
+  private _extendMiddleware: Middleware<Req, Res> | undefined
+  private _noMatchMiddleware: Middleware<Req, Res> | undefined
+  private readonly _settings: AppSettings
+
   middleware: Middleware<Req, Res>[] = []
+
   locals: Record<string, unknown> = {}
-  noMatchHandler: Handler<Req, Res>
   onError: ErrorHandler<Req, Res>
-  settings: AppSettings
   engines: Record<string, TemplateEngine<TemplateEngineOptions>> = {}
-  applyExtensions: Handler<Req, Res> | undefined
   attach: (req: Req, res: Res, next?: NextFunction) => void
   cache: Record<string, unknown>
 
   constructor(options: AppConstructor<Req, Res> = {}) {
     super()
     this.onError = options?.onError || onErrorHandler
-    this.noMatchHandler = options?.noMatchHandler ?? this.onError.bind(this, { code: 404 })
-    this.settings = {
+    this._settings = {
       view: View,
       xPoweredBy: true,
       views: `${process.cwd()}/views`,
@@ -85,10 +87,16 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
       'trust proxy': 0,
       ...options.settings
     }
-    this.applyExtensions = options?.applyExtensions
     const boundHandler = this.handler.bind(this)
     this.attach = (req, res, next?: NextFunction) => setImmediate(boundHandler, req, res, next)
     this.cache = {}
+  }
+
+  get settings(): AppSettings {
+    if (!this.parent) return this._settings
+    if (this.parent.settings == null) return this._settings
+    if (this._settings == null) return this.parent.settings
+    return Object.assign({}, this.parent.settings, this._settings)
   }
 
   /**
@@ -97,7 +105,7 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
    * @param value setting value
    */
   set<K extends keyof AppSettings>(setting: K, value: AppSettings[K]): this {
-    this.settings[setting] = value
+    this._settings[setting] = value
 
     return this
   }
@@ -107,7 +115,7 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
    * @param setting Setting name
    */
   enable<K extends keyof AppSettings>(setting: K): this {
-    this.settings[setting] = true as AppSettings[K]
+    this._settings[setting] = true as AppSettings[K]
 
     return this
   }
@@ -118,7 +126,7 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
    * @returns
    */
   enabled<K extends keyof AppSettings>(setting: K): boolean {
-    return Boolean(this.settings[setting])
+    return Boolean(this._settings[setting])
   }
 
   /**
@@ -126,7 +134,7 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
    * @param setting Setting name
    */
   disable<K extends keyof AppSettings>(setting: K): this {
-    this.settings[setting] = false as AppSettings[K]
+    this._settings[setting] = false as AppSettings[K]
 
     return this
   }
@@ -183,12 +191,12 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
     }
 
     if (!view) {
-      const View = this.settings.view
+      const View = this._settings.view
       if (View == null) throw new TypeError(`No app-wide default view engine is configured, cannot render '${name}'`)
 
       view = new View(name, {
-        defaultEngine: this.settings['view engine'],
-        root: this.settings.views,
+        defaultEngine: this._settings['view engine'],
+        root: this._settings.views,
         engines: this.engines
       })
 
@@ -260,7 +268,7 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
   }
 
   route(path: string): App<Req, Res> {
-    const app = new App<Req, Res>({ settings: this.settings })
+    const app = new App<Req, Res>({ settings: this._settings })
 
     this.use(path, app)
 
@@ -291,10 +299,8 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
    */
   handler(req: Req, res: Res, next?: NextFunction): void {
     /* Set X-Powered-By header */
-    const { xPoweredBy } = this.settings
+    const { xPoweredBy } = this._settings
     if (xPoweredBy) res.setHeader('X-Powered-By', typeof xPoweredBy === 'string' ? xPoweredBy : 'otterhttp')
-
-    const exts = this.applyExtensions || getExtendMiddleware<Req, Res>(this)
 
     req.originalUrl = req.url || req.originalUrl
 
@@ -302,35 +308,39 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
 
     const matched = this.#find(pathname)
 
-    const mw: Middleware<Req, Res>[] = [
-      {
-        handler: exts,
-        type: 'mw',
-        path: '/'
-      },
-      ...matched.filter((x) => req.method === 'HEAD' || (x.method ? x.method === req.method : true))
-    ]
-
-    if (matched[0] != null) {
-      mw.push({
-        type: 'mw',
-        handler: (req, res, next) => {
-          if (req.method === 'HEAD') {
-            res.statusCode = 204
-            return res.end('')
-          }
-          next()
-        },
-        path: '/'
-      })
-    }
+    const mw: Middleware<Req, Res>[] = matched.filter((x) => {
+      if (x.method == null) return true
+      if (req.method === 'HEAD' && x.method === 'GET') return true
+      return x.method === req.method
+    })
 
     if (this.parent == null) {
-      mw.push({
-        handler: this.noMatchHandler,
-        type: 'mw',
-        path: '/'
-      })
+      mw.unshift(
+        (this._extendMiddleware ??= {
+          handler: getExtendMiddleware<Req, Res>(this),
+          type: 'mw',
+          path: '/'
+        })
+      )
+
+      mw.push(
+        (this._noMatchMiddleware ??= {
+          handler: this.onError.bind(
+            this,
+            new ClientError('Middleware fell through', {
+              statusCode: 404,
+              code: 'ERR_MIDDLEWARE_FELL_THROUGH'
+            })
+          ),
+          type: 'mw',
+          path: '/'
+        })
+      )
+    }
+
+    if (mw.length <= 0) {
+      next?.()
+      return
     }
 
     let idx = 0
@@ -385,7 +395,7 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
 
       if (!req.path) req.path = getPathname(req.url)
 
-      if (this.settings?.enableReqRoute) req.route = mw
+      if (this._settings?.enableReqRoute) req.route = mw
 
       await applyHandler<Req, Res>(handler)(req, res, next)
     }

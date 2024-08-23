@@ -46,6 +46,5 @@ export type AppConstructor<Req extends Request = Request, Res extends Response<R
   noMatchHandler: Handler<Req, Res>
   onError: ErrorHandler<Req, Res>
   settings: AppSettings
-  applyExtensions: Handler<Req, Res>
 }>
 /* c8 ignore stop */
