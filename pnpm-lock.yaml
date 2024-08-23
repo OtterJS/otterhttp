@@ -72,6 +72,9 @@ importers:
       '@otterhttp/cookie':
         specifier: workspace:*
         version: link:../cookie
+      '@otterhttp/errors':
+        specifier: workspace:*
+        version: link:../errors
       '@otterhttp/proxy-address':
         specifier: workspace:*
         version: link:../proxy-address
