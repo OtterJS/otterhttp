@@ -29,10 +29,10 @@ describe('Testing App', () => {
 
     expect(app.locals.hello).toBe('world')
   })
-  it('Custom noMatchHandler works', async () => {
-    const app = new App({
-      noMatchHandler: (req, res) => res.status(404).end(`Oopsie! Page ${req.url} is lost.`)
-    })
+  it('Custom fall through handler works', async () => {
+    const app = new App()
+
+    app.use((req, res) => res.status(404).end(`Oopsie! Page ${req.url} is lost.`))
 
     const server = app.listen()
 
@@ -212,7 +212,7 @@ describe('Testing App routing', () => {
 
       await makeFetch(app.listen())('/broken').expect(500, 'Your appearance destroyed this world.')
     })
-    it("next function sends error message if it's not an HTTP status code or string", async () => {
+    it('next function does not expose error message by default', async () => {
       const app = new App()
 
       app.use((req, res, next) => {
@@ -223,7 +223,7 @@ describe('Testing App routing', () => {
         }
       })
 
-      await makeFetch(app.listen())('/broken').expect(500, 'Your appearance destroyed this world.')
+      await makeFetch(app.listen())('/broken').expect(500, 'Internal Server Error')
     })
     it('errors in async wares do not destroy the app', async () => {
       const app = new App()
