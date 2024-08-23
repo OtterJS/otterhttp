@@ -28,7 +28,7 @@ export class Cookie {
    */
   decode(decoder: (encodedValue: string) => string): void {
     try {
-      this._value = decoder(this._value)
+      this._decodedValue = decoder(this._value)
     } catch (e) {
       this._decodingError = e
     }
