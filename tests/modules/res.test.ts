@@ -282,7 +282,7 @@ describe('Response extensions', () => {
   describe('res.cookie(name, value, options)', () => {
     it('serializes the cookie and puts it in a Set-Cookie header', async () => {
       const app = runServer(async (_req, res) => {
-        await res.cookie('hello', 'world')
+        res.cookie('hello', 'world')
         res.end()
 
         expect(res.getHeader('Set-Cookie')).toBe('hello=world; Path=/')
@@ -292,7 +292,7 @@ describe('Response extensions', () => {
     })
     it('sets default path to "/" if not specified in options', async () => {
       const app = runServer(async (_req, res) => {
-        await res.cookie('hello', 'world')
+        res.cookie('hello', 'world')
         res.end()
 
         expect(res.getHeader('Set-Cookie')).toContain('Path=/')
@@ -301,21 +301,21 @@ describe('Response extensions', () => {
       await makeFetch(app)('/').expect(200)
     })
     it('should use encode function if provided', async () => {
-      const encode = (value: string) => `s:${sign(value, 'foo')}`
+      const encode = (value: string) => encodeURIComponent(`s:${sign(value, 'foo')}`)
       const app = runServer(async (_req, res) => {
-        await res.cookie('hello', 'world', { encode })
+        res.cookie('hello', 'world', { encode })
         res.end()
       })
 
       const response = await makeFetch(app)('/')
       const cookies = new Headers(response.headers).getSetCookie()
-      expect(cookies).toContain(`hello=${encodeURIComponent(encode('world'))}; Path=/`)
+      expect(cookies).toContain(`hello=${encode('world')}; Path=/`)
     })
     it('should set "maxAge" and "expires" from options', async () => {
       const maxAge = 3600 * 24 * 365
 
       const app = runServer(async (_req, res) => {
-        await res.cookie('hello', 'world', {
+        res.cookie('hello', 'world', {
           maxAge
         })
         res.end()
@@ -327,8 +327,8 @@ describe('Response extensions', () => {
     })
     it('should append to Set-Cookie if called multiple times', async () => {
       const app = runServer(async (_req, res) => {
-        await res.cookie('hello', 'world')
-        await res.cookie('foo', 'bar')
+        res.cookie('hello', 'world')
+        res.cookie('foo', 'bar')
         res.end()
       })
 
@@ -338,7 +338,7 @@ describe('Response extensions', () => {
   describe('res.clearCookie(name, options)', () => {
     it('sets path to "/" if not specified in options', async () => {
       const app = runServer(async (_req, res) => {
-        await res.clearCookie('cookie')
+        res.clearCookie('cookie')
         res.end()
 
         expect(res.getHeader('Set-Cookie')).toContain('Path=/;')
