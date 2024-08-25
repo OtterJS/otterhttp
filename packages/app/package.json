@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/app",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "0-legacy, tiny & fast web framework as a replacement of Express",
   "type": "module",
   "homepage": "https://otterhttp.lordfirespeed.dev",
