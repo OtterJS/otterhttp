@@ -48,10 +48,10 @@ describe('Request properties', () => {
         param2: 'val2'
       })
     })
-    it('req.subpath does not include the mount path', async () => {
+    it('req.subpathname does not include the mount path', async () => {
       const app = new App()
 
-      app.use('/abc', (req, res) => res.send(req.subpath))
+      app.use('/abc', (req, res) => res.send(req.subpathname))
 
       const server = app.listen()
 
@@ -59,9 +59,9 @@ describe('Request properties', () => {
 
       await fetch('/abc/def').expect(200, '/def')
     })
-    it('should set the correct req.subpath on routes even in a subapp', async () => {
+    it('should set the correct req.subpathname on routes even in a subapp', async () => {
       const echo = (req: Request, res: Response) =>
-        res.json({ subpath: req.subpath, params: Object.fromEntries(req.params) })
+        res.json({ subpath: req.subpathname, params: Object.fromEntries(req.params) })
       const makeApp = () => new App().get('/a1/b/*', echo).get('/a2/b/:pat', echo)
 
       const app = makeApp()
@@ -88,12 +88,12 @@ describe('Request properties', () => {
         params: { pat1: 't', pat2: 'u', pat: 'c' }
       })
     })
-    it('should set the correct req.subpath on middlewares even in a subapp', async () => {
+    it('should set the correct req.subpathname on middlewares even in a subapp', async () => {
       const echo = (req: Request, res: Response) =>
-        res.json({ subpath: req.subpath, params: Object.fromEntries(req.params) })
+        res.json({ subpath: req.subpathname, params: Object.fromEntries(req.params) })
       const mw = (req, _res, next) => {
-        req.subpaths ??= []
-        req.subpaths.push(req.subpath)
+        req.subpathnames ??= []
+        req.subpathnames.push(req.subpathname)
         next()
       }
       const makeApp = () =>
@@ -101,7 +101,7 @@ describe('Request properties', () => {
           .get('/', echo)
           .use('/a1/b', echo)
           .use('/a2/b', mw, mw, mw, (req, res) =>
-            res.json({ subpaths: req.subpaths, params: Object.fromEntries(req.params) })
+            res.json({ subpaths: req.subpathnames, params: Object.fromEntries(req.params) })
           )
           .use('/a3/:pat1/:pat2', echo)
           .use('/a4/:pat1/*', echo)
@@ -150,9 +150,9 @@ describe('Request properties', () => {
         params: { pat: 't', pat1: 'b', wild: 'c/d' }
       })
     }, 0)
-    it('should set the correct req.subpath on a subapp mounted on a wildcard route, for both route and mw', async () => {
+    it('should set the correct req.subpathname on a subapp mounted on a wildcard route, for both route and mw', async () => {
       const echo = (req: Request, res: Response) =>
-        res.json({ subpath: req.subpath, params: Object.fromEntries(req.params) })
+        res.json({ subpath: req.subpathname, params: Object.fromEntries(req.params) })
       // Only possible route on subapps below * is / since * is greedy
       const subAppRoute = new App().get('/', echo)
       const subAppMw = new App().use('/', echo)
@@ -327,16 +327,16 @@ describe('Request properties', () => {
     await fetch('/').expect(200, 'XMLHttpRequest: no')
   })
 
-  it('req.path is the URL but without query parameters', async () => {
+  it('req.pathname is the URL but without query parameters', async () => {
     const { fetch } = InitAppAndTest((req, res) => {
-      res.send(`Path to page: ${req.path}`)
+      res.send(`Path to page: ${req.pathname}`)
     })
 
     await fetch('/page?a=b').expect(200, 'Path to page: /page')
   })
-  it('req.path works properly for optional parameters', async () => {
+  it('req.pathname works properly for optional parameters', async () => {
     const { fetch } = InitAppAndTest((req, res) => {
-      res.send(`Path to page: ${req.path}`)
+      res.send(`Path to page: ${req.pathname}`)
     }, '/:format?/:uml?')
 
     await fetch('/page/page-1').expect(200, 'Path to page: /page/page-1')

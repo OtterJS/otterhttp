@@ -303,11 +303,11 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
     const { xPoweredBy } = this._settings
     if (xPoweredBy) res.setHeader('X-Powered-By', typeof xPoweredBy === 'string' ? xPoweredBy : 'otterhttp')
 
-    req.path ??= getPathname(req.url)
-    req.subpath ??= req.path
+    req.pathname ??= getPathname(req.url)
+    req.subpathname ??= req.pathname
     req.params ??= Object.create(paramsProto)
 
-    const matched = this.#find(req.subpath)
+    const matched = this.#find(req.subpathname)
 
     const mw: Middleware<Req, Res>[] = matched.filter((x) => {
       if (x.method == null) return true
@@ -350,7 +350,7 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
       let params: URLParams
 
       try {
-        params = regex ? getURLParams(regex, req.subpath) : {}
+        params = regex ? getURLParams(regex, req.subpathname) : {}
       } catch (e) {
         console.error(e)
         if (e instanceof URIError) {
@@ -377,9 +377,9 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
         }
       }
 
-      const oldSubpath = req.subpath
+      const oldSubpath = req.subpathname
       if (mw.type === 'mw' || mw.type === 'route') {
-        req.subpath = lead(req.subpath.substring(matchedSubpath.length))
+        req.subpathname = lead(req.subpathname.substring(matchedSubpath.length))
       }
 
       if (this._settings?.enableReqRoute) req.route = mw
@@ -393,7 +393,7 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
       }
 
       req.params = oldReqParams
-      req.subpath = oldSubpath
+      req.subpathname = oldSubpath
 
       return done
     }

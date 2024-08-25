@@ -777,8 +777,8 @@ describe('Subapps', () => {
     subApp.get('/route', (req, res) =>
       res.json({
         url: req.url,
-        path: req.path,
-        subpath: req.subpath
+        path: req.pathname,
+        subpath: req.subpathname
       })
     )
 
@@ -804,7 +804,7 @@ describe('Subapps', () => {
 
     app.use('/test', subApp)
 
-    app.use('/test3', (req, res) => res.send(req.subpath))
+    app.use('/test3', (req, res) => res.send(req.subpathname))
 
     const server = app.listen()
 
@@ -956,7 +956,7 @@ describe('Subapps', () => {
   })
   it('handles errors by parent when no onError specified', async () => {
     const app = new App({
-      onError: (err, req, res) => res.status(500).end(`Ouch, ${err} hurt me on ${req.path} page.`)
+      onError: (err, req, res) => res.status(500).end(`Ouch, ${err} hurt me on ${req.pathname} page.`)
     })
 
     const subApp = new App()
@@ -974,11 +974,11 @@ describe('Subapps', () => {
   })
   it('handles errors in sub when onError is defined', async () => {
     const app = new App({
-      onError: (err, req, res) => res.status(500).end(`Ouch, ${err} hurt me on ${req.path} page.`)
+      onError: (err, req, res) => res.status(500).end(`Ouch, ${err} hurt me on ${req.pathname} page.`)
     })
 
     const subApp = new App({
-      onError: (err, req, res) => res.status(500).end(`Handling ${err} from child on ${req.path} page.`)
+      onError: (err, req, res) => res.status(500).end(`Handling ${err} from child on ${req.pathname} page.`)
     })
 
     subApp.get('/route', () => {
