@@ -330,7 +330,8 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
             this,
             new ClientError('Middleware fell through', {
               statusCode: 404,
-              code: 'ERR_MIDDLEWARE_FELL_THROUGH'
+              code: 'ERR_MIDDLEWARE_FELL_THROUGH',
+              exposeMessage: false
             })
           ),
           type: 'mw',
