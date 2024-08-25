@@ -23,19 +23,19 @@ const lead = (x: string) => (x.charCodeAt(0) === 47 ? x : `/${x}`)
 
 const mount = <Req extends Request = Request, Res extends Response<Req> = Response<Req>>(
   fn: App<Req, Res> | Handler<Req, Res>
-) => (fn instanceof App ? fn.attach : fn)
+) => (fn instanceof App ? fn.attachPromise : fn)
 
-const applyHandler =
-  <Req, Res>(h: Handler<Req, Res>) =>
-  async (req: Req, res: Res, next: NextFunction) => {
-    try {
-      if (h[Symbol.toStringTag] === 'AsyncFunction') {
-        await h(req, res, next)
-      } else h(req, res, next)
-    } catch (e) {
-      next(e)
-    }
+const paramsProto = {
+  getIterator: function* (this: typeof paramsProto) {
+    yield* Object.entries(this)
+    const proto = Object.getPrototypeOf(this)
+    if (proto === paramsProto) return
+    yield* proto
+  },
+  [Symbol.iterator]() {
+    return this.getIterator()
   }
+}
 
 /**
  * `App` class - the starting point of tinyhttp app.
@@ -74,6 +74,7 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
   onError: ErrorHandler<Req, Res>
   engines: Record<string, TemplateEngine<TemplateEngineOptions>> = {}
   attach: (req: Req, res: Res, next?: NextFunction) => void
+  attachPromise: (req: Req, res: Res, next?: NextFunction) => Promise<void>
   cache: Record<string, unknown>
 
   constructor(options: AppConstructor<Req, Res> = {}) {
@@ -87,8 +88,8 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
       'trust proxy': 0,
       ...options.settings
     }
-    const boundHandler = this.handler.bind(this)
-    this.attach = (req, res, next?: NextFunction) => setImmediate(boundHandler, req, res, next)
+    this.attach = (req, res, next?: NextFunction) => queueMicrotask(() => this.handler(req, res, next))
+    this.attachPromise = async (req, res, next?: NextFunction) => await this.handler(req, res, next)
     this.cache = {}
   }
 
@@ -297,16 +298,16 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
    * @param res Res object
    * @param next 'Next' function
    */
-  handler(req: Req, res: Res, next?: NextFunction): void {
+  async handler(req: Req, res: Res, next?: NextFunction): Promise<void> {
     /* Set X-Powered-By header */
     const { xPoweredBy } = this._settings
     if (xPoweredBy) res.setHeader('X-Powered-By', typeof xPoweredBy === 'string' ? xPoweredBy : 'otterhttp')
 
-    req.originalUrl = req.url || req.originalUrl
+    req.path ??= getPathname(req.url)
+    req.subpath ??= req.path
+    req.params ??= Object.create(paramsProto)
 
-    const pathname = getPathname(req.originalUrl)
-
-    const matched = this.#find(pathname)
+    const matched = this.#find(req.subpath)
 
     const mw: Middleware<Req, Res>[] = matched.filter((x) => {
       if (x.method == null) return true
@@ -343,64 +344,70 @@ export class App<Req extends Request = Request, Res extends Response<Req> = Resp
       return
     }
 
-    let idx = 0
-
-    const loop = (): void => void handle(mw[idx++])(req, res, thisNext)
-
-    const parentNext = next
-    const thisNext = (err: unknown) => {
-      if (err != null) {
-        return this.onError(err, req, res, thisNext)
-      }
-
-      if (res.writableEnded) return
-      if (idx >= mw.length) {
-        if (parentNext != null) parentNext()
-        return
-      }
-
-      loop()
-    }
-
-    const handle = (mw: Middleware<Req, Res>) => async (req: Req, res: Res, next: NextFunction) => {
+    const handle = async (mw: Middleware<Req, Res>, req: Req, res: Res): Promise<boolean> => {
       const { path = '/', handler, regex } = mw
 
       let params: URLParams
 
       try {
-        params = regex ? getURLParams(regex, pathname) : {}
+        params = regex ? getURLParams(regex, req.subpath) : {}
       } catch (e) {
         console.error(e)
-        if (e instanceof URIError) return res.sendStatus(400)
+        if (e instanceof URIError) {
+          res.sendStatus(400)
+          return true
+        }
         throw e
       }
 
+      const oldReqParams = req.params
+      if (Object.keys(params).length > 0) {
+        req.params = Object.assign(Object.create(oldReqParams), params)
+      }
+
       // Warning: users should not use :wild as a pattern
-      let prefix = path
+      let matchedSubpath = path
       if (regex) {
         for (const key of regex.keys as string[]) {
           if (key === 'wild') {
-            prefix = prefix.replace('*', params.wild)
+            matchedSubpath = matchedSubpath.replace('*', params.wild)
           } else {
-            prefix = prefix.replace(`:${key}`, params[key])
+            matchedSubpath = matchedSubpath.replace(`:${key}`, params[key])
           }
         }
       }
 
-      req.params = { ...req.params, ...params }
-
-      if (mw.type === 'mw') {
-        req.url = lead(req.originalUrl.substring(prefix.length))
+      const oldSubpath = req.subpath
+      if (mw.type === 'mw' || mw.type === 'route') {
+        req.subpath = lead(req.subpath.substring(matchedSubpath.length))
       }
-
-      if (!req.path) req.path = getPathname(req.url)
 
       if (this._settings?.enableReqRoute) req.route = mw
 
-      await applyHandler<Req, Res>(handler)(req, res, next)
+      let done = true
+      const next = () => (done = false)
+      try {
+        await handler(req, res, next)
+      } catch (err) {
+        this.onError(err, req, res, next)
+      }
+
+      req.params = oldReqParams
+      req.subpath = oldSubpath
+
+      return done
     }
 
-    loop()
+    let idx = 0
+    while (true) {
+      if (idx >= mw.length) {
+        if (next != null) next()
+        return
+      }
+
+      const done = await handle(mw[idx++], req, res)
+      if (done) break
+    }
   }
 
   /**

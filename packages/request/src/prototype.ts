@@ -23,10 +23,10 @@ export class Request<Body = unknown> extends IncomingMessage {
   declare method: string
 
   // assigned by App
-  declare originalUrl: string
   declare path: string
+  declare subpath: string
   declare route?: Middleware<never, never>
-  declare params: URLParams
+  declare params: URLParams & Iterable<readonly [string, string]>
   declare appSettings: RequestAppSettings | undefined
 
   // extension backing fields (assigned by populate)

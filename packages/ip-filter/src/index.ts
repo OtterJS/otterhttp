@@ -28,19 +28,12 @@ export const ipFilter = (opts: IPFilterOptions) => {
 
   const fail = (res: Response): void => void res.writeHead(403, forbidden).end()
 
-  return (req: Request, res: Response, next: (err?: unknown) => void): void => {
+  return (req: Request, res: Response, next: () => void): void => {
     const ip = getIp(req, res)
     if (ip == null) return fail(res)
     if (typeof ip !== 'string') throw new TypeError('@otterhttp/ip-filter: expect `getIp` to return a string')
 
-    let isBadIP: boolean
-
-    try {
-      isBadIP = processIpFilters(ip, filter, strict)
-    } catch (e) {
-      next(e)
-      return
-    }
+    const isBadIP = processIpFilters(ip, filter, strict)
 
     if (isBadIP) {
       return fail(res)

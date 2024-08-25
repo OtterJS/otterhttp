@@ -45,7 +45,9 @@ describe('Testing App', () => {
       onError: (err, req, res) => res.status(500).end(`Ouch, ${err} hurt me on ${req.url} page.`)
     })
 
-    app.use((_req, _res, next) => next('you'))
+    app.use(() => {
+      throw 'you'
+    })
 
     const server = app.listen()
     const fetch = makeFetch(server)
@@ -184,7 +186,18 @@ describe('Testing App routing', () => {
     await fetch('/abc/route2').expect(200, 'route2')
     await fetch('/abc/route3').expect(200, 'route3')
   })
-  describe('next(err)', () => {
+  it('should not pollute req.params', async () => {
+    const app = new App()
+
+    app.use('/foo/:foo', (_req, _res, next) => next())
+    app.use('/foo/:bar', (req, res) => res.json(req.params))
+
+    const fetch = makeFetch(app.listen())
+
+    await fetch('/foo/baz').expect(200, { bar: 'baz' })
+  })
+
+  describe('next()', () => {
     it('next function skips current middleware', async () => {
       const app = new App()
 
@@ -198,32 +211,6 @@ describe('Testing App routing', () => {
         .use((_req, res) => void res.json({ ...app.locals }))
 
       await makeFetch(app.listen())('/').expect(200, { log: '/' })
-    })
-    it('next function handles errors', async () => {
-      const app = new App()
-
-      app.use((req, res, next) => {
-        if (req.url === '/broken') {
-          next('Your appearance destroyed this world.')
-        } else {
-          res.send('Welcome back')
-        }
-      })
-
-      await makeFetch(app.listen())('/broken').expect(500, 'Your appearance destroyed this world.')
-    })
-    it('next function does not expose error message by default', async () => {
-      const app = new App()
-
-      app.use((req, res, next) => {
-        if (req.url === '/broken') {
-          next(new Error('Your appearance destroyed this world.'))
-        } else {
-          res.send('Welcome back')
-        }
-      })
-
-      await makeFetch(app.listen())('/broken').expect(500, 'Internal Server Error')
     })
     it('errors in async wares do not destroy the app', async () => {
       const app = new App()
@@ -782,16 +769,16 @@ describe('Subapps', () => {
 
     app.route('/path').get((_, res) => res.send('Hello World'))
   })
-  /* it('req.originalUrl does not change', async () => {
+  it('req.url does not change', async () => {
     const app = new App()
 
     const subApp = new App()
 
     subApp.get('/route', (req, res) =>
-      res.send({
-        origUrl: req.originalUrl,
+      res.json({
         url: req.url,
-        path: req.path
+        path: req.path,
+        subpath: req.subpath
       })
     )
 
@@ -801,12 +788,12 @@ describe('Subapps', () => {
 
     const fetch = makeFetch(server)
 
-    await fetch('/subapp/route').expect(200, {
-      origUrl: '/subapp/route',
-      url: '/route',
-      path: '/route'
+    await fetch('/subapp/route?foo=bar').expect(200, {
+      path: '/subapp/route',
+      url: '/subapp/route?foo=bar',
+      subpath: '/'
     })
-  }) */
+  })
 
   it('lets other wares handle the URL if subapp doesnt have that path', async () => {
     const app = new App()
@@ -817,7 +804,7 @@ describe('Subapps', () => {
 
     app.use('/test', subApp)
 
-    app.use('/test3', (req, res) => res.send(req.url))
+    app.use('/test3', (req, res) => res.send(req.subpath))
 
     const server = app.listen()
 
@@ -944,6 +931,19 @@ describe('Subapps', () => {
 
     await fetch('/users/123/route').expect(200, '123')
   })
+  it('matches when subapp using route with params is mounted on params', async () => {
+    const app = new App()
+
+    const subapp = new App()
+
+    subapp.get('/bar/:bar', (req, res) => res.json({ foo: req.params.foo, bar: req.params.bar }))
+
+    app.use('/foo/:foo', subapp)
+
+    const server = app.listen()
+    const fetch = makeFetch(server)
+    await fetch('/foo/abc/bar/123').expect(200, { foo: 'abc', bar: '123' })
+  })
   it('sends bad request on malformed params', async () => {
     const app = new App()
 
@@ -961,9 +961,11 @@ describe('Subapps', () => {
 
     const subApp = new App()
 
-    subApp.get('/route', (_req, _res, next) => next('you'))
+    subApp.get('/route', (_req, _res, _next) => {
+      throw 'you'
+    })
 
-    app.use('/subapp', subApp).listen()
+    app.use('/subapp', subApp)
 
     const server = app.listen()
     const fetch = makeFetch(server)
@@ -979,7 +981,9 @@ describe('Subapps', () => {
       onError: (err, req, res) => res.status(500).end(`Handling ${err} from child on ${req.path} page.`)
     })
 
-    subApp.get('/route', (_req, _res, next) => next('you'))
+    subApp.get('/route', () => {
+      throw 'you'
+    })
 
     app.use('/subapp', subApp).listen()
 

@@ -2,7 +2,7 @@
 
 import { isString, isStringArray } from './type-guards'
 
-export type NextFunction = (err?: unknown) => void
+export type NextFunction = () => void
 
 export type SyncHandler<Request = unknown, Response = unknown> = (
   req: Request,
