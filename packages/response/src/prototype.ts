@@ -1,4 +1,4 @@
-import { ServerResponse } from 'node:http'
+import { type OutgoingHttpHeader, type OutgoingHttpHeaders, ServerResponse } from 'node:http'
 import { HttpError } from '@otterhttp/errors'
 import type { Request } from '@otterhttp/request'
 import { type JSONLiteral, type SendFileOptions, json, send, sendFile, sendStatus } from '@otterhttp/send'
@@ -25,6 +25,7 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
 
   // own members (assigned by constructor)
   locals: Record<string, unknown>
+  private _lateHeaderActions?: Map<symbol, (res: unknown) => void>
 
   constructor(request: Req) {
     super(request)
@@ -61,6 +62,27 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
   appendHeaders(headers: AppendHeaders): this {
     appendResponseHeaders(this, headers)
     return this
+  }
+
+  writeHead(statusCode: number, statusMessage?: string, headers?: OutgoingHttpHeaders | OutgoingHttpHeader[]): this
+  writeHead(statusCode: number, headers?: OutgoingHttpHeaders | OutgoingHttpHeader[]): this
+  override writeHead(
+    statusCode: number,
+    statusMessage?: string | OutgoingHttpHeaders | OutgoingHttpHeader[],
+    headers?: OutgoingHttpHeaders | OutgoingHttpHeader[]
+  ): this {
+    if (this._lateHeaderActions != null) {
+      for (const action of this._lateHeaderActions.values()) {
+        action(this)
+      }
+    }
+    // @ts-expect-error typescript doesn't handle overloads very well
+    return super.writeHead(statusCode, statusMessage, headers)
+  }
+
+  registerLateHeaderAction(symbol: symbol, action: (res: this) => void) {
+    this._lateHeaderActions ??= new Map()
+    this._lateHeaderActions.set(symbol, action as (res: unknown) => void)
   }
 
   location(url: string | URL): this {

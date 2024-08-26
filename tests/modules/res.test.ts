@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { makeFetch } from 'supertest-fetch'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { sign } from '@/packages/cookie-signature/src'
 import { runServer } from '@/test_helpers/runServer'
@@ -496,6 +496,56 @@ describe('Response extensions', () => {
       })
 
       await makeFetch(app)('/').expect('stale')
+    })
+  })
+  describe('res.registerLateHeaderAction', () => {
+    const fnSymbol = Symbol('fn')
+    const fn = vi.fn()
+    afterEach(() => vi.mocked(fn).mockRestore())
+
+    it('should run actions when res.writeHead() is called', async () => {
+      const app = runServer((_req, res) => {
+        res.registerLateHeaderAction(fnSymbol, fn)
+        res.writeHead(200)
+        res.end()
+      })
+
+      await makeFetch(app)('/')
+      expect(fn).toHaveBeenCalled()
+    })
+
+    it('should run actions when res.end() is called without calling res.writeHead()', async () => {
+      const app = runServer((_req, res) => {
+        res.registerLateHeaderAction(fnSymbol, fn)
+        res.end()
+      })
+
+      await makeFetch(app)('/')
+      expect(fn).toHaveBeenCalled()
+    })
+
+    it('should not run actions when res.end() is called and res.writeHead() was already called', async () => {
+      const app = runServer((_req, res) => {
+        res.writeHead(200)
+        res.registerLateHeaderAction(fnSymbol, fn)
+        res.end()
+      })
+
+      await makeFetch(app)('/')
+      expect(fn).not.toHaveBeenCalled()
+    })
+
+    it('should pass `res` object to actions', async () => {
+      let cacheRes: Response | undefined
+      const app = runServer((_req, res) => {
+        cacheRes = res
+        res.registerLateHeaderAction(fnSymbol, fn)
+        res.end()
+      })
+
+      await makeFetch(app)('/')
+      expect(cacheRes).toBeDefined()
+      expect(fn).toHaveBeenCalledWith(cacheRes)
     })
   })
 })
