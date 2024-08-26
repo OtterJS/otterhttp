@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/rate-limit",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "type": "module",
   "description": "Basic IP rate-limiting middleware for tinyhttp. Use to limit repeated requests to public APIs and/or endpoints such as password reset.",
   "homepage": "https://otterhttp.lordfirespeed.dev",
