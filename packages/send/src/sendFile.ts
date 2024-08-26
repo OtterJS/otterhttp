@@ -98,11 +98,9 @@ export async function sendFile(res: SendFileResponse, path: string, opts: SendFi
     const start = (options.start = Number.parseInt(x, 10) || 0)
 
     if (start >= stats.size || end >= stats.size) {
-      res
-        .writeHead(416, {
-          'Content-Range': `bytes */${stats.size}`
-        })
-        .end()
+      res.setHeader('Content-Range', `bytes */${stats.size}`)
+      res.writeHead(416)
+      res.end()
       return
     }
     headers['Content-Range'] = `bytes ${start}-${end}/${stats.size}`
@@ -112,9 +110,12 @@ export async function sendFile(res: SendFileResponse, path: string, opts: SendFi
     headers['Content-Length'] = stats.size
   }
 
-  for (const [k, v] of Object.entries(headers)) res.setHeader(k, v)
+  for (const [key, value] of Object.entries(headers)) {
+    if (value == null) continue
+    res.setHeader(key, value)
+  }
 
-  res.writeHead(status, headers)
+  res.writeHead(status)
 
   const stream = createReadStream(filePath, options)
   await pipeline(stream, makeIndestructible(res))
