@@ -33,9 +33,9 @@ export const onErrorHandler = function <Req extends Request = Request, Res exten
     res.writeHead(err.statusCode, err.statusMessage)
 
     if (err.exposeMessage) {
-      res.end(err.message)
+      res.end(`${err.statusMessage}: ${err.message}`)
     } else {
-      res.end()
+      res.end(err.statusMessage)
     }
 
     if (!err.expected) {
