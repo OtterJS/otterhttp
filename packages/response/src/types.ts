@@ -1,25 +1,25 @@
-import type { IncomingHttpHeaders, OutgoingHttpHeaders, ServerResponse } from 'node:http'
-import type { Request } from '@otterhttp/request'
+import type { IncomingHttpHeaders, OutgoingHttpHeaders, ServerResponse } from "node:http"
+import type { Request } from "@otterhttp/request"
 
-import type { SetCookieOptions } from './cookie'
-import type { Response } from './prototype'
+import type { SetCookieOptions } from "./cookie"
+import type { Response } from "./prototype"
 
 export type HasIncomingHeaders = { headers: IncomingHttpHeaders }
 
-export type HasAccepts = Pick<Request, 'accepts'>
+export type HasAccepts = Pick<Request, "accepts">
 
 export type HasMethod = { method: string }
 
 export type HasOutgoingHeaders = Pick<
   Response,
-  | 'getHeader'
-  | 'getHeaders'
-  | 'setHeader'
-  | 'appendHeader'
-  | 'getHeaderNames'
-  | 'hasHeader'
-  | 'removeHeader'
-  | 'headersSent'
+  | "getHeader"
+  | "getHeaders"
+  | "setHeader"
+  | "appendHeader"
+  | "getHeaderNames"
+  | "hasHeader"
+  | "removeHeader"
+  | "headersSent"
 >
 
 export type HasStatus = {
@@ -33,11 +33,11 @@ export type HasReq<Request> = {
 
 export type HasWriteMethods = Pick<
   ServerResponse,
-  'writeContinue' | 'writeHead' | 'writeEarlyHints' | 'writeProcessing'
+  "writeContinue" | "writeHead" | "writeEarlyHints" | "writeProcessing"
 >
 
 type ExtraHeaders = {
-  'content-type'?: string | undefined
+  "content-type"?: string | undefined
   vary?: string | string[] | undefined
 }
 

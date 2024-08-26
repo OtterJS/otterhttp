@@ -9,7 +9,7 @@ const ENCODE_URL_ATTR_CHAR_REGEXP = /[\x00-\x20"'()*,/:;<=>?@[\\\]{}\x7f]/g
 
 export function getLatin1Fallback(val: unknown) {
   // simple Unicode -> ISO-8859-1 transformation
-  return String(val).replace(NON_LATIN1_REGEXP, '?')
+  return String(val).replace(NON_LATIN1_REGEXP, "?")
 }
 
 function percentDecode(_str: string, hex: string) {
@@ -38,25 +38,25 @@ export function encodeUtf8ExtendedFieldValue(val: unknown): string {
  */
 export function decodeExtendedFieldValue(str: string) {
   const match = EXT_VALUE_REGEXP.exec(str)
-  if (!match) throw new TypeError('invalid extended field value')
+  if (!match) throw new TypeError("invalid extended field value")
 
   const charset = match[1].toLowerCase()
   const encoded = match[2]
   let value: string
   switch (charset) {
-    case 'iso-8859-1':
+    case "iso-8859-1":
       HEX_ESCAPE_REPLACE_REGEXP.lastIndex = 0
       value = getLatin1Fallback(encoded.replace(HEX_ESCAPE_REPLACE_REGEXP, percentDecode))
       break
-    case 'utf-8':
+    case "utf-8":
       try {
         value = decodeURIComponent(encoded)
       } catch {
-        throw new TypeError('invalid encoded utf-8')
+        throw new TypeError("invalid encoded utf-8")
       }
       break
     default:
-      throw new TypeError('unsupported charset in extended field')
+      throw new TypeError("unsupported charset in extended field")
   }
 
   return value

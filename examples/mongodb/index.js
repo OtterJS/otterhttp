@@ -1,8 +1,8 @@
-import assert from 'node:assert'
-import { App } from '@otterhttp/app'
-import * as dotenv from '@otterhttp/dotenv'
-import { urlencoded as parser } from 'milliparsec'
-import mongodb from 'mongodb'
+import assert from "node:assert"
+import { App } from "@otterhttp/app"
+import * as dotenv from "@otterhttp/dotenv"
+import { urlencoded as parser } from "milliparsec"
+import mongodb from "mongodb"
 
 dotenv.config()
 
@@ -13,18 +13,18 @@ let coll
 
 // connect to mongodb
 const client = new mongodb.MongoClient(process.env.DB_URI, {
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 })
 
 client.connect(async (err) => {
   assert.notStrictEqual(null, err)
-  console.log('successfully connected to MongoDB')
-  db = client.db('notes')
-  coll = db.collection('notes')
+  console.log("successfully connected to MongoDB")
+  db = client.db("notes")
+  coll = db.collection("notes")
 })
 
 // get all notes
-app.get('/notes', async (_, res, next) => {
+app.get("/notes", async (_, res, next) => {
   try {
     const r = await coll.find({}).toArray()
     res.send(r)
@@ -34,10 +34,10 @@ app.get('/notes', async (_, res, next) => {
   }
 })
 
-app.use('/notes', parser())
+app.use("/notes", parser())
 
 // add new note
-app.post('/notes', async (req, res, next) => {
+app.post("/notes", async (req, res, next) => {
   try {
     const { title, desc } = req.body
     const r = await coll.insertOne({ title, desc })
@@ -49,7 +49,7 @@ app.post('/notes', async (req, res, next) => {
 })
 
 // delete note
-app.delete('/notes', async (req, res, next) => {
+app.delete("/notes", async (req, res, next) => {
   try {
     const { id } = req.body
     const r = await coll.deleteOne({ _id: new mongodb.ObjectId(id) })
@@ -61,13 +61,13 @@ app.delete('/notes', async (req, res, next) => {
 })
 
 // update existing note
-app.put('/notes', async (req, res, next) => {
+app.put("/notes", async (req, res, next) => {
   try {
     const { title, desc, id } = req.body
     await coll.findOneAndUpdate(
       { _id: new mongodb.ObjectId(id) },
       { $set: { title, desc } },
-      { returnOriginal: false, upsert: true }
+      { returnOriginal: false, upsert: true },
     )
     res.send(`Note with title of ${title} has been updated`)
   } catch (err) {

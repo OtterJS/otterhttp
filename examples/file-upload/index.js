@@ -1,9 +1,9 @@
-import { App } from '@otterhttp/app'
-import { formidable } from 'formidable'
+import { App } from "@otterhttp/app"
+import { formidable } from "formidable"
 
 const app = new App()
 
-app.post('/api/upload', (req, res, next) => {
+app.post("/api/upload", (req, res, next) => {
   const form = formidable({ multiples: true })
 
   form.parse(req, (err, fields, files) => {
@@ -15,4 +15,4 @@ app.post('/api/upload', (req, res, next) => {
   })
 })
 
-app.listen(3000, () => console.log('Server listening on http://localhost:3000'))
+app.listen(3000, () => console.log("Server listening on http://localhost:3000"))

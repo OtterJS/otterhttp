@@ -1,5 +1,5 @@
-import type { HasHeaders } from '../types'
+import type { HasHeaders } from "../types"
 
 export function isXmlHttpRequest(req: HasHeaders): boolean {
-  return req.headers['x-requested-with'] === 'XMLHttpRequest'
+  return req.headers["x-requested-with"] === "XMLHttpRequest"
 }

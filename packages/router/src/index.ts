@@ -1,19 +1,19 @@
 /* HELPER TYPES */
 
-import { isString, isStringArray } from './type-guards'
+import { isString, isStringArray } from "./type-guards"
 
 export type NextFunction = () => void
 
 export type SyncHandler<Request = unknown, Response = unknown> = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => void
 
 export type AsyncHandler<Request = unknown, Response = unknown> = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => Promise<void>
 
 export type Handler<Request = unknown, Response = unknown> =
@@ -21,46 +21,46 @@ export type Handler<Request = unknown, Response = unknown> =
   | SyncHandler<Request, Response>
 
 const METHODS = [
-  'ACL',
-  'BIND',
-  'CHECKOUT',
-  'CONNECT',
-  'COPY',
-  'DELETE',
-  'GET',
-  'HEAD',
-  'LINK',
-  'LOCK',
-  'M-SEARCH',
-  'MERGE',
-  'MKACTIVITY',
-  'MKCALENDAR',
-  'MKCOL',
-  'MOVE',
-  'NOTIFY',
-  'OPTIONS',
-  'PATCH',
-  'POST',
-  'PRI',
-  'PROPFIND',
-  'PROPPATCH',
-  'PURGE',
-  'PUT',
-  'REBIND',
-  'REPORT',
-  'SEARCH',
-  'SOURCE',
-  'SUBSCRIBE',
-  'TRACE',
-  'UNBIND',
-  'UNLINK',
-  'UNLOCK',
-  'UNSUBSCRIBE'
+  "ACL",
+  "BIND",
+  "CHECKOUT",
+  "CONNECT",
+  "COPY",
+  "DELETE",
+  "GET",
+  "HEAD",
+  "LINK",
+  "LOCK",
+  "M-SEARCH",
+  "MERGE",
+  "MKACTIVITY",
+  "MKCALENDAR",
+  "MKCOL",
+  "MOVE",
+  "NOTIFY",
+  "OPTIONS",
+  "PATCH",
+  "POST",
+  "PRI",
+  "PROPFIND",
+  "PROPPATCH",
+  "PURGE",
+  "PUT",
+  "REBIND",
+  "REPORT",
+  "SEARCH",
+  "SOURCE",
+  "SUBSCRIBE",
+  "TRACE",
+  "UNBIND",
+  "UNLINK",
+  "UNLOCK",
+  "UNSUBSCRIBE",
 ] as const
 
 export type Method = (typeof METHODS)[number]
 
-export type MiddlewareType = 'mw' | 'route'
+export type MiddlewareType = "mw" | "route"
 
 type RegexParams = {
   keys: string[] | false
@@ -90,7 +90,7 @@ export type RouterMethod<
   Req = unknown,
   Res = unknown,
   App extends Router<App, Req, Res> = never,
-  ReturnedApp = never
+  ReturnedApp = never,
 > = {
   (path: string | string[], handler: RouterHandler<Req, Res>, ...handlers: RouterHandler<Req, Res>[]): ReturnedApp
   (handler: RouterHandler<Req, Res>, ...handlers: RouterHandler<Req, Res>[]): ReturnedApp
@@ -105,7 +105,7 @@ export type UseMethod<Req, Res, App extends Router<App, Req, Res>> = {
 
 export type UseMethodParams<Req, Res, App extends Router<App, Req, Res>> = [
   string | string[] | RouterHandler<Req, Res> | App,
-  ...Array<RouterHandler<Req, Res> | App>
+  ...Array<RouterHandler<Req, Res> | App>,
 ]
 
 /** HELPER METHODS */
@@ -114,17 +114,17 @@ const createMiddlewareFromRoute = <Req, Res, App extends Router<App, Req, Res>>(
   path,
   handler,
   fullPath,
-  method
+  method,
 }: MethodHandler<Req, Res, App> & {
   method?: Method
-}): Pick<Middleware<Req, Res, App>, 'method' | 'handler' | 'path' | 'fullPath'> => {
+}): Pick<Middleware<Req, Res, App>, "method" | "handler" | "path" | "fullPath"> => {
   if (isString(path)) {
     if (handler == null) throw new Error()
     return {
       method,
       handler,
       path,
-      fullPath
+      fullPath,
     }
   }
   if (isStringArray(path)) {
@@ -132,8 +132,8 @@ const createMiddlewareFromRoute = <Req, Res, App extends Router<App, Req, Res>>(
     return {
       method,
       handler,
-      path: '/',
-      fullPath: path.join('/')
+      path: "/",
+      fullPath: path.join("/"),
     }
   }
 
@@ -141,8 +141,8 @@ const createMiddlewareFromRoute = <Req, Res, App extends Router<App, Req, Res>>(
     return {
       method,
       handler: path,
-      path: '/',
-      fullPath
+      path: "/",
+      fullPath,
     }
   }
 
@@ -150,8 +150,8 @@ const createMiddlewareFromRoute = <Req, Res, App extends Router<App, Req, Res>>(
     return {
       method,
       handler,
-      path: '/',
-      fullPath
+      path: "/",
+      fullPath,
     }
   }
 
@@ -170,7 +170,7 @@ export const pushMiddleware =
     method,
     handlers,
     type,
-    fullPaths
+    fullPaths,
   }: MethodHandler<Req, Res, Router<App, Req, Res>> & {
     method?: Method
     handlers?: Array<RouterHandler<Req, Res> | App>
@@ -181,7 +181,7 @@ export const pushMiddleware =
       handler,
       method,
       type,
-      fullPath: fullPaths?.[0]
+      fullPath: fullPaths?.[0],
     })
 
     let waresFromHandlers: { handler: Handler<Req, Res> | Router<App, Req, Res> }[] = []
@@ -194,8 +194,8 @@ export const pushMiddleware =
           handler: handler,
           method,
           type,
-          fullPath: fullPaths == null ? undefined : fullPaths[idx++]
-        })
+          fullPath: fullPaths == null ? undefined : fullPaths[idx++],
+        }),
       )
     }
 
@@ -207,7 +207,7 @@ export const pushMiddleware =
  */
 export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Res = unknown> {
   middleware: Middleware<Req, Res>[] = []
-  mountpath = '/'
+  mountpath = "/"
   parent?: App
   apps: Record<string, App> = {}
 
@@ -253,7 +253,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
   }
 
   static add<App extends Router<App, Req, Res>, Req, Res>(
-    method: Method
+    method: Method,
   ): RouterMethod<Req, Res, Router<App, Req, Res>, Router<App, Req, Res>> {
     return function (this: Router<App, Req, Res>, ...args: RouterMethodParams<Req, Res>): Router<App, Req, Res> {
       const [path, ...restArgs] = args
@@ -266,7 +266,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
           handler: handler,
           handlers: handlers,
           method,
-          type: 'route'
+          type: "route",
         })
         return this
       }
@@ -279,7 +279,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
             handler: handler,
             handlers: handlers,
             method,
-            type: 'route'
+            type: "route",
           })
         }
         return this
@@ -296,7 +296,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
         handler: handler,
         handlers: handlers,
         method,
-        type: 'route'
+        type: "route",
       })
       return this
     }
@@ -312,8 +312,8 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
         path: path,
         handler: handler,
         handlers: handlers,
-        method: 'M-SEARCH',
-        type: 'route'
+        method: "M-SEARCH",
+        type: "route",
       })
       return this
     }
@@ -325,8 +325,8 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
           path: eachPath,
           handler: handler,
           handlers: handlers,
-          method: 'M-SEARCH',
-          type: 'route'
+          method: "M-SEARCH",
+          type: "route",
         })
       }
       return this
@@ -342,8 +342,8 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
     pushMiddleware<Req, Res>(this.middleware)({
       handler: handler,
       handlers: handlers,
-      method: 'M-SEARCH',
-      type: 'route'
+      method: "M-SEARCH",
+      type: "route",
     })
     return this
   }
@@ -358,7 +358,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
         path: path,
         handler: handler,
         handlers: handlers,
-        type: 'route'
+        type: "route",
       })
       return this
     }
@@ -370,7 +370,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
           path: eachPath,
           handler: handler,
           handlers: handlers,
-          type: 'route'
+          type: "route",
         })
       }
       return this
@@ -386,7 +386,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
     pushMiddleware(this.middleware)({
       handler: handler,
       handlers: handlers,
-      type: 'route'
+      type: "route",
     })
     return this
   }
@@ -404,7 +404,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
         path,
         handler: handler,
         handlers: handlers,
-        type: 'mw'
+        type: "mw",
       })
       return this
     }
@@ -416,7 +416,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
           path: eachPath,
           handler: handler,
           handlers: handlers,
-          type: 'mw'
+          type: "mw",
         })
       }
       return this
@@ -432,7 +432,7 @@ export class Router<App extends Router<App, Req, Res> = never, Req = unknown, Re
     pushMiddleware<Req, Res, Router<App, Req, Res>>(this.middleware)({
       handler: handler,
       handlers: handlers,
-      type: 'mw'
+      type: "mw",
     })
 
     return this

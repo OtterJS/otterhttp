@@ -1,6 +1,6 @@
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import pgq from 'pg-promise'
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
+import pgq from "pg-promise"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -28,7 +28,7 @@ const sql = (file) => {
   const options = {
     // minifying the SQL is always advised;
     // see also option 'compress' in the API;
-    minify: true
+    minify: true,
     // See also property 'params' for two-step template formatting
   }
 
@@ -49,14 +49,14 @@ const sql = (file) => {
 
 export default {
   users: {
-    init: sql('users/init.sql'),
-    create: sql('users/create.sql'),
-    list: sql('users/list.sql'),
-    get: sql('users/get.sql'),
-    add: sql('users/add.sql'),
-    delete: sql('users/delete.sql'),
-    update: sql('users/update.sql')
-  }
+    init: sql("users/init.sql"),
+    create: sql("users/create.sql"),
+    list: sql("users/list.sql"),
+    get: sql("users/get.sql"),
+    add: sql("users/add.sql"),
+    delete: sql("users/delete.sql"),
+    update: sql("users/update.sql"),
+  },
 }
 
 ///////////////////////////////////////////////////////////////////

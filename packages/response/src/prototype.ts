@@ -1,11 +1,11 @@
-import { type OutgoingHttpHeader, type OutgoingHttpHeaders, ServerResponse } from 'node:http'
-import { HttpError } from '@otterhttp/errors'
-import type { Request } from '@otterhttp/request'
-import { type JSONLiteral, type SendFileOptions, json, send, sendFile, sendStatus } from '@otterhttp/send'
+import { type OutgoingHttpHeader, type OutgoingHttpHeaders, ServerResponse } from "node:http"
+import { HttpError } from "@otterhttp/errors"
+import type { Request } from "@otterhttp/request"
+import { type JSONLiteral, type SendFileOptions, json, send, sendFile, sendStatus } from "@otterhttp/send"
 
-import { type SetCookieOptions, clearCookie, setCookie } from './cookie'
-import { type DownloadOptions, attachment, download } from './download'
-import { type FormatProps, formatResponse } from './format'
+import { type SetCookieOptions, clearCookie, setCookie } from "./cookie"
+import { type DownloadOptions, attachment, download } from "./download"
+import { type FormatProps, formatResponse } from "./format"
 import {
   appendResponseHeaders,
   appendResponseVaryHeader,
@@ -13,11 +13,11 @@ import {
   setResponseHeaderSpecialCases,
   setResponseHeaders,
   setResponseLinkHeader,
-  setResponseLocationHeader
-} from './headers'
-import { validatePreconditions } from './preconditions'
-import { redirect } from './redirect'
-import type { AppendHeaders, Headers, Input, ResponseAppSettings } from './types'
+  setResponseLocationHeader,
+} from "./headers"
+import { validatePreconditions } from "./preconditions"
+import { redirect } from "./redirect"
+import type { AppendHeaders, Headers, Input, ResponseAppSettings } from "./types"
 
 export class Response<Req extends Request<unknown> = Request<unknown>> extends ServerResponse<Req> {
   // assigned by App
@@ -53,7 +53,7 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
 
   appendHeader<HeaderName extends string>(
     headerName: HeaderName,
-    value: Input<AppendHeaders[Lowercase<HeaderName>]>
+    value: Input<AppendHeaders[Lowercase<HeaderName>]>,
   ): this {
     super.appendHeader(headerName, value)
     return this
@@ -69,7 +69,7 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
   override writeHead(
     statusCode: number,
     statusMessage?: string | OutgoingHttpHeaders | OutgoingHttpHeader[],
-    headers?: OutgoingHttpHeaders | OutgoingHttpHeader[]
+    headers?: OutgoingHttpHeaders | OutgoingHttpHeader[],
   ): this {
     if (this._lateHeaderActions != null) {
       for (const action of this._lateHeaderActions.values()) {
@@ -176,7 +176,7 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
     try {
       this.validatePreconditions()
     } catch (error) {
-      if (error instanceof HttpError && error.code != null && error.code.startsWith('ERR_PRECONDITION_FAILED'))
+      if (error instanceof HttpError && error.code != null && error.code.startsWith("ERR_PRECONDITION_FAILED"))
         return true
       throw error
     }

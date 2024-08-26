@@ -1,11 +1,11 @@
-import { App } from '@otterhttp/app'
-import { json as json_parser } from 'milliparsec'
-import { bulkInsert, insert, search } from './client.js'
-import { PORT, hasPostProps, isEmptyObject, isEmptyString } from './utils.js'
+import { App } from "@otterhttp/app"
+import { json as json_parser } from "milliparsec"
+import { bulkInsert, insert, search } from "./client.js"
+import { PORT, hasPostProps, isEmptyObject, isEmptyString } from "./utils.js"
 
-const app = new App().use('/', json_parser())
+const app = new App().use("/", json_parser())
 
-app.get('/search/:index', async (req, res) => {
+app.get("/search/:index", async (req, res) => {
   const index = req.params.index
   const query = req.query.query
   const value = req.query.value
@@ -15,7 +15,7 @@ app.get('/search/:index', async (req, res) => {
   }
 })
 
-app.post('/insert/bulk/:index', async (req, res) => {
+app.post("/insert/bulk/:index", async (req, res) => {
   const index = req.params.index
   const dataToBeInserted = []
   if (req.body && Array.isArray(req.body.data)) {
@@ -31,7 +31,7 @@ app.post('/insert/bulk/:index', async (req, res) => {
   }
 })
 
-app.post('/insert/:index', async (req, res) => {
+app.post("/insert/:index", async (req, res) => {
   const index = req.params.index
   let document = {}
   if (!isEmptyObject(req.body) && hasPostProps(req.body)) {

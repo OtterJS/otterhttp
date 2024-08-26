@@ -1,9 +1,9 @@
-import { App } from '@otterhttp/app'
+import { App } from "@otterhttp/app"
 
 const app = new App({
   settings: {
-    networkExtensions: true
-  }
+    networkExtensions: true,
+  },
 })
 
 app.use((req, res) => {

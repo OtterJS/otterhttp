@@ -1,5 +1,5 @@
-import { App } from '@otterhttp/app'
-import { rateLimit } from '@otterhttp/rate-limit'
+import { App } from "@otterhttp/app"
+import { rateLimit } from "@otterhttp/rate-limit"
 
 const app = new App()
 const maxNumberOfRequests = 5
@@ -8,11 +8,11 @@ const port = 3000
 
 const routeRateLimit = rateLimit({
   max: maxNumberOfRequests,
-  windowMs: rateLimitResetTimeInSeconds * 1000
+  windowMs: rateLimitResetTimeInSeconds * 1000,
 })
 
-app.get('unlimited-route', (_, res) => res.send('Unlimited route'))
-app.get('limited-route', routeRateLimit, (_, res) => res.send('Limited route'))
+app.get("unlimited-route", (_, res) => res.send("Unlimited route"))
+app.get("limited-route", routeRateLimit, (_, res) => res.send("Limited route"))
 
 const serverDescription = `
   Server is running on port ${port}.

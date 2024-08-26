@@ -1,4 +1,4 @@
-import { NotModifiedError } from '@otterhttp/errors'
+import { NotModifiedError } from "@otterhttp/errors"
 import type {
   HasFreshness,
   HasIncomingHeaders,
@@ -6,9 +6,9 @@ import type {
   HasOutgoingHeaders,
   HasReq,
   HasStatus,
-  HasWriteMethods
-} from './types'
-import { createETag, isString } from './utils'
+  HasWriteMethods,
+} from "./types"
+import { createETag, isString } from "./utils"
 
 type SendResponse = HasOutgoingHeaders &
   HasReq<HasIncomingHeaders & HasMethod> &
@@ -18,18 +18,18 @@ type SendResponse = HasOutgoingHeaders &
   NodeJS.WritableStream
 
 function assignDefaultContentType(res: SendResponse, body: string | Buffer | null): void {
-  const existingContentType = res.getHeader('content-type')
-  if (existingContentType != null && typeof existingContentType === 'string') return
+  const existingContentType = res.getHeader("content-type")
+  if (existingContentType != null && typeof existingContentType === "string") return
 
   if (body == null) return
 
   if (Buffer.isBuffer(body)) {
-    res.setHeader('content-type', 'application/octet-stream')
+    res.setHeader("content-type", "application/octet-stream")
     return
   }
 
   if (isString(body)) {
-    res.setHeader('content-type', 'text/html')
+    res.setHeader("content-type", "text/html")
     return
   }
 }
@@ -42,11 +42,11 @@ function etagIsValid(etag: string | number | string[] | undefined): boolean {
 
 function populateETag(res: SendResponse, resourceRepresentation: string | Buffer): void {
   if (resourceRepresentation == null) return
-  const existingETag = res.getHeader('etag')
+  const existingETag = res.getHeader("etag")
   if (etagIsValid(existingETag)) return
 
-  const newETag = createETag(resourceRepresentation, 'utf-8')
-  res.setHeader('etag', newETag)
+  const newETag = createETag(resourceRepresentation, "utf-8")
+  res.setHeader("etag", newETag)
 }
 
 /**
@@ -76,14 +76,14 @@ export function send(res: SendResponse, body: string | Buffer | null): void {
 
   // strip irrelevant headers
   if (res.statusCode === 204 || res.statusCode === 304) {
-    res.removeHeader('Content-Type')
-    res.removeHeader('Content-Length')
-    res.removeHeader('Transfer-Encoding')
+    res.removeHeader("Content-Type")
+    res.removeHeader("Content-Length")
+    res.removeHeader("Transfer-Encoding")
     res.end()
     return
   }
 
-  if (res.req.method === 'HEAD' || body == null || body === '') {
+  if (res.req.method === "HEAD" || body == null || body === "") {
     res.end()
     return
   }
@@ -93,5 +93,5 @@ export function send(res: SendResponse, body: string | Buffer | null): void {
     return
   }
 
-  res.end(body, 'utf-8')
+  res.end(body, "utf-8")
 }

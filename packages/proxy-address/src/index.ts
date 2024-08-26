@@ -1,8 +1,8 @@
-import type { IncomingMessage } from 'node:http'
-import { forwarded } from '@otterhttp/forwarded'
-import ipaddr, { type IPv6, type IPv4 } from 'ipaddr.js'
+import type { IncomingMessage } from "node:http"
+import { forwarded } from "@otterhttp/forwarded"
+import ipaddr, { type IPv6, type IPv4 } from "ipaddr.js"
 
-type Req = Pick<IncomingMessage, 'headers' | 'socket'>
+type Req = Pick<IncomingMessage, "headers" | "socket">
 
 export type TrustParameter = string | number | string[]
 export type TrustFunction = (addr: string | undefined, i: number) => boolean
@@ -20,9 +20,9 @@ const parseip = ipaddr.parse
  * Pre-defined IP ranges.
  */
 const IP_RANGES = {
-  linklocal: ['169.254.0.0/16', 'fe80::/10'],
-  loopback: ['127.0.0.1/8', '::1/128'],
-  uniquelocal: ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', 'fc00::/7']
+  linklocal: ["169.254.0.0/16", "fe80::/10"],
+  loopback: ["127.0.0.1/8", "::1/128"],
+  uniquelocal: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "fc00::/7"],
 }
 
 /**
@@ -37,12 +37,12 @@ function isIPRangeName(val: string): val is keyof typeof IP_RANGES {
  * Type-guard to determine whether an IP address is a v4 address.
  * @param val
  */
-const isIPv4 = (val: IPv4 | IPv6): val is IPv4 => val.kind() === 'ipv4'
+const isIPv4 = (val: IPv4 | IPv6): val is IPv4 => val.kind() === "ipv4"
 /**
  * Type-guard to determine whether an IP address is a v6 address.
  * @param val
  */
-const isIPv6 = (val: IPv4 | IPv6): val is IPv6 => val.kind() === 'ipv6'
+const isIPv6 = (val: IPv4 | IPv6): val is IPv6 => val.kind() === "ipv6"
 /**
  * Static trust function to trust nothing.
  */
@@ -62,7 +62,7 @@ function allAddresses(req: Req, trust?: Trust): Array<string | undefined> {
 
   if (trust == null) return addrs
 
-  if (typeof trust !== 'function') trust = compile(trust)
+  if (typeof trust !== "function") trust = compile(trust)
 
   for (let i = 0; i < addrs.length - 1; i++) {
     if (trust(addrs[i], i)) continue
@@ -77,10 +77,10 @@ function allAddresses(req: Req, trust?: Trust): Array<string | undefined> {
  */
 function compile(val: string | number | string[]): TrustFunction {
   let trust: string[]
-  if (typeof val === 'string') trust = [val]
-  else if (typeof val === 'number') return compileHopsTrust(val)
+  if (typeof val === "string") trust = [val]
+  else if (typeof val === "number") return compileHopsTrust(val)
   else if (Array.isArray(val)) trust = val.slice()
-  else throw new TypeError('unsupported trust argument')
+  else throw new TypeError("unsupported trust argument")
 
   for (let i = 0; i < trust.length; i++) {
     const element = trust[i]
@@ -125,13 +125,13 @@ function compileTrust(rangeSubnets: Subnet[]): TrustFunction {
  * @private
  */
 export function parseIPNotation(note: string): Subnet {
-  const pos = note.lastIndexOf('/')
+  const pos = note.lastIndexOf("/")
   const str = pos !== -1 ? note.substring(0, pos) : note
 
   if (!isip(str)) throw new TypeError(`invalid IP address: ${str}`)
 
   let ip = parseip(str)
-  const max = ip.kind() === 'ipv6' ? 128 : 32
+  const max = ip.kind() === "ipv6" ? 128 : 32
 
   if (pos === -1) {
     if (isIPv6(ip) && ip.isIPv4MappedAddress()) ip = ip.toIPv4Address()
@@ -142,7 +142,7 @@ export function parseIPNotation(note: string): Subnet {
   let range: number | null = null
 
   if (DIGIT_REGEXP.test(rangeString)) range = Number.parseInt(rangeString, 10)
-  else if (ip.kind() === 'ipv4' && isip(rangeString)) range = parseNetmask(rangeString)
+  else if (ip.kind() === "ipv4" && isip(rangeString)) range = parseNetmask(rangeString)
 
   if (range == null || range <= 0 || range > max) throw new TypeError(`invalid range on address: ${note}`)
   return { ip, range }
@@ -155,7 +155,7 @@ export function parseIPNotation(note: string): Subnet {
  */
 function parseNetmask(netmask: string) {
   const ip = parseip(netmask)
-  return ip.kind() === 'ipv4' ? ip.prefixLengthFromSubnetMask() : null
+  return ip.kind() === "ipv4" ? ip.prefixLengthFromSubnetMask() : null
 }
 /**
  * Determine address of proxied request.
@@ -165,7 +165,7 @@ function parseNetmask(netmask: string) {
  * @public
  */
 function proxyAddress(req: Req, trust: Trust): string | undefined {
-  if (trust == null) throw new TypeError('trust argument cannot be null-ish')
+  if (trust == null) throw new TypeError("trust argument cannot be null-ish")
   const addrs = allAddresses(req, trust)
 
   return addrs[addrs.length - 1]
@@ -204,7 +204,7 @@ function trustMulti(subnets: Subnet[]): TrustFunction {
  */
 function trustSingle(subnet: Subnet): TrustFunction {
   const subnetKind = subnet.ip.kind()
-  const subnetIsIPv4 = subnetKind === 'ipv4'
+  const subnetIsIPv4 = subnetKind === "ipv4"
   return function trust(addr: string | undefined) {
     if (addr == null) return false
     if (!isip(addr)) return false

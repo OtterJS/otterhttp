@@ -1,7 +1,7 @@
-import { MemoryStore } from '@/packages/rate-limit/src'
-import { describe, expect, it, vi } from 'vitest'
+import { MemoryStore } from "@/packages/rate-limit/src"
+import { describe, expect, it, vi } from "vitest"
 
-const key = '127.0.0.1'
+const key = "127.0.0.1"
 
 const testHelper = (increaseFunction, key: string): Promise<{ current: number }> => {
   return new Promise((resolve) => {
@@ -9,21 +9,21 @@ const testHelper = (increaseFunction, key: string): Promise<{ current: number }>
   })
 }
 
-describe('MemoryStore store', () => {
-  it('sets the value to 1 on first incr', async () => {
+describe("MemoryStore store", () => {
+  it("sets the value to 1 on first incr", async () => {
     const store = new MemoryStore(-1)
 
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 1)
   })
 
-  it('increments the key for the store each increment', async () => {
+  it("increments the key for the store each increment", async () => {
     const store = new MemoryStore(-1)
 
     await testHelper(store.incr, key)
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 2)
   })
 
-  it('resets the key for the store when used with resetKey', async () => {
+  it("resets the key for the store when used with resetKey", async () => {
     const store = new MemoryStore(-1)
 
     await testHelper(store.incr, key)
@@ -32,7 +32,7 @@ describe('MemoryStore store', () => {
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 1)
   })
 
-  it('resets the key for the store when used with resetAll', async () => {
+  it("resets the key for the store when used with resetAll", async () => {
     const store = new MemoryStore(-1)
 
     await testHelper(store.incr, key)
@@ -41,7 +41,7 @@ describe('MemoryStore store', () => {
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 1)
   })
 
-  it('resets all keys for the store when the timeout is reached', async () => {
+  it("resets all keys for the store when the timeout is reached", async () => {
     vi.useFakeTimers()
     const store = new MemoryStore(50)
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 1)
@@ -49,7 +49,7 @@ describe('MemoryStore store', () => {
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 1)
   })
 
-  it('decrements the key for the store each decrement', async () => {
+  it("decrements the key for the store each decrement", async () => {
     const store = new MemoryStore(-1)
 
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 1)
@@ -59,11 +59,11 @@ describe('MemoryStore store', () => {
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 1)
   })
 
-  it('decrements the key for the store each decrement', async () => {
+  it("decrements the key for the store each decrement", async () => {
     const store = new MemoryStore(-1)
 
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 1)
-    await store.decrement('randomKey')
+    await store.decrement("randomKey")
     assertCurrentAfterIncrement(await testHelper(store.incr, key), 2)
   })
 })

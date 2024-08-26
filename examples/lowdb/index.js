@@ -1,10 +1,10 @@
-import { App } from '@otterhttp/app'
-import { Low } from 'lowdb'
-import { JSONFile } from 'lowdb/node'
-import { urlencoded } from 'milliparsec'
+import { App } from "@otterhttp/app"
+import { Low } from "lowdb"
+import { JSONFile } from "lowdb/node"
+import { urlencoded } from "milliparsec"
 
 const app = new App()
-const adapter = new JSONFile('db.json')
+const adapter = new JSONFile("db.json")
 const db = new Low(adapter)
 await db.read()
 const { posts } = db.data
@@ -12,12 +12,12 @@ const { posts } = db.data
 app.use(urlencoded())
 
 // get all posts
-app.get('/', (_, res) => {
+app.get("/", (_, res) => {
   res.send(posts)
 })
 
 // get post by id
-app.get('/:id', (req, res) => {
+app.get("/:id", (req, res) => {
   const currentPost = posts.find((post) => post.id === Number.parseInt(req.params.id))
   if (currentPost) {
     res.send(currentPost)
@@ -27,18 +27,18 @@ app.get('/:id', (req, res) => {
 })
 
 // add a post
-app.post('/', (req, res) => {
+app.post("/", (req, res) => {
   if (req.body.title) {
     posts.push({ id: Date.now(), title: req.body.title, likes: 0 })
     db.write()
     res.send({ msg: `Post with title of "${req.body.title}" is successfully added` })
   } else {
-    res.send({ msg: 'Post title missing' })
+    res.send({ msg: "Post title missing" })
   }
 })
 
 // like a post
-app.put('/:id', (req, res) => {
+app.put("/:id", (req, res) => {
   const currentPost = posts.find((post) => post.id === Number.parseInt(req.params.id))
   if (currentPost) {
     currentPost.likes += 1
@@ -50,7 +50,7 @@ app.put('/:id', (req, res) => {
 })
 
 // delete a post
-app.delete('/:id', (req, res) => {
+app.delete("/:id", (req, res) => {
   const currentPost = posts.filter((post) => post.id !== Number.parseInt(req.params.id))
   if (posts.length > currentPost.length) {
     db.data.posts = currentPost
@@ -61,4 +61,4 @@ app.delete('/:id', (req, res) => {
   }
 })
 
-app.listen(3000, () => console.log('Server is connected on http://localhost:3000'))
+app.listen(3000, () => console.log("Server is connected on http://localhost:3000"))

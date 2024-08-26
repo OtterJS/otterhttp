@@ -1,6 +1,6 @@
-import * as cookie from '@otterhttp/cookie'
+import * as cookie from "@otterhttp/cookie"
 
-import type { HasIncomingHeaders, HasOutgoingHeaders, HasReq } from './types'
+import type { HasIncomingHeaders, HasOutgoingHeaders, HasReq } from "./types"
 
 type SetCookieResponse = HasOutgoingHeaders & HasReq<HasIncomingHeaders>
 export type SetCookieOptions = cookie.SerializeOptions
@@ -10,11 +10,11 @@ export function setCookie(res: SetCookieResponse, name, value: string, options: 
     options.maxAge /= 1000
   }
 
-  if (options.path == null) options.path = '/'
+  if (options.path == null) options.path = "/"
 
-  res.appendHeader('set-cookie', cookie.serialize(name, value, options))
+  res.appendHeader("set-cookie", cookie.serialize(name, value, options))
 }
 
 export function clearCookie(res: SetCookieResponse, name: string, options?: cookie.SerializeOptions): void {
-  setCookie(res, name, '', Object.assign({}, { expires: new Date(1), path: '/' }, options))
+  setCookie(res, name, "", Object.assign({}, { expires: new Date(1), path: "/" }, options))
 }

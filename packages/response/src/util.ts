@@ -1,5 +1,5 @@
-import { format, isPlainText, parse } from '@otterhttp/content-type'
-import mime from 'mime'
+import { format, isPlainText, parse } from "@otterhttp/content-type"
+import mime from "mime"
 
 export type NormalizedType = {
   value: string | null
@@ -9,7 +9,7 @@ export type NormalizedType = {
 }
 
 export const normalizeType = (type: string): NormalizedType => {
-  if (type.indexOf('/') === -1) {
+  if (type.indexOf("/") === -1) {
     return { value: mime.getType(type), params: {} }
   }
 
@@ -22,7 +22,7 @@ export function acceptParams(str: string, index?: number): NormalizedType {
 
   for (const part of parts) {
     const pms = part.split(/ *= */)
-    if ('q' === pms[0]) ret.quality = Number.parseFloat(pms[1])
+    if ("q" === pms[0]) ret.quality = Number.parseFloat(pms[1])
     else ret.params[pms[0]] = pms[1]
   }
 

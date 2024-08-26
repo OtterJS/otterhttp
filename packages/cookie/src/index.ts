@@ -30,14 +30,14 @@ export function parse(
   options: {
     decode: (str: string) => string
   } = {
-    decode: decodeURIComponent
-  }
+    decode: decodeURIComponent,
+  },
 ): Record<string, string> {
   const obj: Record<string, string> = {}
   const pairs = str.split(pairSplitRegExp)
 
   for (const pair of pairs) {
-    let eqIdx = pair.indexOf('=')
+    let eqIdx = pair.indexOf("=")
 
     // skip things that don't look like key=value
     if (eqIdx < 0) continue
@@ -62,63 +62,63 @@ export type SerializeOptions = Partial<{
   path: string
   httpOnly: boolean
   secure: boolean
-  sameSite: boolean | 'Strict' | 'strict' | 'Lax' | 'lax' | 'None' | 'none' | string
+  sameSite: boolean | "Strict" | "strict" | "Lax" | "lax" | "None" | "none" | string
   expires: Date
 }>
 
 export function serialize(name: string, val: string, opt: SerializeOptions = {}): string {
   if (!opt.encode) opt.encode = encodeURIComponent
 
-  if (!fieldContentRegExp.test(name)) throw new TypeError('argument name is invalid')
+  if (!fieldContentRegExp.test(name)) throw new TypeError("argument name is invalid")
 
   const value = opt.encode(val)
 
-  if (value && !fieldContentRegExp.test(value)) throw new TypeError('argument val is invalid')
+  if (value && !fieldContentRegExp.test(value)) throw new TypeError("argument val is invalid")
 
   let str = `${name}=${value}`
 
   if (null != opt.maxAge) {
     const maxAge = opt.maxAge - 0
 
-    if (Number.isNaN(maxAge) || !Number.isFinite(maxAge)) throw new TypeError('option maxAge is invalid')
+    if (Number.isNaN(maxAge) || !Number.isFinite(maxAge)) throw new TypeError("option maxAge is invalid")
 
     str += `; Max-Age=${Math.floor(maxAge)}`
   }
 
   if (opt.domain) {
-    if (!fieldContentRegExp.test(opt.domain)) throw new TypeError('option domain is invalid')
+    if (!fieldContentRegExp.test(opt.domain)) throw new TypeError("option domain is invalid")
 
     str += `; Domain=${opt.domain}`
   }
 
   if (opt.path) {
-    if (!fieldContentRegExp.test(opt.path)) throw new TypeError('option path is invalid')
+    if (!fieldContentRegExp.test(opt.path)) throw new TypeError("option path is invalid")
 
     str += `; Path=${opt.path}`
   }
 
   if (opt.expires) str += `; Expires=${opt.expires.toUTCString()}`
 
-  if (opt.httpOnly) str += '; HttpOnly'
+  if (opt.httpOnly) str += "; HttpOnly"
 
-  if (opt.secure) str += '; Secure'
+  if (opt.secure) str += "; Secure"
 
   if (opt.sameSite) {
-    const sameSite = typeof opt.sameSite === 'string' ? opt.sameSite.toLowerCase() : opt.sameSite
+    const sameSite = typeof opt.sameSite === "string" ? opt.sameSite.toLowerCase() : opt.sameSite
 
     switch (sameSite) {
       case true:
-      case 'strict':
-        str += '; SameSite=Strict'
+      case "strict":
+        str += "; SameSite=Strict"
         break
-      case 'lax':
-        str += '; SameSite=Lax'
+      case "lax":
+        str += "; SameSite=Lax"
         break
-      case 'none':
-        str += '; SameSite=None'
+      case "none":
+        str += "; SameSite=None"
         break
       default:
-        throw new TypeError('option sameSite is invalid')
+        throw new TypeError("option sameSite is invalid")
     }
   }
 

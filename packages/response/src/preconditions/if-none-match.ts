@@ -1,4 +1,4 @@
-import { weakCompareETags } from './compare-etag'
+import { weakCompareETags } from "./compare-etag"
 
 /**
  * [RFC 9110, 13.1.2 If-None-Match]{@link https://datatracker.ietf.org/doc/html/rfc9110#name-if-none-match}
@@ -8,8 +8,8 @@ import { weakCompareETags } from './compare-etag'
  */
 export function noneMatch(currentETag: string | undefined, validatorETags: string) {
   if (currentETag == null) return true
-  if (currentETag.trim() === '') return true
-  if (validatorETags === '*') return false
+  if (currentETag.trim() === "") return true
+  if (validatorETags === "*") return false
 
   let start = 0
   let end = 0

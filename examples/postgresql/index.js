@@ -1,9 +1,9 @@
-import { App } from '@otterhttp/app'
-import * as dotenv from '@otterhttp/dotenv'
-import { urlencoded as parser } from 'milliparsec'
-import pg from 'pg-promise'
+import { App } from "@otterhttp/app"
+import * as dotenv from "@otterhttp/dotenv"
+import { urlencoded as parser } from "milliparsec"
+import pg from "pg-promise"
 
-import sql from './sql/index.js'
+import sql from "./sql/index.js"
 
 dotenv.config()
 
@@ -12,7 +12,7 @@ const port = Number.parseInt(process.env.PORT) || 3000
 const connection = process.env.DB_CONNECTION
 
 if (!connection) {
-  throw new Error('DB_CONNECTION must be provided')
+  throw new Error("DB_CONNECTION must be provided")
 }
 
 const initOptions = {
@@ -32,7 +32,7 @@ const init = async () => {
 init()
 
 // get all users
-app.get('/users', async (_, res, next) => {
+app.get("/users", async (_, res, next) => {
   try {
     const result = await db.manyOrNone(sql.users.list)
     res.send(result)
@@ -42,10 +42,10 @@ app.get('/users', async (_, res, next) => {
   }
 })
 
-app.use('/users', parser())
+app.use("/users", parser())
 
 // get a user by id
-app.get('/users/:id', async (req, res, next) => {
+app.get("/users/:id", async (req, res, next) => {
   try {
     const { id } = req.params
     const result = await db.oneOrNone(sql.users.get, id)
@@ -57,7 +57,7 @@ app.get('/users/:id', async (req, res, next) => {
 })
 
 // add new user
-app.post('/users', async (req, res, next) => {
+app.post("/users", async (req, res, next) => {
   try {
     const { name } = req.body
     const result = await db.one(sql.users.add, name)
@@ -68,7 +68,7 @@ app.post('/users', async (req, res, next) => {
 })
 
 // delete user
-app.delete('/users', async (req, res, next) => {
+app.delete("/users", async (req, res, next) => {
   try {
     const { id } = req.body
     const result = await db.one(sql.users.delete, id)
@@ -79,7 +79,7 @@ app.delete('/users', async (req, res, next) => {
 })
 
 // update existing user
-app.put('/users', async (req, res, next) => {
+app.put("/users", async (req, res, next) => {
   try {
     const { name, id } = req.body
     await db.none(sql.users.update, [name, id])

@@ -1,11 +1,11 @@
-import { send } from '@otterhttp/send'
+import { send } from "@otterhttp/send"
 
-import { MemoryStore, type Store } from './memory-store'
-import type { RateLimitMiddleware, RateLimitRequest, RateLimitResponse } from './types'
+import { MemoryStore, type Store } from "./memory-store"
+import type { RateLimitMiddleware, RateLimitRequest, RateLimitResponse } from "./types"
 
 export interface RateLimitOptions<
   Req extends RateLimitRequest = RateLimitRequest,
-  Res extends RateLimitResponse<Req> = RateLimitResponse<Req>
+  Res extends RateLimitResponse<Req> = RateLimitResponse<Req>,
 > {
   windowMs: number
   max: number | ((req: Req, res: Res) => Promise<number>)
@@ -24,7 +24,7 @@ export interface RateLimitOptions<
 const defaultOptions: RateLimitOptions = {
   windowMs: 5 * 1000,
   max: 5,
-  message: 'Too many requests, please try again later.',
+  message: "Too many requests, please try again later.",
   statusCode: 429,
   headers: true,
   skipFailedRequests: false,
@@ -32,12 +32,12 @@ const defaultOptions: RateLimitOptions = {
   draftPolliRatelimitHeaders: false,
   keyGenerator: (req) => req.ip as unknown as string,
   shouldSkip: () => false,
-  onLimitReached: () => {}
+  onLimitReached: () => {},
 }
 
 export function rateLimit<
   Req extends RateLimitRequest = RateLimitRequest,
-  Res extends RateLimitResponse<Req> = RateLimitResponse<Req>
+  Res extends RateLimitResponse<Req> = RateLimitResponse<Req>,
 >(options?: Partial<RateLimitOptions<Req, Res>>): RateLimitMiddleware<Req, Res> {
   const {
     shouldSkip,
@@ -54,7 +54,7 @@ export function rateLimit<
     ...otherOptions
   } = {
     ...defaultOptions,
-    ...options
+    ...options,
   }
   const store = otherOptions.store || new MemoryStore(windowMs)
 
@@ -73,30 +73,30 @@ export function rateLimit<
     const key = keyGenerator(req)
 
     const { current, resetTime } = await incrementStore(key)
-    const maxResult = typeof max === 'function' ? await max(req, res) : max
+    const maxResult = typeof max === "function" ? await max(req, res) : max
 
     req.rateLimit = {
       limit: maxResult,
       current: current,
       remaining: Math.max(maxResult - current, 0),
-      resetTime: resetTime
+      resetTime: resetTime,
     }
 
     if (headers && !res.headersSent) {
-      res.setHeader('X-RateLimit-Limit', maxResult)
-      res.setHeader('X-RateLimit-Remaining', req.rateLimit.remaining)
+      res.setHeader("X-RateLimit-Limit", maxResult)
+      res.setHeader("X-RateLimit-Remaining", req.rateLimit.remaining)
       if (resetTime instanceof Date) {
         // provide the current date to help avoid issues with incorrect clocks
-        res.setHeader('Date', new Date().toUTCString())
-        res.setHeader('X-RateLimit-Reset', Math.ceil(resetTime.getTime() / 1000))
+        res.setHeader("Date", new Date().toUTCString())
+        res.setHeader("X-RateLimit-Reset", Math.ceil(resetTime.getTime() / 1000))
       }
     }
     if (draftPolliRatelimitHeaders && !res.headersSent) {
-      res.setHeader('RateLimit-Limit', maxResult)
-      res.setHeader('RateLimit-Remaining', req.rateLimit.remaining)
+      res.setHeader("RateLimit-Limit", maxResult)
+      res.setHeader("RateLimit-Remaining", req.rateLimit.remaining)
       if (resetTime) {
         const deltaSeconds = Math.ceil((resetTime.getTime() - Date.now()) / 1000)
-        res.setHeader('RateLimit-Reset', Math.max(0, deltaSeconds))
+        res.setHeader("RateLimit-Reset", Math.max(0, deltaSeconds))
       }
     }
 
@@ -110,19 +110,19 @@ export function rateLimit<
       }
 
       if (skipFailedRequests) {
-        res.on('finish', () => {
+        res.on("finish", () => {
           if (res.statusCode >= 400) decrementKey()
         })
 
-        res.on('close', () => {
+        res.on("close", () => {
           if (!res.writableEnded) decrementKey()
         })
 
-        res.on('error', () => decrementKey())
+        res.on("error", () => decrementKey())
       }
 
       if (skipSuccessfulRequests) {
-        res.on('finish', () => {
+        res.on("finish", () => {
           if (res.statusCode < 400) store.decrement(key)
         })
       }
@@ -134,7 +134,7 @@ export function rateLimit<
 
     if (maxResult && current > maxResult) {
       if (headers && !res.headersSent) {
-        res.setHeader('Retry-After', Math.ceil(windowMs / 1000))
+        res.setHeader("Retry-After", Math.ceil(windowMs / 1000))
       }
       res.statusCode = statusCode
       send(res, message)

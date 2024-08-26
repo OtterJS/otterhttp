@@ -2,8 +2,8 @@ import {
   decodeExtendedFieldValue,
   formatParameters,
   parseParameters,
-  validateParameterNames
-} from '@otterhttp/parameters'
+  validateParameterNames,
+} from "@otterhttp/parameters"
 
 const NON_LATIN1_REGEXP = /[^\x20-\x7e\xa0-\xff]/g
 
@@ -21,25 +21,25 @@ export class ContentDisposition {
   }
 }
 
-const basename = (str: string) => str.slice(str.lastIndexOf('/') + 1)
+const basename = (str: string) => str.slice(str.lastIndexOf("/") + 1)
 
 /**
  * Format Content-Disposition header string.
  */
 export function format({
   parameters,
-  type
+  type,
 }: {
   parameters?: Record<string, string>
   type: string | boolean | undefined
 }) {
-  if (type == null || typeof type !== 'string' || !TOKEN_REGEXP.test(type)) {
-    throw new TypeError('invalid type')
+  if (type == null || typeof type !== "string" || !TOKEN_REGEXP.test(type)) {
+    throw new TypeError("invalid type")
   }
   // start with normalized type
   let string = String(type).toLowerCase()
   // append parameters
-  if (parameters && typeof parameters === 'object') {
+  if (parameters && typeof parameters === "object") {
     validateParameterNames(Object.keys(parameters))
     string += formatParameters(parameters)
   }
@@ -50,8 +50,8 @@ export function format({
 function createParams(filename?: string, fallback?: string): Record<string, string> {
   if (filename == null) return {}
 
-  if (typeof fallback === 'string' && NON_LATIN1_REGEXP.test(fallback)) {
-    throw new TypeError('fallback must be ISO-8859-1 string')
+  if (typeof fallback === "string" && NON_LATIN1_REGEXP.test(fallback)) {
+    throw new TypeError("fallback must be ISO-8859-1 string")
   }
 
   // restrict to file base name
@@ -61,19 +61,19 @@ function createParams(filename?: string, fallback?: string): Record<string, stri
   const canUseAsciiEncoding = TEXT_REGEXP.test(name)
   if (canUseAsciiEncoding && fallback == null) {
     return {
-      filename: name
+      filename: name,
     }
   }
 
   if (fallback == null) {
     return {
-      'filename*': name
+      "filename*": name,
     }
   }
 
   return {
-    'filename*': name,
-    filename: basename(fallback)
+    "filename*": name,
+    filename: basename(fallback),
   }
 }
 
@@ -89,10 +89,10 @@ export function contentDisposition(
   options?: {
     type?: string
     fallback?: string
-  }
+  },
 ): string {
   // format into string
-  return format(new ContentDisposition(options?.type ?? 'attachment', createParams(filename, options?.fallback)))
+  return format(new ContentDisposition(options?.type ?? "attachment", createParams(filename, options?.fallback)))
 }
 
 /**
@@ -102,18 +102,18 @@ export function contentDisposition(
 export function parse(header: string): ContentDisposition {
   const match = DISPOSITION_TYPE_REGEXP.exec(header)
 
-  if (!match) throw new TypeError('invalid type format')
+  if (!match) throw new TypeError("invalid type format")
 
   // normalize type
   const index = match[0].length
   const type = match[1].toLowerCase()
 
   // calculate index to start at
-  if (!match[0].endsWith(';')) return new ContentDisposition(type, {})
+  if (!match[0].endsWith(";")) return new ContentDisposition(type, {})
 
   const parameters = parseParameters(header.slice(index - 1))
   for (const [parameterName, parameterValue] of Object.entries(parameters)) {
-    if (!parameterName.endsWith('*')) continue
+    if (!parameterName.endsWith("*")) continue
     parameters[parameterName] = decodeExtendedFieldValue(parameterValue)
   }
 

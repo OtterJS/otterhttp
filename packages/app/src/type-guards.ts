@@ -1,9 +1,9 @@
 export const isString = (something: unknown): something is string => {
-  return typeof something === 'string' || something instanceof String
+  return typeof something === "string" || something instanceof String
 }
 
 export const isNumber = (something: unknown): something is number => {
-  return typeof something === 'number' || something instanceof Number
+  return typeof something === "number" || something instanceof Number
 }
 
 export const isIndexer = (something: unknown): something is string | number => {
@@ -11,7 +11,7 @@ export const isIndexer = (something: unknown): something is string | number => {
 }
 
 export const isStringArray = (something: unknown): something is string[] => {
-  if (typeof something !== 'object') return false
+  if (typeof something !== "object") return false
   if (!Array.isArray(something)) return false
   return something.every(isString)
 }

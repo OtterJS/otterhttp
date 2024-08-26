@@ -6,7 +6,7 @@
  */
 export function hasBeenModifiedSince(
   currentLastModified: Date | string | undefined,
-  validatorLastModified: Date | string
+  validatorLastModified: Date | string,
 ) {
   if (currentLastModified == null) return true
 

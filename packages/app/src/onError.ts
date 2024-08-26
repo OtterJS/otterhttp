@@ -1,18 +1,18 @@
-import { STATUS_CODES } from 'node:http'
-import { HttpError } from '@otterhttp/errors'
-import type { Request } from '@otterhttp/request'
-import type { Response } from '@otterhttp/response'
-import type { NextFunction } from '@otterhttp/router'
+import { STATUS_CODES } from "node:http"
+import { HttpError } from "@otterhttp/errors"
+import type { Request } from "@otterhttp/request"
+import type { Response } from "@otterhttp/response"
+import type { NextFunction } from "@otterhttp/router"
 
-import type { App } from './app'
-import { isIndexer } from './type-guards'
+import type { App } from "./app"
+import { isIndexer } from "./type-guards"
 
 export type ErrorHandler<Req extends Request = Request, Res extends Response<Req> = Response<Req>> = (
   this: App<Req, Res>,
   err: any,
   req: Req,
   res: Res,
-  next: NextFunction
+  next: NextFunction,
 ) => void
 
 export const onErrorHandler = function <Req extends Request = Request, Res extends Response<Req> = Response<Req>>(
@@ -20,7 +20,7 @@ export const onErrorHandler = function <Req extends Request = Request, Res exten
   err: unknown,
   _req: Req,
   res: Res,
-  next: NextFunction
+  next: NextFunction,
 ) {
   if (res.headersSent || res.socket == null) {
     console.error(err)
@@ -50,11 +50,11 @@ export const onErrorHandler = function <Req extends Request = Request, Res exten
     return
   }
 
-  if (typeof err === 'object') {
+  if (typeof err === "object") {
     let code: string | number
-    if ('statusCode' in err && isIndexer(err.statusCode) && err.statusCode in STATUS_CODES) code = err.statusCode
-    else if ('code' in err && isIndexer(err.code) && err.code in STATUS_CODES) code = err.code
-    else if ('status' in err && isIndexer(err.status) && err.status in STATUS_CODES) code = err.status
+    if ("statusCode" in err && isIndexer(err.statusCode) && err.statusCode in STATUS_CODES) code = err.statusCode
+    else if ("code" in err && isIndexer(err.code) && err.code in STATUS_CODES) code = err.code
+    else if ("status" in err && isIndexer(err.status) && err.status in STATUS_CODES) code = err.status
     else {
       res.writeHead(500).end(STATUS_CODES[500])
       console.error(err)
@@ -67,7 +67,7 @@ export const onErrorHandler = function <Req extends Request = Request, Res exten
     return
   }
 
-  if (typeof err === 'string' || Buffer.isBuffer(err)) {
+  if (typeof err === "string" || Buffer.isBuffer(err)) {
     res.writeHead(500).end(err)
     return
   }

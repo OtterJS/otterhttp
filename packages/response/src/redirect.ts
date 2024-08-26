@@ -1,19 +1,19 @@
-import { STATUS_CODES } from 'node:http'
-import { escapeHTML } from 'es-escape-html'
+import { STATUS_CODES } from "node:http"
+import { escapeHTML } from "es-escape-html"
 
-import { formatResponse } from './format.js'
-import { setResponseLocationHeader } from './headers'
-import type { HasAccepts, HasMethod, HasOutgoingHeaders, HasReq, HasStatus } from './types'
+import { formatResponse } from "./format.js"
+import { setResponseLocationHeader } from "./headers"
+import type { HasAccepts, HasMethod, HasOutgoingHeaders, HasReq, HasStatus } from "./types"
 
 type RedirectResponse = HasOutgoingHeaders & HasStatus & HasReq<HasAccepts & HasMethod> & NodeJS.WritableStream
 export async function redirect(res: RedirectResponse, url: string, status?: number) {
   let address: string | undefined = url
   status = status || 302
 
-  let body = ''
+  let body = ""
 
   setResponseLocationHeader(res, address)
-  address = res.getHeader('location')
+  address = res.getHeader("location")
   if (!address) throw new Error()
 
   await formatResponse(res, {
@@ -26,15 +26,15 @@ export async function redirect(res: RedirectResponse, url: string, status?: numb
       body = `<p>${STATUS_CODES[status]}. Redirecting to <a href="${u}">${u}</a></p>`
     },
     default: () => {
-      body = ''
-    }
+      body = ""
+    },
   })
 
-  res.setHeader('Content-Length', Buffer.byteLength(body))
+  res.setHeader("Content-Length", Buffer.byteLength(body))
 
   res.statusCode = status
 
-  if (res.req.method === 'HEAD') res.end()
+  if (res.req.method === "HEAD") res.end()
   else res.end(body)
 
   return res

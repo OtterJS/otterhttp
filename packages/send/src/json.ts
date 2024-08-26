@@ -1,4 +1,4 @@
-import { send } from './send'
+import { send } from "./send"
 import type {
   HasFreshness,
   HasIncomingHeaders,
@@ -7,9 +7,9 @@ import type {
   HasReq,
   HasStatus,
   HasWriteMethods,
-  JSONLiteral
-} from './types'
-import { isJSONLiteral, isString } from './utils'
+  JSONLiteral,
+} from "./types"
+import { isJSONLiteral, isString } from "./utils"
 
 type JsonResponse = HasOutgoingHeaders &
   HasReq<HasIncomingHeaders & HasMethod> &
@@ -24,14 +24,14 @@ type JsonResponse = HasOutgoingHeaders &
  * @param body
  */
 export const json = (res: JsonResponse, body: JSONLiteral): void => {
-  res.setHeader('Content-Type', 'application/json')
+  res.setHeader("Content-Type", "application/json")
 
   if (isString(body)) {
     return send(res, body)
   }
 
   if (body == null) {
-    return send(res, '')
+    return send(res, "")
   }
 
   if (isJSONLiteral(body)) {

@@ -1,30 +1,30 @@
-import 'reflect-metadata'
-import { App, type Request, type Response } from '@otterhttp/app'
-import { json } from 'milliparsec'
-import { createConnection } from 'typeorm'
-import { User } from './entity/User'
+import "reflect-metadata"
+import { App, type Request, type Response } from "@otterhttp/app"
+import { json } from "milliparsec"
+import { createConnection } from "typeorm"
+import { User } from "./entity/User"
 
 const users = [
   {
-    firstName: 'Homer',
-    lastName: 'Simpson',
-    age: 42
+    firstName: "Homer",
+    lastName: "Simpson",
+    age: 42,
   },
   {
-    firstName: 'Philip J.',
-    lastName: 'Fry',
-    age: 25
+    firstName: "Philip J.",
+    lastName: "Fry",
+    age: 25,
   },
   {
-    firstName: 'Stanley',
-    lastName: 'Smith',
-    age: 42
-  }
+    firstName: "Stanley",
+    lastName: "Smith",
+    age: 42,
+  },
 ]
 
 createConnection()
   .then(async (connection) => {
-    console.log('Inserting a few new users into the database...')
+    console.log("Inserting a few new users into the database...")
     for (const user of users) {
       const dbUser = new User()
       dbUser.firstName = user.firstName
@@ -34,19 +34,19 @@ createConnection()
       console.log(`Saved a new user with id: ${dbUser.id}`)
     }
 
-    console.log('Loading users from the database...')
+    console.log("Loading users from the database...")
     const dbUsers = await connection.manager.find(User)
-    console.log('Loaded users: ', dbUsers)
+    console.log("Loaded users: ", dbUsers)
 
     const userRepository = connection.getRepository(User)
 
     // create and setup tinyhttp app
     const app = new App()
-    app.use('/users', json())
+    app.use("/users", json())
 
     // register routes
 
-    app.get('/users', async (req: Request, res: Response, next) => {
+    app.get("/users", async (req: Request, res: Response, next) => {
       try {
         const users = await userRepository.find()
         res.json(users)
@@ -55,7 +55,7 @@ createConnection()
       }
     })
 
-    app.get('/users/:id', async (req: Request, res: Response, next) => {
+    app.get("/users/:id", async (req: Request, res: Response, next) => {
       try {
         const user = await userRepository.findOne(req.params.id)
         res.json(user)
@@ -64,7 +64,7 @@ createConnection()
       }
     })
 
-    app.post('/users', async (req: Request, res: Response, next) => {
+    app.post("/users", async (req: Request, res: Response, next) => {
       try {
         const { firstName, lastName, age } = req.body
 
@@ -80,7 +80,7 @@ createConnection()
       }
     })
 
-    app.put('/users/:id', async (req: Request, res: Response, next) => {
+    app.put("/users/:id", async (req: Request, res: Response, next) => {
       try {
         const { firstName, lastName, age } = req.body
 
@@ -96,7 +96,7 @@ createConnection()
       }
     })
 
-    app.delete('/users', async (req: Request, res: Response, next) => {
+    app.delete("/users", async (req: Request, res: Response, next) => {
       try {
         const { id } = req.body
         const user = await userRepository.findOne(id)
@@ -108,6 +108,6 @@ createConnection()
     })
 
     // start tinyhttp server
-    app.listen(3000, () => console.log('Started on http://localhost:3000'))
+    app.listen(3000, () => console.log("Started on http://localhost:3000"))
   })
   .catch((error) => console.log(error))

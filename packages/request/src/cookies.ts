@@ -1,6 +1,6 @@
-import { parse as parseCookie } from '@otterhttp/cookie'
+import { parse as parseCookie } from "@otterhttp/cookie"
 
-import type { CookieParsingSettings, HasHeaders } from './types'
+import type { CookieParsingSettings, HasHeaders } from "./types"
 
 export class Cookie {
   private _value: string

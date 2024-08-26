@@ -1,6 +1,6 @@
-import { STATUS_CODES } from 'node:http'
+import { STATUS_CODES } from "node:http"
 
-import { send } from './send'
+import { send } from "./send"
 import type {
   HasFreshness,
   HasIncomingHeaders,
@@ -8,8 +8,8 @@ import type {
   HasOutgoingHeaders,
   HasReq,
   HasStatus,
-  HasWriteMethods
-} from './types'
+  HasWriteMethods,
+} from "./types"
 
 type SendStatusResponse = HasOutgoingHeaders &
   HasReq<HasIncomingHeaders & HasMethod> &
@@ -31,7 +31,7 @@ export function sendStatus(res: SendStatusResponse, statusCode: number): void {
 
   res.statusCode = statusCode
 
-  res.setHeader('Content-Type', 'text/plain')
+  res.setHeader("Content-Type", "text/plain")
 
   send(res, body)
 }

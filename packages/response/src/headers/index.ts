@@ -1,7 +1,7 @@
-export { appendResponseHeaders } from './append-headers'
-export { setResponseContentTypeHeader } from './content-type'
-export { setResponseLinkHeader } from './link'
-export { setResponseLocationHeader } from './location'
-export { setResponseHeaderSpecialCases } from './set-header'
-export { setResponseHeaders } from './set-headers'
-export { appendResponseVaryHeader } from './vary'
+export { appendResponseHeaders } from "./append-headers"
+export { setResponseContentTypeHeader } from "./content-type"
+export { setResponseLinkHeader } from "./link"
+export { setResponseLocationHeader } from "./location"
+export { setResponseHeaderSpecialCases } from "./set-header"
+export { setResponseHeaders } from "./set-headers"
+export { appendResponseVaryHeader } from "./vary"

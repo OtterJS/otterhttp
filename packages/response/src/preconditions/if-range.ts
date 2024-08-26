@@ -1,4 +1,4 @@
-import { someMatch } from './if-match'
+import { someMatch } from "./if-match"
 
 /**
  * [RFC 9110, 13.1.5 If-Range]{@link https://datatracker.ietf.org/doc/html/rfc9110#name-if-range}
@@ -8,7 +8,7 @@ import { someMatch } from './if-match'
  */
 export function rangePrecondition(
   current: { etag: string | undefined; lastModified: string | Date | undefined },
-  validator: string
+  validator: string,
 ) {
   const currentETag = current.etag
   const currentLastModified =
@@ -16,7 +16,7 @@ export function rangePrecondition(
       ? current.lastModified?.getTime()
       : Date.parse(current.lastModified)
 
-  const currentETagUnspecified = currentETag == null || currentETag.trim() === ''
+  const currentETagUnspecified = currentETag == null || currentETag.trim() === ""
   const currentLastModifiedUnspecified = currentLastModified == null || Number.isNaN(currentLastModified)
 
   if (currentETagUnspecified && currentLastModifiedUnspecified) return false

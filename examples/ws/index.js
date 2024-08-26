@@ -1,5 +1,5 @@
-import { App } from '@otterhttp/app'
-import { tinyws } from 'tinyws'
+import { App } from "@otterhttp/app"
+import { tinyws } from "tinyws"
 
 const app = new App()
 
@@ -7,21 +7,21 @@ app.use(tinyws())
 
 let connections = []
 
-app.use('/chat', async (req) => {
+app.use("/chat", async (req) => {
   if (req.ws) {
     const ws = await req.ws()
 
     connections.push(ws)
 
-    ws.on('message', (message) => {
-      console.log('Received message:', message.toString())
+    ws.on("message", (message) => {
+      console.log("Received message:", message.toString())
 
       // broadcast
       // biome-ignore lint/complexity/noForEach: <explanation>
       connections.forEach((socket) => socket.send(message))
     })
 
-    ws.on('close', () => (connections = connections.filter((conn) => conn !== ws)))
+    ws.on("close", () => (connections = connections.filter((conn) => conn !== ws)))
   }
 })
 

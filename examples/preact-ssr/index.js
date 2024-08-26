@@ -1,7 +1,7 @@
-import { readFile } from 'node:fs/promises'
-import { App } from '@otterhttp/app'
-import preact from 'htm/preact/index.js'
-import render from 'preact-render-to-string'
+import { readFile } from "node:fs/promises"
+import { App } from "@otterhttp/app"
+import preact from "htm/preact/index.js"
+import render from "preact-render-to-string"
 
 const { html } = preact
 
@@ -10,16 +10,16 @@ const app = new App()
 const PreactApp = ({ page }) => (page ? html`<h1>You visited ${page}</h1>` : html`<h1>Hello World</h1>`)
 
 app
-  .get('/htm.js', async (req, res) => {
+  .get("/htm.js", async (req, res) => {
     const preactFile = await readFile(`${process.cwd()}/node_modules/htm/preact/standalone.module.js`)
 
-    res.set('Content-Type', 'text/javascript').send(preactFile.toString())
+    res.set("Content-Type", "text/javascript").send(preactFile.toString())
   })
-  .get('/app.js', async (_req, res) => {
+  .get("/app.js", async (_req, res) => {
     const clientJS = await readFile(`${process.cwd()}/app.js`)
-    res.set('Content-Type', 'text/javascript').send(clientJS.toString())
+    res.set("Content-Type", "text/javascript").send(clientJS.toString())
   })
-  .get('/:page?', (req, res) => {
+  .get("/:page?", (req, res) => {
     const renderered = render(html`<${PreactApp} page=${req.params.page} />`)
 
     res.send(`<!DOCTYPE html>
@@ -31,4 +31,4 @@ app
   </html>
   `)
   })
-  .listen(3000, () => console.log('Running on http://localhost:3000'))
+  .listen(3000, () => console.log("Running on http://localhost:3000"))

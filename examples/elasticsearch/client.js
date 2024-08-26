@@ -1,5 +1,5 @@
-import { Client } from '@elastic/elasticsearch'
-import { config } from '@otterhttp/dotenv'
+import { Client } from "@elastic/elasticsearch"
+import { config } from "@otterhttp/dotenv"
 config()
 
 //define elastic client and read keys from the environment
@@ -7,11 +7,11 @@ const client = new Client({
   node: process.env.ELASTICSEARCH_NODE,
   auth: {
     username: process.env.ELASTICSEARCH_USER,
-    password: process.env.ELASTICSEARCH_PASSWORD
+    password: process.env.ELASTICSEARCH_PASSWORD,
   },
   tls: {
-    rejectUnauthorized: false //for development only. Use SSL for production!
-  }
+    rejectUnauthorized: false, //for development only. Use SSL for production!
+  },
 })
 
 // search function
@@ -20,9 +20,9 @@ export async function search(index, query, value) {
     index,
     query: {
       match: {
-        [query]: value
-      }
-    }
+        [query]: value,
+      },
+    },
   })
   return result.hits.hits
 }
@@ -32,7 +32,7 @@ export async function insert(index, document) {
   await client.index({
     index,
     document,
-    refresh: true
+    refresh: true,
   })
   return { success: true }
 }
@@ -42,7 +42,7 @@ export async function bulkInsert(index, document_array) {
   const operations = document_array.flatMap((document) => [{ index: { _index: index } }, document])
   await client.bulk({
     index,
-    operations
+    operations,
   })
   return { success: true }
 }

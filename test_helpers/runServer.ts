@@ -1,6 +1,6 @@
-import { type Server, createServer } from 'node:http'
-import { Request } from '@/packages/app/src'
-import { Response } from '../packages/response/src'
+import { type Server, createServer } from "node:http"
+import { Request } from "@/packages/app/src"
+import { Response } from "../packages/response/src"
 
 export const runServer = (func: (req: Request, res: Response) => void | Promise<void>): Server => {
   const listener = async (req: Request, res: Response) => {

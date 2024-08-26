@@ -1,5 +1,5 @@
 function isWeak(etag: string) {
-  return etag.startsWith('W/')
+  return etag.startsWith("W/")
 }
 
 export function weakCompareETags(current: string, validator: string): boolean {

@@ -1,7 +1,7 @@
-import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'node:http'
-import { formatParameters, parseParameters, validateParameterNames } from '@otterhttp/parameters'
+import type { IncomingHttpHeaders, OutgoingHttpHeaders } from "node:http"
+import { formatParameters, parseParameters, validateParameterNames } from "@otterhttp/parameters"
 
-const alreadyParsed = Symbol('already parsed content-type')
+const alreadyParsed = Symbol("already parsed content-type")
 
 type Request = { headers: IncomingHttpHeaders; [alreadyParsed]?: ContentType }
 type Response = { getHeader: <HeaderName extends string>(name: HeaderName) => OutgoingHttpHeaders[HeaderName] }
@@ -50,11 +50,11 @@ const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
 const TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
 
 function isRequest(obj: TypeParseableObject): obj is Request {
-  return 'headers' in obj && typeof obj.headers === 'object'
+  return "headers" in obj && typeof obj.headers === "object"
 }
 
 function isResponse(obj: TypeParseableObject): obj is Response {
-  return 'getHeader' in obj && typeof obj.getHeader === 'function'
+  return "getHeader" in obj && typeof obj.getHeader === "function"
 }
 
 function getContentType(obj: TypeParseableObject): string {
@@ -62,14 +62,14 @@ function getContentType(obj: TypeParseableObject): string {
 
   if (isResponse(obj)) {
     // res-like
-    header = obj.getHeader('content-type')
+    header = obj.getHeader("content-type")
   } else if (isRequest(obj)) {
     // req-like
-    header = obj.headers['content-type']
+    header = obj.headers["content-type"]
   }
 
-  if (typeof header !== 'string') {
-    throw new TypeError('content-type header is missing from object')
+  if (typeof header !== "string") {
+    throw new TypeError("content-type header is missing from object")
   }
 
   return header
@@ -127,7 +127,7 @@ export class ContentType {
   }
 
   hasWildcard() {
-    return this.type.indexOf('*') !== -1 || this.subtype.indexOf('*') !== -1
+    return this.type.indexOf("*") !== -1 || this.subtype.indexOf("*") !== -1
   }
 
   isPlainText() {
@@ -146,17 +146,17 @@ export class ContentType {
  * Format object to media type.
  */
 export function format(obj: { type: string; subtype: string; parameters?: Record<string, string> }) {
-  if (!obj || typeof obj !== 'object') throw new TypeError('argument obj is required')
+  if (!obj || typeof obj !== "object") throw new TypeError("argument obj is required")
 
   const { parameters, type, subtype } = obj
 
-  if (!type || !subtype) throw new TypeError('invalid type')
+  if (!type || !subtype) throw new TypeError("invalid type")
 
   let string = `${type}/${subtype}`
-  if (!TYPE_REGEXP.test(string)) throw new TypeError('invalid type')
+  if (!TYPE_REGEXP.test(string)) throw new TypeError("invalid type")
 
   // append parameters
-  if (parameters && typeof parameters === 'object') {
+  if (parameters && typeof parameters === "object") {
     validateParameterNames(Object.keys(parameters))
     string += formatParameters(parameters)
   }
@@ -168,48 +168,48 @@ export function format(obj: { type: string; subtype: string; parameters?: Record
  * Parse media type to object.
  */
 export function parse(value: TypeParseable): ContentType {
-  if (!value) throw new TypeError('argument `value` is required')
+  if (!value) throw new TypeError("argument `value` is required")
 
   let header: string
   // support req/res-like objects as argument
-  if (typeof value === 'object') {
+  if (typeof value === "object") {
     if (value[alreadyParsed] != null) return value[alreadyParsed]
     header = getContentType(value)
   } else header = value
 
-  if (typeof header !== 'string') throw new TypeError('argument `value` must be string, request-like or response-like')
+  if (typeof header !== "string") throw new TypeError("argument `value` must be string, request-like or response-like")
   header = header.trim()
 
   let currentIndex = 0
   let slashIndex: number | undefined
   for (; currentIndex < header.length; ++currentIndex) {
     const currentChar = header.charAt(currentIndex)
-    if (currentChar === '/') {
+    if (currentChar === "/") {
       slashIndex = currentIndex
       break
     }
-    if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError('invalid media type')
+    if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError("invalid media type")
   }
 
-  if (typeof slashIndex === 'undefined') throw new TypeError('invalid media type')
-  if (slashIndex === 0) throw new TypeError('invalid media type')
+  if (typeof slashIndex === "undefined") throw new TypeError("invalid media type")
+  if (slashIndex === 0) throw new TypeError("invalid media type")
 
   currentIndex += 1
   let plusIndex: number | undefined
   let endIndex: number | undefined
   for (; currentIndex < header.length; ++currentIndex) {
     const currentChar = header.charAt(currentIndex)
-    if (currentChar === ';' || WHITESPACE_CHAR_REGEXP.test(currentChar)) {
-      if (currentIndex === slashIndex + 1) throw new TypeError('invalid media type')
+    if (currentChar === ";" || WHITESPACE_CHAR_REGEXP.test(currentChar)) {
+      if (currentIndex === slashIndex + 1) throw new TypeError("invalid media type")
       endIndex = currentIndex
       break
     }
-    if (currentChar === '+') {
-      if (currentIndex === slashIndex + 1) throw new TypeError('invalid media type')
+    if (currentChar === "+") {
+      if (currentIndex === slashIndex + 1) throw new TypeError("invalid media type")
       plusIndex = currentIndex
       continue
     }
-    if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError('invalid media type')
+    if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError("invalid media type")
   }
 
   const lowercaseHeader = header.toLowerCase()
@@ -219,7 +219,7 @@ export function parse(value: TypeParseable): ContentType {
 
   const parsedRepresentation = ContentType.fromValidatedInput(type, subtype, subtypeSuffix)
   // cache the parse result for request-like objects
-  if (typeof value === 'object' && isRequest(value)) value[alreadyParsed] = parsedRepresentation
+  if (typeof value === "object" && isRequest(value)) value[alreadyParsed] = parsedRepresentation
   if (endIndex === undefined) return parsedRepresentation
 
   parsedRepresentation.parameters = parseParameters(header.slice(endIndex))
@@ -230,17 +230,17 @@ export function parse(value: TypeParseable): ContentType {
  * `application` MIME subtypes that are plaintext
  */
 const applicationPlaintextWhitelist = new Set<string>([
-  'ecmascript',
-  'javascript',
-  'json',
-  'xml',
-  'x-httpd-php',
-  'x-sh',
-  'node'
+  "ecmascript",
+  "javascript",
+  "json",
+  "xml",
+  "x-httpd-php",
+  "x-sh",
+  "node",
 ])
 
 export function isPlainText({ type, subtypeSuffix }: ContentType) {
-  if (type === 'text') return true
-  if (type !== 'application') return false
+  if (type === "text") return true
+  if (type !== "application") return false
   return applicationPlaintextWhitelist.has(subtypeSuffix)
 }

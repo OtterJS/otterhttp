@@ -1,12 +1,12 @@
-import cluster from 'node:cluster'
-import os from 'node:os'
-import { App } from '@otterhttp/app'
+import cluster from "node:cluster"
+import os from "node:os"
+import { App } from "@otterhttp/app"
 
 if (cluster.isPrimary) {
   for (let i = 0; i < os.cpus().length; i++) {
     cluster.fork()
   }
-  cluster.on('exit', (worker, code, signal) => {
+  cluster.on("exit", (worker, code, signal) => {
     if (signal) {
       console.log(`worker ${worker.id} was killed by signal: ${signal}`)
     } else if (code !== 0) {

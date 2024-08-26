@@ -1,10 +1,10 @@
-import { App } from '@otterhttp/app'
-import ejs from 'ejs'
+import { App } from "@otterhttp/app"
+import ejs from "ejs"
 
 const app = new App()
 
-app.engine('ejs', ejs.renderFile)
+app.engine("ejs", ejs.renderFile)
 
-app.use((_, res) => void res.render('index.ejs', { name: 'EJS' }))
+app.use((_, res) => void res.render("index.ejs", { name: "EJS" }))
 
-app.listen(3000, () => console.log('Listening on http://localhost:3000'))
+app.listen(3000, () => console.log("Listening on http://localhost:3000"))

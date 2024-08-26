@@ -3,7 +3,7 @@ const ENCODE_CHARS_REGEXP =
 
 const UNMATCHED_SURROGATE_PAIR_REGEXP = /(^|[^\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF]([^\uDC00-\uDFFF]|$)/g
 
-const UNMATCHED_SURROGATE_PAIR_REPLACE = '$1\uFFFD$2'
+const UNMATCHED_SURROGATE_PAIR_REPLACE = "$1\uFFFD$2"
 
 export const encodeUrl = (url: string): string => {
   return String(url)

@@ -1,4 +1,4 @@
-import { strongCompareETags } from './compare-etag'
+import { strongCompareETags } from "./compare-etag"
 
 /**
  * [RFC 9110, 13.1.1 If-Match]{@link https://datatracker.ietf.org/doc/html/rfc9110#name-if-match}
@@ -8,8 +8,8 @@ import { strongCompareETags } from './compare-etag'
  */
 export function someMatch(currentETag: string | undefined, validatorETags: string) {
   if (currentETag == null) return false
-  if (currentETag.trim() === '') return false
-  if (validatorETags === '*') return true
+  if (currentETag.trim() === "") return false
+  if (validatorETags === "*") return true
 
   let start = 0
   let end = 0

@@ -1,10 +1,10 @@
-import { readFileSync } from 'node:fs'
-import path from 'node:path'
-import type { DotenvConfigOptions, DotenvConfigOutput, DotenvParseOptions, DotenvParseOutput } from './types.js'
+import { readFileSync } from "node:fs"
+import path from "node:path"
+import type { DotenvConfigOptions, DotenvConfigOutput, DotenvParseOptions, DotenvParseOutput } from "./types.js"
 
 const log = (message: string) => console.log(`[dotenv][DEBUG] ${message}`)
 
-const NEWLINE = '\n'
+const NEWLINE = "\n"
 const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/
 const RE_NEWLINES = /\\n/g
 const NEWLINES_MATCH = /\n|\r|\r\n/
@@ -31,7 +31,7 @@ export function parse(src: string | Buffer, options?: DotenvParseOptions): Doten
       if (keyValueArr != null) {
         const key = keyValueArr[1]
         // default undefined or missing values to empty string
-        let val = keyValueArr[2] || ''
+        let val = keyValueArr[2] || ""
         const end = val.length - 1
         const isDoubleQuoted = val[0] === '"' && val[end] === '"'
         const isSingleQuoted = val[0] === "'" && val[end] === "'"
@@ -67,8 +67,8 @@ export function parse(src: string | Buffer, options?: DotenvParseOptions): Doten
  *
  */
 export function config(options?: Partial<DotenvConfigOptions>): DotenvConfigOutput {
-  const dotenvPath = options?.path || path.resolve(process.cwd(), '.env')
-  const encoding = options?.encoding || 'utf8'
+  const dotenvPath = options?.path || path.resolve(process.cwd(), ".env")
+  const encoding = options?.encoding || "utf8"
   const debug = options?.debug || false
 
   try {

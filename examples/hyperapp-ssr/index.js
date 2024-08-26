@@ -1,34 +1,34 @@
-import { App } from '@otterhttp/app'
-import { h, text } from 'hyperapp'
-import { renderToString } from 'hyperapp-render'
+import { App } from "@otterhttp/app"
+import { h, text } from "hyperapp"
+import { renderToString } from "hyperapp-render"
 
 const state = {
-  text: 'Hello'
+  text: "Hello",
 }
 
 const actions = {
   setText: (state, event) => ({
     ...state,
-    text: event.target.value
-  })
+    text: event.target.value,
+  }),
 }
 
 const view = (state) =>
-  h('main', {}, [
-    h('h1', {}, [text(state.text)]),
-    h('input', {
+  h("main", {}, [
+    h("h1", {}, [text(state.text)]),
+    h("input", {
       value: state.text,
-      onchange: actions.setText
-    })
+      onchange: actions.setText,
+    }),
   ])
 
 const app = new App()
 
 app
-  .get('/hyperapp.js', (_, res) => {
+  .get("/hyperapp.js", (_, res) => {
     res.sendFile(`${process.cwd()}/node_modules/hyperapp/index.js`)
   })
-  .get('/app.js', async (_, res) => {
+  .get("/app.js", async (_, res) => {
     res.sendFile(`${process.cwd()}/app.js`)
   })
   .get((_, res) => {
@@ -52,4 +52,4 @@ app
 </html>
     `)
   })
-  .listen(3000, () => console.log('Listening on http://localhost:3000'))
+  .listen(3000, () => console.log("Listening on http://localhost:3000"))

@@ -1,28 +1,28 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest"
 
-import type { Response } from '@/packages/app/src'
-import { type Middleware, Router, pushMiddleware } from '@/packages/router/src'
+import type { Response } from "@/packages/app/src"
+import { type Middleware, Router, pushMiddleware } from "@/packages/router/src"
 
-describe('Testing Router', () => {
-  describe('Basic', () => {
-    it('new router has empty ware array', () => {
+describe("Testing Router", () => {
+  describe("Basic", () => {
+    it("new router has empty ware array", () => {
       const app = new Router()
 
       expect(app.middleware).toStrictEqual([])
     })
   })
-  describe('.use method', () => {
-    it('new ware gets added via .use', () => {
+  describe(".use method", () => {
+    it("new ware gets added via .use", () => {
       const app = new Router<never, unknown, Response>()
 
-      app.use((_: unknown, res: Response) => res.end('hi'))
+      app.use((_: unknown, res: Response) => res.end("hi"))
 
       expect(app.middleware[0]).toMatchObject({
-        path: '/',
-        type: 'mw'
+        path: "/",
+        type: "mw",
       })
     })
-    it('accepts a list of wares', () => {
+    it("accepts a list of wares", () => {
       const app = new Router()
 
       app.use(
@@ -34,386 +34,386 @@ describe('Testing Router', () => {
         },
         function m3(_req, _res, next) {
           next()
-        }
+        },
       )
 
       expect(app.middleware).toHaveLength(3)
     })
-    it('accepts an array of wares', () => {
+    it("accepts an array of wares", () => {
       const app = new Router<Router>()
 
       app.use((_req, _res, next) => next(), [(_req, _res, next) => next(), (_req, _res, next) => next()])
 
       expect(app.middleware).toHaveLength(3)
     })
-    it('accepts an array of wares as a first argument', () => {
+    it("accepts an array of wares as a first argument", () => {
       const app = new Router<Router>()
 
       app.use([(_req, _res, next) => next(), (_req, _res, next) => next()])
 
       expect(app.middleware).toHaveLength(2)
     })
-    it('accepts an array of wares and path as first argument', () => {
+    it("accepts an array of wares and path as first argument", () => {
       const app = new Router<Router>()
 
-      app.use('/path', [(_req, _res, next) => next(), (_req, _res, next) => next()])
+      app.use("/path", [(_req, _res, next) => next(), (_req, _res, next) => next()])
 
       expect(app.middleware).toHaveLength(2)
 
-      expect(app.middleware.every((x) => x.path === '/path')).toBe(true)
+      expect(app.middleware.every((x) => x.path === "/path")).toBe(true)
     })
   })
 })
 
-describe('Testing HTTP methods', () => {
-  it('should accept arrays for first second arg', () => {
+describe("Testing HTTP methods", () => {
+  it("should accept arrays for first second arg", () => {
     const router = new Router()
 
-    router.get('/', [() => 0, () => 0])
+    router.get("/", [() => 0, () => 0])
 
     expect(router.middleware.length).toBe(2)
   })
-  it('should accept arrays for third argument', () => {
+  it("should accept arrays for third argument", () => {
     const router = new Router()
 
-    router.get('/', () => 0, [() => 0, () => 0])
+    router.get("/", () => 0, [() => 0, () => 0])
 
     expect(router.middleware.length).toBe(3)
   })
 
-  it('app.get should set GET as HTTP method', () => {
+  it("app.get should set GET as HTTP method", () => {
     const router = new Router()
 
-    router.get('/', () => void 0)
+    router.get("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('GET')
+    expect(router.middleware[0].method).toBe("GET")
   })
-  it('app.post should set POST as HTTP method', () => {
+  it("app.post should set POST as HTTP method", () => {
     const router = new Router()
 
-    router.post('/', () => void 0)
+    router.post("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('POST')
+    expect(router.middleware[0].method).toBe("POST")
   })
-  it('app.put should set PUT as HTTP method', () => {
+  it("app.put should set PUT as HTTP method", () => {
     const router = new Router()
 
-    router.put('/', () => void 0)
+    router.put("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('PUT')
+    expect(router.middleware[0].method).toBe("PUT")
   })
-  it('app.patch should set PATCH as HTTP method', () => {
+  it("app.patch should set PATCH as HTTP method", () => {
     const router = new Router()
 
-    router.patch('/', () => void 0)
+    router.patch("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('PATCH')
+    expect(router.middleware[0].method).toBe("PATCH")
   })
-  it('app.delete should set DELETE as HTTP method', () => {
+  it("app.delete should set DELETE as HTTP method", () => {
     const router = new Router()
 
-    router.delete('/', () => void 0)
+    router.delete("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('DELETE')
+    expect(router.middleware[0].method).toBe("DELETE")
   })
-  it('app.head should set HEAD as HTTP method', () => {
+  it("app.head should set HEAD as HTTP method", () => {
     const router = new Router()
 
-    router.head('/', () => void 0)
+    router.head("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('HEAD')
+    expect(router.middleware[0].method).toBe("HEAD")
   })
-  it('app.options should set OPTIONS as HTTP method', () => {
+  it("app.options should set OPTIONS as HTTP method", () => {
     const router = new Router()
 
-    router.options('/', () => void 0)
+    router.options("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('OPTIONS')
+    expect(router.middleware[0].method).toBe("OPTIONS")
   })
-  it('app.acl should set ACL as HTTP method', () => {
+  it("app.acl should set ACL as HTTP method", () => {
     const router = new Router()
 
-    router.acl('/', () => void 0)
+    router.acl("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('ACL')
+    expect(router.middleware[0].method).toBe("ACL")
   })
-  it('app.bind should set BIND as HTTP method', () => {
+  it("app.bind should set BIND as HTTP method", () => {
     const router = new Router()
 
-    router.bind('/', () => void 0)
+    router.bind("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('BIND')
+    expect(router.middleware[0].method).toBe("BIND")
   })
 
-  it('app.checkout should set CHECKOUT as HTTP method', () => {
+  it("app.checkout should set CHECKOUT as HTTP method", () => {
     const router = new Router()
 
-    router.checkout('/', () => void 0)
+    router.checkout("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('CHECKOUT')
+    expect(router.middleware[0].method).toBe("CHECKOUT")
   })
 
-  it('app.copy should set COPY as HTTP method', () => {
+  it("app.copy should set COPY as HTTP method", () => {
     const router = new Router()
 
-    router.copy('/', () => void 0)
+    router.copy("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('COPY')
+    expect(router.middleware[0].method).toBe("COPY")
   })
 
-  it('app.lock should set LOCK as HTTP method', () => {
+  it("app.lock should set LOCK as HTTP method", () => {
     const router = new Router()
 
-    router.lock('/', () => void 0)
+    router.lock("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('LOCK')
+    expect(router.middleware[0].method).toBe("LOCK")
   })
 
-  it('app.unlock should set UNLOCK as HTTP method', () => {
+  it("app.unlock should set UNLOCK as HTTP method", () => {
     const router = new Router()
 
-    router.unlock('/', () => void 0)
+    router.unlock("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('UNLOCK')
+    expect(router.middleware[0].method).toBe("UNLOCK")
   })
 
-  it('app.merge should set MERGE as HTTP method', () => {
+  it("app.merge should set MERGE as HTTP method", () => {
     const router = new Router()
 
-    router.merge('/', () => void 0)
+    router.merge("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('MERGE')
+    expect(router.middleware[0].method).toBe("MERGE")
   })
 
-  it('app.mkactivity should set MKACTIVITY as HTTP method', () => {
+  it("app.mkactivity should set MKACTIVITY as HTTP method", () => {
     const router = new Router()
 
-    router.mkactivity('/', () => void 0)
+    router.mkactivity("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('MKACTIVITY')
+    expect(router.middleware[0].method).toBe("MKACTIVITY")
   })
-  it('app.mkcol should set MKCOL as HTTP method', () => {
+  it("app.mkcol should set MKCOL as HTTP method", () => {
     const router = new Router()
 
-    router.mkcol('/', () => void 0)
+    router.mkcol("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('MKCOL')
+    expect(router.middleware[0].method).toBe("MKCOL")
   })
 
-  it('app.move should set MOVE as HTTP method', () => {
+  it("app.move should set MOVE as HTTP method", () => {
     const router = new Router()
 
-    router.move('/', () => void 0)
+    router.move("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('MOVE')
+    expect(router.middleware[0].method).toBe("MOVE")
   })
 
-  it('app.search should set SEARCH as HTTP method', () => {
+  it("app.search should set SEARCH as HTTP method", () => {
     const router = new Router()
 
-    router.search('/', () => void 0)
+    router.search("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('SEARCH')
+    expect(router.middleware[0].method).toBe("SEARCH")
   })
 
-  it('app.msearch should set M-SEARCH as HTTP method', () => {
+  it("app.msearch should set M-SEARCH as HTTP method", () => {
     const router = new Router()
 
-    router.msearch('/', () => void 0)
+    router.msearch("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('M-SEARCH')
+    expect(router.middleware[0].method).toBe("M-SEARCH")
   })
 
-  it('app.notify should set NOTIFY as HTTP method', () => {
+  it("app.notify should set NOTIFY as HTTP method", () => {
     const router = new Router()
 
-    router.notify('/', () => void 0)
+    router.notify("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('NOTIFY')
+    expect(router.middleware[0].method).toBe("NOTIFY")
   })
 
-  it('app.notify should set NOTIFY as HTTP method', () => {
+  it("app.notify should set NOTIFY as HTTP method", () => {
     const router = new Router()
 
-    router.notify('/', () => void 0)
+    router.notify("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('NOTIFY')
+    expect(router.middleware[0].method).toBe("NOTIFY")
   })
 
-  it('app.purge should set PURGE as HTTP method', () => {
+  it("app.purge should set PURGE as HTTP method", () => {
     const router = new Router()
 
-    router.purge('/', () => void 0)
+    router.purge("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('PURGE')
+    expect(router.middleware[0].method).toBe("PURGE")
   })
 
-  it('app.report should set REPORT as HTTP method', () => {
+  it("app.report should set REPORT as HTTP method", () => {
     const router = new Router()
 
-    router.report('/', () => void 0)
+    router.report("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('REPORT')
+    expect(router.middleware[0].method).toBe("REPORT")
   })
 
-  it('app.subscribe should set SUBSCRIBE as HTTP method', () => {
+  it("app.subscribe should set SUBSCRIBE as HTTP method", () => {
     const router = new Router()
 
-    router.subscribe('/', () => void 0)
+    router.subscribe("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('SUBSCRIBE')
+    expect(router.middleware[0].method).toBe("SUBSCRIBE")
   })
 
-  it('app.unsubscribe should set UNSUBSCRIBE as HTTP method', () => {
+  it("app.unsubscribe should set UNSUBSCRIBE as HTTP method", () => {
     const router = new Router()
 
-    router.unsubscribe('/', () => void 0)
+    router.unsubscribe("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('UNSUBSCRIBE')
+    expect(router.middleware[0].method).toBe("UNSUBSCRIBE")
   })
 
-  it('app.trace should set TRACE as HTTP method', () => {
+  it("app.trace should set TRACE as HTTP method", () => {
     const router = new Router()
 
-    router.trace('/', () => void 0)
+    router.trace("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('TRACE')
+    expect(router.middleware[0].method).toBe("TRACE")
   })
 
-  it('app.acl should set ACL as HTTP method', () => {
+  it("app.acl should set ACL as HTTP method", () => {
     const router = new Router()
 
-    router.acl('/', () => void 0)
+    router.acl("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('ACL')
+    expect(router.middleware[0].method).toBe("ACL")
   })
 
-  it('app.connect should set CONNECT as HTTP method', () => {
+  it("app.connect should set CONNECT as HTTP method", () => {
     const router = new Router()
 
-    router.connect('/', () => void 0)
+    router.connect("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('CONNECT')
+    expect(router.middleware[0].method).toBe("CONNECT")
   })
 
-  it('app.bind should set BIND as HTTP method', () => {
+  it("app.bind should set BIND as HTTP method", () => {
     const router = new Router()
 
-    router.bind('/', () => void 0)
+    router.bind("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('BIND')
+    expect(router.middleware[0].method).toBe("BIND")
   })
 
-  it('app.unbind should set UNBIND as HTTP method', () => {
+  it("app.unbind should set UNBIND as HTTP method", () => {
     const router = new Router()
 
-    router.unbind('/', () => void 0)
+    router.unbind("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('UNBIND')
+    expect(router.middleware[0].method).toBe("UNBIND")
   })
 
-  it('app.rebind should set REBIND as HTTP method', () => {
+  it("app.rebind should set REBIND as HTTP method", () => {
     const router = new Router()
 
-    router.rebind('/', () => void 0)
+    router.rebind("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('REBIND')
+    expect(router.middleware[0].method).toBe("REBIND")
   })
 
-  it('app.link should set LINK as HTTP method', () => {
+  it("app.link should set LINK as HTTP method", () => {
     const router = new Router()
 
-    router.link('/', () => void 0)
+    router.link("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('LINK')
+    expect(router.middleware[0].method).toBe("LINK")
   })
 
-  it('app.unlink should set UNLINK as HTTP method', () => {
+  it("app.unlink should set UNLINK as HTTP method", () => {
     const router = new Router()
 
-    router.unlink('/', () => void 0)
+    router.unlink("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('UNLINK')
+    expect(router.middleware[0].method).toBe("UNLINK")
   })
 
-  it('app.mkcalendar should set MKCALENDAR as HTTP method', () => {
+  it("app.mkcalendar should set MKCALENDAR as HTTP method", () => {
     const router = new Router()
 
-    router.mkcalendar('/', () => void 0)
+    router.mkcalendar("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('MKCALENDAR')
+    expect(router.middleware[0].method).toBe("MKCALENDAR")
   })
 
-  it('app.propfind should set PROPFIND as HTTP method', () => {
+  it("app.propfind should set PROPFIND as HTTP method", () => {
     const router = new Router()
 
-    router.propfind('/', () => void 0)
+    router.propfind("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('PROPFIND')
+    expect(router.middleware[0].method).toBe("PROPFIND")
   })
 
-  it('app.proppatch should set PROPPATCH as HTTP method', () => {
+  it("app.proppatch should set PROPPATCH as HTTP method", () => {
     const router = new Router()
 
-    router.proppatch('/', () => void 0)
+    router.proppatch("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('PROPPATCH')
+    expect(router.middleware[0].method).toBe("PROPPATCH")
   })
 
-  it('app.source should set SOURCE as HTTP method', () => {
+  it("app.source should set SOURCE as HTTP method", () => {
     const router = new Router()
 
-    router.source('/', () => void 0)
+    router.source("/", () => void 0)
 
-    expect(router.middleware[0].method).toBe('SOURCE')
+    expect(router.middleware[0].method).toBe("SOURCE")
   })
 
-  it('app.all should push all HTTP methods handlers', () => {
+  it("app.all should push all HTTP methods handlers", () => {
     const router = new Router()
 
-    router.all('/', () => void 0)
+    router.all("/", () => void 0)
 
-    expect(router.middleware[0].type).toBe('route')
+    expect(router.middleware[0].type).toBe("route")
   })
-  it('should push a dummy GET HTTP method and its handlers and expect the middleware object to match', () => {
+  it("should push a dummy GET HTTP method and its handlers and expect the middleware object to match", () => {
     function dummyHandler(_req, res) {
-      res.send('Hello World!')
+      res.send("Hello World!")
     }
     const middleware: Middleware[] = []
     pushMiddleware(middleware)({
       path: dummyHandler,
-      method: 'GET',
-      type: 'route'
+      method: "GET",
+      type: "route",
     })
     expect(middleware[0]).toMatchObject({
-      path: '/',
-      method: 'GET',
-      type: 'route',
-      handler: dummyHandler
+      path: "/",
+      method: "GET",
+      type: "route",
+      handler: dummyHandler,
     })
   })
-  it('should push a dummy GET HTTP method containing the fullPaths array and expect the middleware object to match', () => {
+  it("should push a dummy GET HTTP method containing the fullPaths array and expect the middleware object to match", () => {
     function dummyHandler(_req, res) {
-      res.send('Hello World!')
+      res.send("Hello World!")
     }
-    const fullPaths = ['']
+    const fullPaths = [""]
     const middleware: Middleware[] = []
     pushMiddleware(middleware)({
-      method: 'GET',
-      type: 'route',
+      method: "GET",
+      type: "route",
       fullPaths: fullPaths,
-      handler: dummyHandler
+      handler: dummyHandler,
     })
     expect(middleware[0]).toMatchObject({
-      path: '/',
-      method: 'GET',
-      type: 'route'
+      path: "/",
+      method: "GET",
+      type: "route",
     })
   })
-  it('app.get with array of paths should set GET as HTTP method', () => {
+  it("app.get with array of paths should set GET as HTTP method", () => {
     const router = new Router()
 
-    router.get(['/', '/test'], () => void 0)
+    router.get(["/", "/test"], () => void 0)
 
     expect(router.middleware).toHaveLength(2)
   })

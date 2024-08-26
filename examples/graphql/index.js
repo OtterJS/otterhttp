@@ -1,6 +1,6 @@
-import { App } from '@otterhttp/app'
-import graphql from 'graphql'
-import { createHandler } from 'graphql-http/lib/use/http'
+import { App } from "@otterhttp/app"
+import graphql from "graphql"
+import { createHandler } from "graphql-http/lib/use/http"
 
 const app = new App()
 const port = Number.parseInt(process.env.PORT) || 3000
@@ -12,11 +12,11 @@ const schema = graphql.buildSchema(`
 `)
 
 const rootValue = {
-  hello: () => 'Hello world!'
+  hello: () => "Hello world!",
 }
 
 const handler = createHandler({ schema, rootValue })
 
-app.use('/graphql', handler)
+app.use("/graphql", handler)
 
 app.listen(port, () => console.log(`Listening on http://localhost:${port}`))

@@ -1,8 +1,8 @@
-import type { ServerResponse } from 'node:http'
+import type { ServerResponse } from "node:http"
 
 type HasHeaders = Pick<
   ServerResponse,
-  'getHeader' | 'getHeaders' | 'setHeader' | 'appendHeader' | 'getHeaderNames' | 'hasHeader' | 'removeHeader'
+  "getHeader" | "getHeaders" | "setHeader" | "appendHeader" | "getHeaderNames" | "hasHeader" | "removeHeader"
 >
 
 /**
@@ -18,9 +18,9 @@ type HasHeaders = Pick<
 const FIELD_NAME_REGEXP = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/
 
 function getVaryHeader(res: HasHeaders): string[] {
-  const vary = res.getHeader('vary')
+  const vary = res.getHeader("vary")
   if (Array.isArray(vary)) return vary
-  if (typeof vary === 'string') return parse(vary.toLowerCase())
+  if (typeof vary === "string") return parse(vary.toLowerCase())
   return []
 }
 
@@ -66,18 +66,18 @@ export function vary(res: HasHeaders, field: string | string[]) {
 
   // ensure field names are valid
   for (const field of fields) {
-    if (!FIELD_NAME_REGEXP.test(field)) throw new TypeError('field argument contains an invalid header name')
+    if (!FIELD_NAME_REGEXP.test(field)) throw new TypeError("field argument contains an invalid header name")
   }
 
-  if (alreadySetHeaderNameLookup.has('*')) {
-    if (val.length > 1) res.setHeader('vary', ['*'])
+  if (alreadySetHeaderNameLookup.has("*")) {
+    if (val.length > 1) res.setHeader("vary", ["*"])
     return
   }
 
   const unsetHeaderNamesToSet: string[] = []
   for (const headerName of fields) {
-    if (headerName === '*') {
-      res.setHeader('vary', ['*'])
+    if (headerName === "*") {
+      res.setHeader("vary", ["*"])
       return
     }
 
@@ -87,5 +87,5 @@ export function vary(res: HasHeaders, field: string | string[]) {
     alreadySetHeaderNameLookup.add(lowerCaseHeaderName)
   }
 
-  res.appendHeader('vary', unsetHeaderNamesToSet)
+  res.appendHeader("vary", unsetHeaderNamesToSet)
 }

@@ -16,10 +16,10 @@
  * Lordfirespeed licenses the contents of this file to you under the terms of the LGPL-3.0-or-later license.
  */
 
-import { statSync } from 'node:fs'
-import { basename, dirname, extname, join, resolve } from 'node:path'
-import { isString, isStringArray } from './type-guards'
-import type { TemplateEngine, TemplateEngineOptions } from './types.js'
+import { statSync } from "node:fs"
+import { basename, dirname, extname, join, resolve } from "node:path"
+import { isString, isStringArray } from "./type-guards"
+import type { TemplateEngine, TemplateEngineOptions } from "./types.js"
 
 function tryStat(path: string) {
   try {
@@ -30,8 +30,8 @@ function tryStat(path: string) {
 }
 
 type Renderable<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions> = Pick<
-  (typeof View<RenderOptions>)['prototype'],
-  'render'
+  (typeof View<RenderOptions>)["prototype"],
+  "render"
 >
 
 export type IViewPrototype<RenderOptions extends TemplateEngineOptions = TemplateEngineOptions> = {
@@ -67,7 +67,7 @@ export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOp
       defaultEngine: string
       root: string | string[]
       engines: Record<string, TemplateEngine<RenderOptions>>
-    }> = {}
+    }> = {},
   ) {
     this.ext = extname(name)
     this.name = name
@@ -75,13 +75,13 @@ export class View<RenderOptions extends TemplateEngineOptions = TemplateEngineOp
     this.defaultEngine = opts.defaultEngine
 
     if (!this.ext && !this.defaultEngine)
-      throw new Error('No default engine was specified and no extension was provided.')
+      throw new Error("No default engine was specified and no extension was provided.")
 
     let fileName = name
 
     if (!this.ext) {
       // get extension from default engine name
-      this.ext = this.defaultEngine && this.defaultEngine[0] !== '.' ? `.${this.defaultEngine}` : this.defaultEngine
+      this.ext = this.defaultEngine && this.defaultEngine[0] !== "." ? `.${this.defaultEngine}` : this.defaultEngine
 
       fileName += this.ext
     }

@@ -1,10 +1,10 @@
-import { basename, extname, resolve } from 'node:path'
-import { contentDisposition } from '@otterhttp/content-disposition'
-import { sendFile } from '@otterhttp/send'
-import type { SendFileOptions } from '@otterhttp/send'
+import { basename, extname, resolve } from "node:path"
+import { contentDisposition } from "@otterhttp/content-disposition"
+import { sendFile } from "@otterhttp/send"
+import type { SendFileOptions } from "@otterhttp/send"
 
-import { setResponseContentTypeHeader } from './headers'
-import type { HasIncomingHeaders, HasOutgoingHeaders, HasReq, HasStatus, HasWriteMethods } from './types'
+import { setResponseContentTypeHeader } from "./headers"
+import type { HasIncomingHeaders, HasOutgoingHeaders, HasReq, HasStatus, HasWriteMethods } from "./types"
 
 export type DownloadOptions = SendFileOptions &
   Partial<{
@@ -20,17 +20,17 @@ export async function download(
   res: DownloadResponse,
   path: string,
   filename?: string,
-  options?: DownloadOptions
+  options?: DownloadOptions,
 ): Promise<void> {
   // set Content-Disposition when file is sent
   const headers = {
-    'Content-Disposition': contentDisposition(filename || basename(path))
+    "Content-Disposition": contentDisposition(filename || basename(path)),
   }
 
   // merge user-provided headers
   if (options?.headers) {
     for (const key of Object.keys(options.headers)) {
-      if (key.toLowerCase() !== 'content-disposition') headers[key] = options.headers[key]
+      if (key.toLowerCase() !== "content-disposition") headers[key] = options.headers[key]
     }
   }
 
@@ -47,5 +47,5 @@ export function attachment(res: HasOutgoingHeaders, filename?: string) {
     filename = basename(filename)
   }
 
-  res.setHeader('Content-Disposition', contentDisposition(filename))
+  res.setHeader("Content-Disposition", contentDisposition(filename))
 }

@@ -1,16 +1,16 @@
-import { App } from '@otterhttp/app'
-import { cookieParser } from '@otterhttp/cookie-parser'
+import { App } from "@otterhttp/app"
+import { cookieParser } from "@otterhttp/cookie-parser"
 
 const app = new App()
 
 app
   .use(cookieParser())
-  .get('/', (req, res) => {
+  .get("/", (req, res) => {
     console.log(req.cookies)
-    if (req.cookies?.user === 'user' && req.cookies?.password === 'pwd') {
-      res.send('<h1>Welcome user!</h1>')
+    if (req.cookies?.user === "user" && req.cookies?.password === "pwd") {
+      res.send("<h1>Welcome user!</h1>")
     } else {
-      res.send('<h1>Send cookie to show hidden content</h1>')
+      res.send("<h1>Send cookie to show hidden content</h1>")
     }
   })
-  .listen(3000, () => console.log('Started on http://localhost:3000'))
+  .listen(3000, () => console.log("Started on http://localhost:3000"))

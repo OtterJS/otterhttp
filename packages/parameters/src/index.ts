@@ -1,4 +1,4 @@
-import { encodeUtf8ExtendedFieldValue, getLatin1Fallback } from './extended-fields'
+import { encodeUtf8ExtendedFieldValue, getLatin1Fallback } from "./extended-fields"
 
 /**
  * RegExp for values that can be escaped to create a valid quoted-string
@@ -67,10 +67,10 @@ export function encodeFieldValue(val: string) {
   // no need to quote tokens
   if (TOKEN_REGEXP.test(val)) return val
 
-  if (val.length > 0 && !TEXT_REGEXP.test(val)) throw new TypeError('invalid parameter value')
+  if (val.length > 0 && !TEXT_REGEXP.test(val)) throw new TypeError("invalid parameter value")
 
   MUST_QUOTE_REGEXP.lastIndex = 0
-  return `"${val.replace(MUST_QUOTE_REGEXP, '\\$1')}"`
+  return `"${val.replace(MUST_QUOTE_REGEXP, "\\$1")}"`
 }
 
 function formatParameter([parameterName, encodedParameterValue]: [string, string]): string {
@@ -79,12 +79,12 @@ function formatParameter([parameterName, encodedParameterValue]: [string, string
 
 export function formatParameters(
   parameters: Record<string, string>,
-  { addFallbacks = true }: { addFallbacks?: boolean } = {}
+  { addFallbacks = true }: { addFallbacks?: boolean } = {},
 ): string {
   const expandedParameters: Map<string, string> = new Map()
 
   for (const [parameterName, parameterValue] of Object.entries(parameters)) {
-    if (!parameterName.endsWith('*')) {
+    if (!parameterName.endsWith("*")) {
       expandedParameters.set(parameterName, encodeFieldValue(parameterValue))
       continue
     }
@@ -97,12 +97,12 @@ export function formatParameters(
     expandedParameters.set(fallbackParameterName, fallbackValue)
   }
 
-  return Array.from(expandedParameters.entries()).sort().map(formatParameter).join('')
+  return Array.from(expandedParameters.entries()).sort().map(formatParameter).join("")
 }
 
 export function validateParameterNames(parameterNames: readonly string[]): void {
   if (parameterNames.every((parameterName) => TOKEN_REGEXP.test(parameterName))) return
-  throw new TypeError('invalid parameter name')
+  throw new TypeError("invalid parameter name")
 }
 
 /**
@@ -137,8 +137,8 @@ export function parseParameters(value: string): Record<string, string> {
   }
 
   function getParameterValue() {
-    if (quotedParameterValue != null) return quotedParameterValue.join('')
-    if (extendedParameterValue != null) return extendedParameterValue.join('')
+    if (quotedParameterValue != null) return quotedParameterValue.join("")
+    if (extendedParameterValue != null) return extendedParameterValue.join("")
     if (equalsIndex == null) throw new Error()
     return value.slice(equalsIndex + 1, currentIndex)
   }
@@ -149,7 +149,7 @@ export function parseParameters(value: string): Record<string, string> {
     const parameterName = value.slice(parameterNameIndex, equalsIndex).toLowerCase()
     const parameterValue = getParameterValue()
     if (Object.prototype.hasOwnProperty.call(parsedParameters, parameterName))
-      throw new TypeError('duplicate parameter name')
+      throw new TypeError("duplicate parameter name")
     parsedParameters[parameterName] = parameterValue
   }
 
@@ -159,12 +159,12 @@ export function parseParameters(value: string): Record<string, string> {
 
     // match whitespace until ";"
     if (semicolonIndex == null) {
-      if (currentChar === ';') {
+      if (currentChar === ";") {
         semicolonIndex = currentIndex
         validIfTerminate = true
         continue
       }
-      if (!WHITESPACE_CHAR_REGEXP.test(currentChar)) throw new TypeError('invalid parameter format')
+      if (!WHITESPACE_CHAR_REGEXP.test(currentChar)) throw new TypeError("invalid parameter format")
       continue
     }
 
@@ -174,25 +174,25 @@ export function parseParameters(value: string): Record<string, string> {
         parameterNameIndex = currentIndex
         continue
       }
-      if (currentChar === ';') {
+      if (currentChar === ";") {
         semicolonIndex = currentIndex
         validIfTerminate = true
         continue
       }
-      if (!WHITESPACE_CHAR_REGEXP.test(currentChar)) throw new TypeError('invalid parameter format')
+      if (!WHITESPACE_CHAR_REGEXP.test(currentChar)) throw new TypeError("invalid parameter format")
       validIfTerminate = true
       continue
     }
 
     // match token until "="
     if (equalsIndex == null) {
-      if (currentChar === '=') {
+      if (currentChar === "=") {
         equalsIndex = currentIndex
 
-        const previousIsAsterisk = value.charAt(currentIndex - 1) === '*'
+        const previousIsAsterisk = value.charAt(currentIndex - 1) === "*"
         const nextIsDoubleQuote = value.charAt(currentIndex + 1) === '"'
 
-        if (previousIsAsterisk && nextIsDoubleQuote) throw new TypeError('invalid extended parameter value')
+        if (previousIsAsterisk && nextIsDoubleQuote) throw new TypeError("invalid extended parameter value")
         if (nextIsDoubleQuote) {
           quotedParameterValue = []
           currentIndex++
@@ -200,13 +200,13 @@ export function parseParameters(value: string): Record<string, string> {
 
         continue
       }
-      if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError('invalid parameter format')
+      if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError("invalid parameter format")
       continue
     }
 
     // match token until whitespace or semicolon
     if (quotedParameterValue == null) {
-      if (currentChar === ';') {
+      if (currentChar === ";") {
         pop()
         reset()
         semicolonIndex = currentIndex
@@ -218,14 +218,14 @@ export function parseParameters(value: string): Record<string, string> {
         reset()
         continue
       }
-      if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError('invalid parameter format')
+      if (!TOKEN_CHAR_REGEXP.test(currentChar)) throw new TypeError("invalid parameter format")
       validIfTerminate = true
       continue
     }
 
     // match quoted string contents until double quote
     if (currentCharEscaped) {
-      if (!CAN_QUOTE_REGEXP.test(currentChar)) throw new TypeError('invalid parameter format')
+      if (!CAN_QUOTE_REGEXP.test(currentChar)) throw new TypeError("invalid parameter format")
       currentCharEscaped = false
       quotedParameterValue.push(currentChar)
       continue
@@ -236,18 +236,18 @@ export function parseParameters(value: string): Record<string, string> {
       validIfTerminate = true
       continue
     }
-    if (currentChar === '\\') {
+    if (currentChar === "\\") {
       currentCharEscaped = true
       continue
     }
-    if (!QUOTED_STRING_CONTENTS_REGEXP.test(currentChar)) throw new TypeError('invalid parameter format')
+    if (!QUOTED_STRING_CONTENTS_REGEXP.test(currentChar)) throw new TypeError("invalid parameter format")
     quotedParameterValue.push(currentChar)
   }
 
-  if (!validIfTerminate) throw new TypeError('invalid parameter format')
+  if (!validIfTerminate) throw new TypeError("invalid parameter format")
 
   pop()
   return parsedParameters
 }
 
-export * from './extended-fields'
+export * from "./extended-fields"

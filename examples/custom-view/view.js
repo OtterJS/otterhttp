@@ -1,4 +1,4 @@
-import { extname } from 'node:path'
+import { extname } from "node:path"
 
 export class CustomView {
   constructor(name, options = {}) {

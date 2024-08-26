@@ -1,10 +1,10 @@
-import type { IncomingMessage as I, IncomingHttpHeaders } from 'node:http'
-import mime from 'mime'
-import Negotiator from 'negotiator'
+import type { IncomingMessage as I, IncomingHttpHeaders } from "node:http"
+import mime from "mime"
+import Negotiator from "negotiator"
 
-const extToMime = (type: string) => (type.indexOf('/') === -1 ? mime.getType(type) : type)
+const extToMime = (type: string) => (type.indexOf("/") === -1 ? mime.getType(type) : type)
 
-const validMime = (type: unknown): type is string => typeof type === 'string'
+const validMime = (type: unknown): type is string => typeof type === "string"
 
 interface IAccepts {
   types(types?: undefined): string[]
@@ -61,7 +61,7 @@ interface IAccepts {
 export class Accepts implements IAccepts {
   headers: IncomingHttpHeaders
   negotiator: Negotiator
-  constructor(req: Pick<I, 'headers'>) {
+  constructor(req: Pick<I, "headers">) {
     this.headers = req.headers
     this.negotiator = new Negotiator(req)
   }

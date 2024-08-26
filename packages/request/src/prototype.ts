@@ -1,21 +1,21 @@
-import { IncomingMessage } from 'node:http'
-import type { ParsedUrlQuery } from 'node:querystring'
-import { Accepts } from '@otterhttp/accepts'
-import { ContentType } from '@otterhttp/content-type'
-import type { Trust } from '@otterhttp/proxy-address'
-import type { Middleware } from '@otterhttp/router'
-import { type URLParams, getQueryParams } from '@otterhttp/url'
-import type { Result as RangeParseResult, Options as RangeParsingOptions, Ranges } from 'header-range-parser'
+import { IncomingMessage } from "node:http"
+import type { ParsedUrlQuery } from "node:querystring"
+import { Accepts } from "@otterhttp/accepts"
+import { ContentType } from "@otterhttp/content-type"
+import type { Trust } from "@otterhttp/proxy-address"
+import type { Middleware } from "@otterhttp/router"
+import { type URLParams, getQueryParams } from "@otterhttp/url"
+import type { Result as RangeParseResult, Options as RangeParsingOptions, Ranges } from "header-range-parser"
 
-import { getIP, getIPs } from './addresses'
-import { type Cookie, parseCookieHeader } from './cookies'
-import { getRequestHeader } from './get-header'
-import { getHost, getSubdomains } from './host'
-import { type Protocol, getProtocol } from './protocol'
-import { getRange } from './range'
-import type { Headers, RequestAppSettings } from './types'
-import { isXmlHttpRequest } from './util/is-xml-http-request'
-import { requestTypeIs } from './util/request-type-is'
+import { getIP, getIPs } from "./addresses"
+import { type Cookie, parseCookieHeader } from "./cookies"
+import { getRequestHeader } from "./get-header"
+import { getHost, getSubdomains } from "./host"
+import { type Protocol, getProtocol } from "./protocol"
+import { getRange } from "./range"
+import type { Headers, RequestAppSettings } from "./types"
+import { isXmlHttpRequest } from "./util/is-xml-http-request"
+import { requestTypeIs } from "./util/request-type-is"
 
 export class Request<Body = unknown> extends IncomingMessage {
   // assigned by node:http
@@ -119,7 +119,7 @@ export class Request<Body = unknown> extends IncomingMessage {
     return isXmlHttpRequest(this)
   }
   get secure(): boolean {
-    return this.protocol === 'https'
+    return this.protocol === "https"
   }
   get cookies(): Record<string, Cookie> {
     this._cookies ??= parseCookieHeader(this, this.appSettings?.cookieParsing)

@@ -1,70 +1,70 @@
-import type { Ranges } from 'header-range-parser'
-import { makeFetch } from 'supertest-fetch'
-import { describe, expect, it } from 'vitest'
+import type { Ranges } from "header-range-parser"
+import { makeFetch } from "supertest-fetch"
+import { describe, expect, it } from "vitest"
 
-import { App } from '@/packages/app/src'
-import { runServer } from '@/test_helpers/runServer'
+import { App } from "@/packages/app/src"
+import { runServer } from "@/test_helpers/runServer"
 
-describe('Request extensions', () => {
-  describe('req.getHeader(header)', () => {
-    it('should return a specified header', async () => {
+describe("Request extensions", () => {
+  describe("req.getHeader(header)", () => {
+    it("should return a specified header", async () => {
       const app = runServer((req, res) => {
-        res.end(req.getHeader('accept'))
+        res.end(req.getHeader("accept"))
       })
 
-      await makeFetch(app)('/').expect('*/*')
+      await makeFetch(app)("/").expect("*/*")
     })
     it('should handle "referer"', async () => {
       const app = runServer((req, res) => {
-        res.end(req.getHeader('referrer'))
+        res.end(req.getHeader("referrer"))
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Referrer-Policy': 'unsafe-url',
-          referer: 'localhost:3000'
-        }
-      }).expect('localhost:3000')
+          "Referrer-Policy": "unsafe-url",
+          referer: "localhost:3000",
+        },
+      }).expect("localhost:3000")
     })
     it('should handle "referrer"', async () => {
       const app = runServer((req, res) => {
-        res.end(req.getHeader('referrer'))
+        res.end(req.getHeader("referrer"))
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Referrer-Policy': 'unsafe-url',
-          referrer: 'localhost:3000'
-        }
-      }).expect('localhost:3000')
+          "Referrer-Policy": "unsafe-url",
+          referrer: "localhost:3000",
+        },
+      }).expect("localhost:3000")
     })
   })
-  describe('req.xhr', () => {
-    it('should be false in node environment', async () => {
+  describe("req.xhr", () => {
+    it("should be false in node environment", async () => {
       const app = runServer((req, res) => {
-        res.end(`Browser request: ${req.xhr ? 'yes' : 'no'}`)
+        res.end(`Browser request: ${req.xhr ? "yes" : "no"}`)
       })
 
-      await makeFetch(app)('/').expect('Browser request: no')
+      await makeFetch(app)("/").expect("Browser request: no")
     })
-    it('should match for any case', async () => {
+    it("should match for any case", async () => {
       const app = new App()
-      app.get('/xhr', (req, res) => {
+      app.get("/xhr", (req, res) => {
         return res.json({
-          xhrHeader: req.headers['x-requested-with'],
-          xhr: req.xhr
+          xhrHeader: req.headers["x-requested-with"],
+          xhr: req.xhr,
         })
       })
 
-      await makeFetch(app.listen())('/xhr', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      await makeFetch(app.listen())("/xhr", { headers: { "X-Requested-With": "XMLHttpRequest" } })
         .expectStatus(200)
         .expectBody({
-          xhrHeader: 'XMLHttpRequest',
-          xhr: true
+          xhrHeader: "XMLHttpRequest",
+          xhr: true,
         })
     })
   })
-  describe('req.accepts()', () => {
+  describe("req.accepts()", () => {
     it('should detect an "Accept" header', async () => {
       const app = runServer((req, res) => {
         const accepts = req.accepts()
@@ -72,27 +72,27 @@ describe('Request extensions', () => {
         res.end(accepts[0])
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          Accept: 'text/plain'
-        }
-      }).expect('text/plain')
+          Accept: "text/plain",
+        },
+      }).expect("text/plain")
     })
-    it('should parse multiple values', async () => {
+    it("should parse multiple values", async () => {
       const app = runServer((req, res) => {
         const accepts = req.accepts()
 
-        res.end((accepts as string[]).join(' | '))
+        res.end((accepts as string[]).join(" | "))
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          Accept: 'text/plain, text/html'
-        }
-      }).expect('text/plain | text/html')
+          Accept: "text/plain, text/html",
+        },
+      }).expect("text/plain | text/html")
     })
   })
-  describe('req.acceptsEncodings()', () => {
+  describe("req.acceptsEncodings()", () => {
     it('should detect "Accept-Encoding" header', async () => {
       const app = runServer((req, res) => {
         const encodings = req.acceptsEncodings()
@@ -100,27 +100,27 @@ describe('Request extensions', () => {
         res.end(encodings[0])
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Accept-Encoding': 'gzip'
-        }
-      }).expect('gzip')
+          "Accept-Encoding": "gzip",
+        },
+      }).expect("gzip")
     })
-    it('should parse multiple values', async () => {
+    it("should parse multiple values", async () => {
       const app = runServer((req, res) => {
         const encodings = req.acceptsEncodings()
 
-        res.end((encodings as string[]).join(' | '))
+        res.end((encodings as string[]).join(" | "))
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Accept-Encoding': 'gzip, br'
-        }
-      }).expect('gzip | br | identity')
+          "Accept-Encoding": "gzip, br",
+        },
+      }).expect("gzip | br | identity")
     })
   })
-  describe('req.acceptsCharsets()', () => {
+  describe("req.acceptsCharsets()", () => {
     it('should detect "Accept-Charset" header', async () => {
       const app = runServer((req, res) => {
         const charsets = req.acceptsCharsets()
@@ -128,27 +128,27 @@ describe('Request extensions', () => {
         res.end(charsets[0])
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Accept-Charset': 'utf-8'
-        }
-      }).expect('utf-8')
+          "Accept-Charset": "utf-8",
+        },
+      }).expect("utf-8")
     })
-    it('should parse multiple values', async () => {
+    it("should parse multiple values", async () => {
       const app = runServer((req, res) => {
         const charsets = req.acceptsCharsets()
 
-        res.end((charsets as string[]).join(' | '))
+        res.end((charsets as string[]).join(" | "))
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Accept-Charset': 'utf-8, iso-8859-1'
-        }
-      }).expect('utf-8 | iso-8859-1')
+          "Accept-Charset": "utf-8, iso-8859-1",
+        },
+      }).expect("utf-8 | iso-8859-1")
     })
   })
-  describe('req.acceptsLanguages()', () => {
+  describe("req.acceptsLanguages()", () => {
     it('should detect "Accept-Language" header', async () => {
       const app = runServer((req, res) => {
         const languages = req.acceptsLanguages()
@@ -156,29 +156,29 @@ describe('Request extensions', () => {
         res.end(languages[0])
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Accept-Language': 'ru-RU'
-        }
-      }).expect('ru-RU')
+          "Accept-Language": "ru-RU",
+        },
+      }).expect("ru-RU")
     })
-    it('should parse multiple values', async () => {
+    it("should parse multiple values", async () => {
       const app = runServer((req, res) => {
         const languages = req.acceptsLanguages()
 
-        res.end((languages as string[]).join(' | '))
+        res.end((languages as string[]).join(" | "))
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Accept-Language': 'ru-RU, ru;q=0.9, en-US;q=0.8'
-        }
-      }).expect('ru-RU | ru | en-US')
+          "Accept-Language": "ru-RU, ru;q=0.9, en-US;q=0.8",
+        },
+      }).expect("ru-RU | ru | en-US")
     })
   })
 
-  describe('req.range', () => {
-    it('should return parsed ranges', async () => {
+  describe("req.range", () => {
+    it("should return parsed ranges", async () => {
       const app = runServer((req, res) => {
         const array = req.range(300)
         expect(array).toContainEqual({ end: 299, start: 0 })
@@ -186,78 +186,78 @@ describe('Request extensions', () => {
         res.end()
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          Range: 'bytes=0-1000'
-        }
+          Range: "bytes=0-1000",
+        },
       })
       expect.assertions(2)
     })
-    it('should cap to the given size', async () => {
+    it("should cap to the given size", async () => {
       const app = runServer((req, res) => {
         const size = 300
         expect((req.range(size) as Ranges)[0].end).toBe(size - 1)
         res.end()
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          Range: 'bytes=0-1000'
-        }
+          Range: "bytes=0-1000",
+        },
       })
       expect.assertions(1)
     })
-    it('should cap to the given size when open-ended', async () => {
+    it("should cap to the given size when open-ended", async () => {
       const app = runServer((req, res) => {
         const size = 300
         expect((req.range(size) as Ranges)[0].end).toBe(size - 1)
         res.end()
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          Range: 'bytes=0-'
-        }
+          Range: "bytes=0-",
+        },
       })
       expect.assertions(1)
     })
-    it('should have a .type', async () => {
+    it("should have a .type", async () => {
       const app = runServer((req, res) => {
-        expect((req.range(300) as Ranges).type).toBe('bytes')
+        expect((req.range(300) as Ranges).type).toBe("bytes")
         res.end()
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          Range: 'bytes=0-1000'
-        }
+          Range: "bytes=0-1000",
+        },
       })
       expect.assertions(1)
     })
-    it('should accept any type', async () => {
+    it("should accept any type", async () => {
       const app = runServer((req, res) => {
-        expect((req.range(300) as Ranges).type).toBe('any')
+        expect((req.range(300) as Ranges).type).toBe("any")
         res.end()
       })
 
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          Range: 'any=0-1000'
-        }
+          Range: "any=0-1000",
+        },
       })
       expect.assertions(1)
     })
-    it('should return undefined if no range', async () => {
+    it("should return undefined if no range", async () => {
       const app = runServer((req, res) => {
         expect(req.range(300)).toBeUndefined()
         res.end()
       })
 
-      await makeFetch(app)('/')
+      await makeFetch(app)("/")
       expect.assertions(1)
     })
-    describe('with options', () => {
-      it('should return combined ranges if combine set to true', async () => {
+    describe("with options", () => {
+      it("should return combined ranges if combine set to true", async () => {
         const app = runServer((req, res) => {
           const array = req.range(300, { combine: true })
           expect(array).toContainEqual({ end: 299, start: 0 })
@@ -265,14 +265,14 @@ describe('Request extensions', () => {
           res.end()
         })
 
-        await makeFetch(app)('/', {
+        await makeFetch(app)("/", {
           headers: {
-            Range: 'bytes=0-100, 101-500'
-          }
+            Range: "bytes=0-100, 101-500",
+          },
         })
         expect.assertions(2)
       })
-      it('should return separated ranges if combine set to false', async () => {
+      it("should return separated ranges if combine set to false", async () => {
         const app = runServer((req, res) => {
           const array = req.range(300, { combine: false })
           expect(array).toContainEqual({ end: 100, start: 0 })
@@ -281,71 +281,71 @@ describe('Request extensions', () => {
           res.end()
         })
 
-        await makeFetch(app)('/', {
+        await makeFetch(app)("/", {
           headers: {
-            Range: 'bytes=0-100, 101-500'
-          }
+            Range: "bytes=0-100, 101-500",
+          },
         })
         expect.assertions(3)
       })
     })
   })
-  describe('req.is', () => {
-    it('should return the given MIME type when matching', async () => {
+  describe("req.is", () => {
+    it("should return the given MIME type when matching", async () => {
       const app = runServer((req, res) => {
-        expect(req.is('text/plain')).toBe(true)
+        expect(req.is("text/plain")).toBe(true)
         res.end()
       })
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Content-Type': 'text/plain'
-        }
+          "Content-Type": "text/plain",
+        },
       })
       expect.assertions(1)
     })
-    it('should return false when not matching', async () => {
+    it("should return false when not matching", async () => {
       const app = runServer((req, res) => {
-        expect(req.is('text/other')).toBe(false)
+        expect(req.is("text/other")).toBe(false)
         res.end()
       })
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Content-Type': 'text/plain'
-        }
+          "Content-Type": "text/plain",
+        },
       })
       expect.assertions(1)
     })
-    it('should return false when Content-Type header is not present', async () => {
+    it("should return false when Content-Type header is not present", async () => {
       const app = runServer((req, res) => {
-        expect(req.is('text/other')).toBe(false)
+        expect(req.is("text/other")).toBe(false)
         res.end()
       })
-      await makeFetch(app)('/', {
-        headers: {}
+      await makeFetch(app)("/", {
+        headers: {},
       })
       expect.assertions(1)
     })
     it("Should lookup the MIME type with the extension given (e.g. req.is('json')", async () => {
       const app = runServer((req, res) => {
-        expect(req.is('json')).toBe(true)
+        expect(req.is("json")).toBe(true)
         res.end()
       })
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       })
       expect.assertions(1)
     })
-    it('should ignore charset', async () => {
+    it("should ignore charset", async () => {
       const app = runServer((req, res) => {
-        expect(req.is('text/html')).toBe(true)
+        expect(req.is("text/html")).toBe(true)
         res.end()
       })
-      await makeFetch(app)('/', {
+      await makeFetch(app)("/", {
         headers: {
-          'Content-Type': 'text/html; charset=UTF-8'
-        }
+          "Content-Type": "text/html; charset=UTF-8",
+        },
       })
 
       expect.assertions(1)

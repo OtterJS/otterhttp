@@ -1,7 +1,7 @@
-import type { IncomingMessage } from 'node:http'
-import { Accepts } from '@otterhttp/accepts'
+import type { IncomingMessage } from "node:http"
+import { Accepts } from "@otterhttp/accepts"
 
-type Request = Pick<IncomingMessage, 'headers'>
+type Request = Pick<IncomingMessage, "headers">
 
 type AcceptReturns = string | boolean | string[]
 

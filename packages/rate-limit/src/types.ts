@@ -1,18 +1,18 @@
-import type { IncomingHttpHeaders, ServerResponse } from 'node:http'
-import type { Writable } from 'node:stream'
+import type { IncomingHttpHeaders, ServerResponse } from "node:http"
+import type { Writable } from "node:stream"
 
 export type HasIncomingHeaders = { headers: IncomingHttpHeaders }
 
 export type HasOutgoingHeaders = Pick<
   ServerResponse,
-  | 'getHeader'
-  | 'getHeaders'
-  | 'setHeader'
-  | 'appendHeader'
-  | 'getHeaderNames'
-  | 'hasHeader'
-  | 'removeHeader'
-  | 'headersSent'
+  | "getHeader"
+  | "getHeaders"
+  | "setHeader"
+  | "appendHeader"
+  | "getHeaderNames"
+  | "hasHeader"
+  | "removeHeader"
+  | "headersSent"
 >
 
 export type HasStatus = {
@@ -30,7 +30,7 @@ export type HasReq<Request> = {
 
 export type HasWriteMethods = Pick<
   ServerResponse,
-  'writeContinue' | 'writeHead' | 'writeEarlyHints' | 'writeProcessing'
+  "writeContinue" | "writeHead" | "writeEarlyHints" | "writeProcessing"
 >
 
 export type RateLimitRequest = HasIncomingHeaders &
@@ -53,7 +53,7 @@ export type RateLimitResponse<Request extends RateLimitRequest = RateLimitReques
 
 export type RateLimitMiddleware<
   Req extends RateLimitRequest = RateLimitRequest,
-  Res extends RateLimitResponse<Req> = RateLimitResponse<Req>
+  Res extends RateLimitResponse<Req> = RateLimitResponse<Req>,
 > = {
   (req: Req, res: Res, next: () => void): Promise<void>
   resetKey: (key: string) => void

@@ -1,11 +1,11 @@
-import { App, type Request, type Response } from '@otterhttp/app'
-import { basePath, get, register } from 'express-decorators'
+import { App, type Request, type Response } from "@otterhttp/app"
+import { basePath, get, register } from "express-decorators"
 
-@basePath('/hello')
+@basePath("/hello")
 class TestController {
-  @get('/world')
+  @get("/world")
   sayHelloAction(_: Request, res: Response) {
-    res.send('<h1>Hello World</h1>')
+    res.send("<h1>Hello World</h1>")
   }
 }
 
@@ -13,4 +13,4 @@ const app = new App()
 
 register(app, new TestController())
 
-app.listen(3000, () => console.log('Started on http://localhost:3000'))
+app.listen(3000, () => console.log("Started on http://localhost:3000"))

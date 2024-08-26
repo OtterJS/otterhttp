@@ -1,5 +1,5 @@
-import { App } from '@otterhttp/app'
+import { App } from "@otterhttp/app"
 
-import sirv from 'sirv'
+import sirv from "sirv"
 
-new App().use('/files', sirv('static')).listen(3000)
+new App().use("/files", sirv("static")).listen(3000)

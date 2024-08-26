@@ -1,3 +1,3 @@
-import { build } from '../../config/build'
+import { build } from "../../config/build"
 
 export default build()
