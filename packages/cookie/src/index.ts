@@ -27,11 +27,11 @@ function tryDecode(str: string, decode: (str: string) => string) {
  */
 export function parse(
   str: string,
-  options?: {
+  options: {
     decode?: ((str: string) => string) | undefined
-  },
+  } = {},
 ): Record<string, string> {
-  const decode = options?.decode ?? decodeURIComponent
+  options.decode ??= decodeURIComponent
 
   const obj: Record<string, string> = {}
   const pairs = str.split(pairSplitRegExp)
@@ -49,7 +49,7 @@ export function parse(
     if ('"' === val[0]) val = val.slice(1, -1)
 
     // only assign once
-    if (obj[key] == null) obj[key] = tryDecode(val, decode)
+    if (obj[key] == null) obj[key] = tryDecode(val, options.decode)
   }
 
   return obj
@@ -66,45 +66,45 @@ export type SerializeOptions = Partial<{
   expires: Date
 }>
 
-export function serialize(name: string, val: string, opt: SerializeOptions = {}): string {
-  if (!opt.encode) opt.encode = encodeURIComponent
+export function serialize(name: string, val: string, options: SerializeOptions = {}): string {
+  options.encode ??= encodeURIComponent
 
   if (!fieldContentRegExp.test(name)) throw new TypeError("argument name is invalid")
 
-  const value = opt.encode(val)
+  const value = options.encode(val)
 
   if (value && !fieldContentRegExp.test(value)) throw new TypeError("argument val is invalid")
 
   let str = `${name}=${value}`
 
-  if (null != opt.maxAge) {
-    const maxAge = opt.maxAge - 0
+  if (null != options.maxAge) {
+    const maxAge = options.maxAge - 0
 
     if (Number.isNaN(maxAge) || !Number.isFinite(maxAge)) throw new TypeError("option maxAge is invalid")
 
     str += `; Max-Age=${Math.floor(maxAge)}`
   }
 
-  if (opt.domain) {
-    if (!fieldContentRegExp.test(opt.domain)) throw new TypeError("option domain is invalid")
+  if (options.domain) {
+    if (!fieldContentRegExp.test(options.domain)) throw new TypeError("option domain is invalid")
 
-    str += `; Domain=${opt.domain}`
+    str += `; Domain=${options.domain}`
   }
 
-  if (opt.path) {
-    if (!fieldContentRegExp.test(opt.path)) throw new TypeError("option path is invalid")
+  if (options.path) {
+    if (!fieldContentRegExp.test(options.path)) throw new TypeError("option path is invalid")
 
-    str += `; Path=${opt.path}`
+    str += `; Path=${options.path}`
   }
 
-  if (opt.expires) str += `; Expires=${opt.expires.toUTCString()}`
+  if (options.expires) str += `; Expires=${options.expires.toUTCString()}`
 
-  if (opt.httpOnly) str += "; HttpOnly"
+  if (options.httpOnly) str += "; HttpOnly"
 
-  if (opt.secure) str += "; Secure"
+  if (options.secure) str += "; Secure"
 
-  if (opt.sameSite) {
-    const sameSite = typeof opt.sameSite === "string" ? opt.sameSite.toLowerCase() : opt.sameSite
+  if (options.sameSite) {
+    const sameSite = typeof options.sameSite === "string" ? options.sameSite.toLowerCase() : options.sameSite
 
     switch (sameSite) {
       case true:
