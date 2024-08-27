@@ -4,8 +4,9 @@ import type { HasIncomingHeaders, HasOutgoingHeaders, HasReq } from "./types"
 
 type SetCookieResponse = HasOutgoingHeaders & HasReq<HasIncomingHeaders>
 export type SetCookieOptions = cookie.SerializeOptions & {
-  sign?: ((cookieValue: string) => string) | undefined
+  sign?: ((cookieValue: string) => string) | undefined | null
 }
+
 export function setCookie(res: SetCookieResponse, name, value: string, options: SetCookieOptions = {}): void {
   if (options.maxAge != null) {
     options.expires = new Date(Date.now() + options.maxAge)

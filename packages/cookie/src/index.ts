@@ -55,16 +55,16 @@ export function parse(
   return obj
 }
 
-export type SerializeOptions = Partial<{
-  encode: (str: string) => string
-  maxAge: number
-  domain: string
-  path: string
-  httpOnly: boolean
-  secure: boolean
-  sameSite: boolean | "Strict" | "strict" | "Lax" | "lax" | "None" | "none" | string
-  expires: Date
-}>
+export type SerializeOptions = {
+  encode?: ((str: string) => string) | null | undefined
+  maxAge?: number | null | undefined
+  domain?: string | null | undefined
+  path?: string | null | undefined
+  httpOnly?: boolean | null | undefined
+  secure?: boolean | null | undefined
+  sameSite?: boolean | "Strict" | "strict" | "Lax" | "lax" | "None" | "none" | string | null | undefined
+  expires?: Date | null | undefined
+}
 
 export function serialize(name: string, val: string, options: SerializeOptions = {}): string {
   options.encode ??= encodeURIComponent

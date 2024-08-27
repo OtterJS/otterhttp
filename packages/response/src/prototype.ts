@@ -119,7 +119,19 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
 
   cookie(name: string, value: string, options?: SetCookieOptions): this {
     if (options == null) options = this.appSettings?.setCookieOptions
-    else options = Object.assign({}, this.appSettings?.setCookieOptions, options)
+    else {
+      options = [this.appSettings?.setCookieOptions, options].reduce<SetCookieOptions>(
+        (optionsAccumulator, optionsSource) => {
+          if (optionsSource == null) return optionsAccumulator
+          for (const [key, value] of Object.entries(optionsSource)) {
+            if (value === undefined) continue
+            optionsAccumulator[key] = value
+          }
+          return optionsAccumulator
+        },
+        {},
+      )
+    }
     setCookie(this, name, value, options)
     return this
   }
