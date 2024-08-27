@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/jsonp",
-  "version": "3.0.11",
+  "version": "3.0.12",
   "type": "module",
   "description": "JSONP response middleware",
   "homepage": "https://otterhttp.lordfirespeed.dev",
