@@ -4,8 +4,8 @@ import type { CookieParsingSettings, HasHeaders } from "./types"
 
 export class Cookie {
   private _value: string
-  private _decodedValue: string | undefined
-  private _decodingError: unknown | undefined
+  private _unsignedValue: string | undefined
+  private _unsigningError: unknown | undefined
   private _signed: boolean
 
   constructor(value: string, signed = false) {
@@ -14,8 +14,8 @@ export class Cookie {
   }
 
   get value(): string {
-    if (this._decodingError != null) throw this._decodingError
-    if (this._signed) return this._decodedValue as string
+    if (this._unsigningError != null) throw this._unsigningError
+    if (this._signed) return this._unsignedValue as string
     return this._value
   }
 
@@ -26,24 +26,24 @@ export class Cookie {
   /**
    * @internal
    */
-  decode(decoder: (encodedValue: string) => string): void {
+  unsign(unsigner: (encodedValue: string) => string): void {
     try {
-      this._decodedValue = decoder(this._value)
+      this._unsignedValue = unsigner(this._value)
     } catch (e) {
-      this._decodingError = e
+      this._unsigningError = e
     }
     this._signed = true
   }
 }
 
-function decodeCookies(cookies: Record<string, Cookie>, options?: CookieParsingSettings) {
+function unsignCookies(cookies: Record<string, Cookie>, options?: CookieParsingSettings) {
   if (options == null) return
-  if (options.cookieDecoder == null) return
-  if (options.encodedCookieMatcher == null) return
+  if (options.cookieUnsigner == null) return
+  if (options.signedCookieMatcher == null) return
 
   for (const [cookieName, cookie] of Object.entries(cookies)) {
-    if (!options.encodedCookieMatcher(cookie.value)) continue
-    cookies[cookieName].decode(options.cookieDecoder)
+    if (!options.signedCookieMatcher(cookie.value)) continue
+    cookies[cookieName].unsign(options.cookieUnsigner)
   }
 }
 
@@ -52,12 +52,12 @@ export function parseCookieHeader(req: HasHeaders, options?: CookieParsingSettin
     return {}
   }
 
-  const rawCookieJar: Record<string, string> = parseCookie(req.headers.cookie)
+  const rawCookieJar: Record<string, string> = parseCookie(req.headers.cookie, { decode: options?.cookieDecoder })
   const cookieJar: Record<string, Cookie> = {}
   for (const [cookieName, cookieValue] of Object.entries(rawCookieJar)) {
     cookieJar[cookieName] = new Cookie(cookieValue)
   }
-  decodeCookies(cookieJar, options)
+  unsignCookies(cookieJar, options)
 
   return cookieJar
 }

@@ -14,24 +14,30 @@ type ExtraHeaders = {
 
 export type Headers = Omit<IncomingHttpHeaders, keyof ExtraHeaders> & ExtraHeaders
 
-export type CookieParsingSettings =
+export type CookieParsingSettings = {
+  /**
+   * Transform function used to decode all cookies from ASCII.
+   * @default {@link decodeURIComponent}
+   */
+  cookieDecoder?: (cookie: string) => string
+} & (
   | {
       /**
-       * Predicate used to determine whether a cookie is 'encoded'.
-       * @see cookieDecoder
+       * Predicate used to determine whether a cookie is signed.
+       * @see cookieUnsigner
        */
-      encodedCookieMatcher: (cookie: string) => boolean
+      signedCookieMatcher: (cookie: string) => boolean
 
       /**
-       * Transform function used to decode encoded cookies.
-       * @see encodedCookieMatcher
+       * Transform function used to unsign signed cookies.
+       * @see signedCookieMatcher
        */
-      cookieDecoder: (encodedCookie: string) => string
+      cookieUnsigner: (signedCookie: string) => string
     }
   | {
       /**
        * Predicate used to determine whether a cookie is 'encoded'.
-       * @see cookieDecoder
+       * @see cookieUnsigner
        */
       encodedCookieMatcher?: undefined
 
@@ -39,8 +45,9 @@ export type CookieParsingSettings =
        * Transform function used to decode encoded cookies.
        * @see encodedCookieMatcher
        */
-      cookieDecoder?: undefined
+      cookieUnsigner?: undefined
     }
+)
 
 export type RequestAppSettings = {
   cookieParsing?: CookieParsingSettings
