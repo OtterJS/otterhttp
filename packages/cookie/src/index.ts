@@ -27,12 +27,12 @@ function tryDecode(str: string, decode: (str: string) => string) {
  */
 export function parse(
   str: string,
-  options: {
-    decode: (str: string) => string
-  } = {
-    decode: decodeURIComponent,
+  options?: {
+    decode?: ((str: string) => string) | undefined
   },
 ): Record<string, string> {
+  const decode = options?.decode ?? decodeURIComponent
+
   const obj: Record<string, string> = {}
   const pairs = str.split(pairSplitRegExp)
 
@@ -49,7 +49,7 @@ export function parse(
     if ('"' === val[0]) val = val.slice(1, -1)
 
     // only assign once
-    if (obj[key] == null) obj[key] = tryDecode(val, options.decode)
+    if (obj[key] == null) obj[key] = tryDecode(val, decode)
   }
 
   return obj
