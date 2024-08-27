@@ -3,7 +3,9 @@ import * as cookie from "@otterhttp/cookie"
 import type { HasIncomingHeaders, HasOutgoingHeaders, HasReq } from "./types"
 
 type SetCookieResponse = HasOutgoingHeaders & HasReq<HasIncomingHeaders>
-export type SetCookieOptions = cookie.SerializeOptions
+export type SetCookieOptions = cookie.SerializeOptions & {
+  sign?: ((cookieValue: string) => string) | undefined
+}
 export function setCookie(res: SetCookieResponse, name, value: string, options: SetCookieOptions = {}): void {
   if (options.maxAge != null) {
     options.expires = new Date(Date.now() + options.maxAge)
@@ -11,6 +13,10 @@ export function setCookie(res: SetCookieResponse, name, value: string, options: 
   }
 
   if (options.path == null) options.path = "/"
+
+  if (options.sign != null) {
+    value = options.sign(value)
+  }
 
   res.appendHeader("set-cookie", cookie.serialize(name, value, options))
 }
