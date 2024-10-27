@@ -51,7 +51,7 @@ describe("Response extensions", () => {
   describe("res.setHeaders(fields)", () => {
     it("maps keys to values", async () => {
       const app = runServer((_, res) => {
-        res.setHeaders({ foo: "bar" })
+        res.setHeaders(new Headers({ foo: "bar" }))
         res.end()
       })
 
