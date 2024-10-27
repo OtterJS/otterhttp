@@ -11,13 +11,12 @@ import {
   appendResponseVaryHeader,
   setResponseContentTypeHeader,
   setResponseHeaderSpecialCases,
-  setResponseHeaders,
   setResponseLinkHeader,
   setResponseLocationHeader,
 } from "./headers"
 import { validatePreconditions } from "./preconditions"
 import { redirect } from "./redirect"
-import type { AppendHeaders, Headers, Input, ResponseAppSettings } from "./types"
+import type { AppendHeaders, Input, LegacyHeaders, ResponseAppSettings } from "./types"
 
 export class Response<Req extends Request<unknown> = Request<unknown>> extends ServerResponse<Req> {
   // assigned by App
@@ -34,20 +33,18 @@ export class Response<Req extends Request<unknown> = Request<unknown>> extends S
   }
 
   // header-related overrides/extensions
-  getHeader<HeaderName extends string>(headerName: HeaderName): Headers[Lowercase<HeaderName>] {
+  getHeader<HeaderName extends string>(headerName: HeaderName): LegacyHeaders[Lowercase<HeaderName>] {
     return super.getHeader(headerName)
   }
 
-  setHeader<HeaderName extends string>(headerName: HeaderName, value: Input<Headers[Lowercase<HeaderName>]>): this {
+  setHeader<HeaderName extends string>(
+    headerName: HeaderName,
+    value: Input<LegacyHeaders[Lowercase<HeaderName>]>,
+  ): this {
     const lowerCaseHeaderName = headerName.toLowerCase() as Lowercase<HeaderName>
     const specialCase = setResponseHeaderSpecialCases.get<Lowercase<HeaderName>>(lowerCaseHeaderName)
     if (specialCase != null) value = specialCase(this, value)
     super.setHeader(headerName, value)
-    return this
-  }
-
-  setHeaders(headers: Headers): this {
-    setResponseHeaders(this, headers)
     return this
   }
 

@@ -15,6 +15,7 @@ export type HasOutgoingHeaders = Pick<
   | "getHeader"
   | "getHeaders"
   | "setHeader"
+  | "setHeaders"
   | "appendHeader"
   | "getHeaderNames"
   | "hasHeader"
@@ -44,10 +45,10 @@ type ExtraHeaders = {
 // https://stackoverflow.com/a/76616671
 type Omit<T, K extends PropertyKey> = { [P in keyof T as Exclude<P, K>]: T[P] }
 
-export type Headers = Omit<OutgoingHttpHeaders, keyof ExtraHeaders> & ExtraHeaders
+export type LegacyHeaders = Omit<OutgoingHttpHeaders, keyof ExtraHeaders> & ExtraHeaders
 
 export type AppendHeaders = {
-  [Key in keyof Headers]: string[] extends Headers[Key] ? string | readonly string[] : never
+  [Key in keyof LegacyHeaders]: string[] extends LegacyHeaders[Key] ? string | readonly string[] : never
 }
 
 export type Input<T> = Exclude<T, undefined>

@@ -1,10 +1,10 @@
-import type { HasOutgoingHeaders, Headers, Input } from "../types"
+import type { HasOutgoingHeaders, Input, LegacyHeaders } from "../types"
 import { ensureCharsetOnPlaintextTypes } from "../util"
 
 type ResponseHeaderSetter<HeaderName extends string> = (
   res: HasOutgoingHeaders,
-  value: Input<Headers[HeaderName]>,
-) => Input<Headers[HeaderName]>
+  value: Input<LegacyHeaders[HeaderName]>,
+) => Input<LegacyHeaders[HeaderName]>
 
 class ResponseHeaderSpecialCasesMap {
   private map: Map<string, unknown>
