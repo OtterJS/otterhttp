@@ -9,7 +9,11 @@ import { noneMatch } from "./if-none-match"
 import { rangePrecondition } from "./if-range"
 import { isUnmodifiedSince } from "./if-unmodified-since"
 
-function clearPreconditionHeadersFromResponse(response: HasOutgoingHeaders) {
+function clearPreconditionHeaders(request: HasIncomingHeaders, response: HasOutgoingHeaders) {
+  request.headers["if-match"] = undefined
+  request.headers["if-unmodified-since"] = undefined
+  request.headers["if-none-match"] = undefined
+  request.headers["if-modified-since"] = undefined
   response.removeHeader("etag")
   response.removeHeader("last-modified")
 }
@@ -49,7 +53,8 @@ export function validatePreconditions(
   if (ifMatch != null) {
     if (!Object.hasOwnProperty.call(current, "etag")) current.etag = res.getHeader("etag")
     if (!someMatch(current.etag, ifMatch)) {
-      clearPreconditionHeadersFromResponse(res)
+      res.req.headers["if-match"] = undefined
+      clearPreconditionHeaders(res.req, res)
       throw new ClientError("If-Match Precondition Failed", {
         statusCode: HttpStatus.PreconditionFailed,
         code: "ERR_PRECONDITION_FAILED_IF_MATCH",
@@ -66,7 +71,7 @@ export function validatePreconditions(
   if (ifMatch == null && ifUnmodifiedSince != null) {
     if (!Object.hasOwnProperty.call(current, "lastModified")) current.lastModified = res.getHeader("last-modified")
     if (!isUnmodifiedSince(current.lastModified, ifUnmodifiedSince)) {
-      clearPreconditionHeadersFromResponse(res)
+      clearPreconditionHeaders(res.req, res)
       throw new ClientError("If-Unmodified-Since Precondition Failed", {
         statusCode: HttpStatus.PreconditionFailed,
         code: "ERR_PRECONDITION_FAILED_IF_UNMODIFIED_SINCE",
@@ -84,7 +89,7 @@ export function validatePreconditions(
     const failed = !noneMatch(current.etag, ifNoneMatch)
 
     if (failed && (method === "GET" || method === "HEAD")) {
-      clearPreconditionHeadersFromResponse(res)
+      clearPreconditionHeaders(res.req, res)
       throw new NotModifiedError("If-None-Match Precondition Failed", {
         code: "ERR_PRECONDITION_FAILED_IF_NONE_MATCH",
         expected: true,
@@ -92,7 +97,7 @@ export function validatePreconditions(
     }
 
     if (failed) {
-      clearPreconditionHeadersFromResponse(res)
+      clearPreconditionHeaders(res.req, res)
       throw new ClientError("If-None-Match Precondition Failed", {
         statusCode: HttpStatus.PreconditionFailed,
         code: "ERR_PRECONDITION_FAILED_IF_NONE_MATCH",
@@ -109,7 +114,7 @@ export function validatePreconditions(
   if ((method === "GET" || method === "HEAD") && ifNoneMatch == null && ifModifiedSince != null) {
     if (!Object.hasOwnProperty.call(current, "lastModified")) current.lastModified = res.getHeader("last-modified")
     if (!hasBeenModifiedSince(current.lastModified, ifModifiedSince)) {
-      clearPreconditionHeadersFromResponse(res)
+      clearPreconditionHeaders(res.req, res)
       throw new NotModifiedError("If-Modified-Since Precondition Failed", {
         code: "ERR_PRECONDITION_FAILED_IF_MODIFIED_SINCE",
         expected: true,
