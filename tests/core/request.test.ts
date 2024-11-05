@@ -3,10 +3,10 @@ import { makeFetch } from "supertest-fetch"
 import { assert, afterEach, describe, expect, it, vi } from "vitest"
 
 import { App, type Request, type Response } from "@/packages/app/src"
+import * as reqGetHeader from "@/packages/request/src/get-header"
 import { InitAppAndTest } from "@/test_helpers/initAppAndTest"
-import * as reqGetHeader from "../../packages/request/src/get-header"
 
-vi.mock<typeof reqGetHeader>(import("../../packages/request/src/get-header"), async (importOriginal) => {
+vi.mock<typeof reqGetHeader>(import("@/packages/request/src/get-header"), async (importOriginal) => {
   const module = await importOriginal()
 
   return {
@@ -172,8 +172,8 @@ describe("Request properties", () => {
   describe("Network extensions", () => {
     const ipHandler = (req, res) => {
       res.json({
-        ip: req.ip,
-        ips: req.ips,
+        ip: req.ip.toString(),
+        ips: req.ips.map((ip) => ip.toString()),
       })
     }
 
@@ -183,7 +183,7 @@ describe("Request properties", () => {
       const agent = new Agent({ family: 4 }) // ensure IPv4 only
       await fetch("/", { agent }).expect(200, {
         ip: "127.0.0.1",
-        ips: ["::ffff:127.0.0.1"],
+        ips: ["127.0.0.1"],
       })
     })
     if (process.env.GITHUB_ACTION) {
@@ -204,7 +204,7 @@ describe("Request properties", () => {
       const agent = new Agent({ family: 4 }) // ensure IPv4 only
       await fetch("/", { agent, headers: { "x-forwarded-for": "10.0.0.1, 10.0.0.2, 127.0.0.2" } }).expect(200, {
         ip: "127.0.0.1",
-        ips: ["::ffff:127.0.0.1"],
+        ips: ["127.0.0.1"],
       })
     })
     it('IPv4 req.ip & req.ips support trusted proxies with "trust proxy"', async () => {
@@ -214,7 +214,7 @@ describe("Request properties", () => {
       const agent = new Agent({ family: 4 }) // ensure IPv4 only
       await fetch("/", { agent, headers: { "x-forwarded-for": "10.0.0.1, 10.0.0.2, 127.0.0.2" } }).expect(200, {
         ip: "127.0.0.2",
-        ips: ["::ffff:127.0.0.1", "127.0.0.2"],
+        ips: ["127.0.0.1", "127.0.0.2"],
       })
     })
     it("req.protocol is http by default", async () => {

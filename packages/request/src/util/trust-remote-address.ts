@@ -1,9 +1,8 @@
 import { type Trust, compile } from "@otterhttp/proxy-address"
 
-import type { HasSocket } from "../types"
+import type { HasIpAddresses } from "../types"
 
-export const trustRemoteAddress = ({ socket }: HasSocket, trust: Trust): boolean => {
-  const val = socket.remoteAddress
+export const trustRemoteAddress = ({ ips }: HasIpAddresses, trust: Trust): boolean => {
   if (typeof trust !== "function") trust = compile(trust)
-  return trust(val, 0)
+  return trust(ips[0], 0)
 }

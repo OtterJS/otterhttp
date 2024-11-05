@@ -2,7 +2,7 @@ import type { Trust } from "@otterhttp/proxy-address"
 
 import { isIP } from "node:net"
 import { getRequestHeader } from "./get-header"
-import type { HasHeaders, HasSocket } from "./types"
+import type { HasHeaders, HasIpAddresses, HasSocket } from "./types"
 import { trustRemoteAddress } from "./util/trust-remote-address"
 
 export type Host = {
@@ -38,7 +38,7 @@ const getDefaultHeaderHostString = (req: HasHeaders): string | undefined => {
   return normalizeHostString(host)
 }
 
-const getHostString = (req: HasHeaders & HasSocket, trust: Trust): string | undefined => {
+const getHostString = (req: HasHeaders & HasIpAddresses, trust: Trust): string | undefined => {
   if (trustRemoteAddress(req, trust)) {
     const forwardedHost = getForwardedHeaderHostString(req)
     if (forwardedHost) return forwardedHost

@@ -1,6 +1,9 @@
 import type { IncomingHttpHeaders } from "node:http"
 import type { Socket } from "node:net"
 
+import type { IPv4, IPv6 } from "@otterhttp/proxy-address"
+
+export type HasIpAddresses = { ips: Array<IPv4 | IPv6 | undefined> }
 export type HasHeaders = { headers: IncomingHttpHeaders }
 export type HasSocket = { socket: Socket }
 

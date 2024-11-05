@@ -16,6 +16,7 @@ type Subnet = {
 const DIGIT_REGEXP = /^[0-9]+$/
 const isIp = ipaddr.isValid
 const parseIp = ipaddr.parse
+
 /**
  * Pre-defined IP ranges.
  */
@@ -57,20 +58,21 @@ const trustNone: TrustFunction = () => false
  */
 function allAddresses(req: Req, trust?: Trust): Array<IPv4 | IPv6 | undefined> {
   // get addresses
+  const addressGenerator = forwarded(req)
 
-  const addresses = forwarded(req)
-
-  if (trust == null) return addresses
-
+  if (trust == null) return Array.from(addressGenerator)
   if (typeof trust !== "function") trust = compile(trust)
 
-  for (let i = 0; i < addresses.length - 1; i++) {
-    if (trust(addresses[i], i)) continue
-    addresses.length = i + 1 // https://stackoverflow.com/a/26568611
-    break
+  let i = 0
+  const addresses: Array<IPv4 | IPv6 | undefined> = []
+  for (const address of addressGenerator) {
+    addresses.push(address)
+    if (!trust(address, i)) break
+    i += 1
   }
   return addresses
 }
+
 /**
  * Compile argument into trust function.
  *
@@ -94,6 +96,7 @@ function compile(val: string | number | string[]): TrustFunction {
   }
   return compileTrust(compileRangeSubnets(trust))
 }
+
 /**
  * Compile 'hops' number into trust function.
  *
@@ -109,6 +112,7 @@ function compileHopsTrust(hops: number): TrustFunction {
 function compileRangeSubnets(arr: string[]) {
   return arr.map((ip) => parseIPNotation(ip))
 }
+
 /**
  * Compile range subnet array into trust function.
  *
@@ -119,6 +123,7 @@ function compileTrust(rangeSubnets: Subnet[]): TrustFunction {
   const len = rangeSubnets.length
   return len === 0 ? trustNone : len === 1 ? trustSingle(rangeSubnets[0]) : trustMulti(rangeSubnets)
 }
+
 /**
  * Parse IP notation string into range subnet.
  *
@@ -148,6 +153,7 @@ export function parseIPNotation(note: string): Subnet {
   if (range == null || range <= 0 || range > max) throw new TypeError(`invalid range on address: ${note}`)
   return { ip, range }
 }
+
 /**
  * Parse netmask string into CIDR range.
  *
@@ -158,6 +164,7 @@ function parseNetmask(netmask: string) {
   const ip = parseIp(netmask)
   return ip.kind() === "ipv4" ? ip.prefixLengthFromSubnetMask() : null
 }
+
 /**
  * Determine address of proxied request.
  *
@@ -196,6 +203,7 @@ function trustMulti(subnets: Subnet[]): TrustFunction {
     return false
   }
 }
+
 /**
  * Compile trust function for single subnet.
  *

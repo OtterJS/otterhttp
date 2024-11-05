@@ -47,13 +47,13 @@ export class Request<Body = unknown> extends IncomingMessage {
   populate({ trust, subdomainOffset }: { trust: Trust; subdomainOffset: number | undefined }) {
     this._acceptsMeta = new Accepts(this)
     this._query = getQueryParams(this.url)
+    this._ip = getIP(this, trust)
+    this._ips = getIPs(this, trust)
     this._protocol = getProtocol(this, trust)
     const host = getHost(this, trust)
     this._hostname = host.hostname
     this._port = host.port
     this._subdomains = getSubdomains(host, subdomainOffset)
-    this._ip = getIP(this, trust)
-    this._ips = getIPs(this, trust)
   }
 
   getHeader<HeaderName extends Lowercase<string>>(header: HeaderName): Headers[HeaderName] {
