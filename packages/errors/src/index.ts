@@ -3,12 +3,15 @@ import ModuleError from "module-error"
 
 import { HttpStatus, type StatusCode, isValidStatusCode, statusMessages } from "./status-codes"
 
+type ExtraLiteral = string | number | boolean | null | undefined | { [property: string]: ExtraLiteral } | ExtraLiteral[]
+
 type ModuleErrorOptions = ConstructorParameters<typeof ModuleError>[1]
 export type HttpErrorOptions = ModuleErrorOptions & {
   statusCode?: StatusCode
   statusMessage?: string
   exposeMessage?: boolean
   headers?: OutgoingHttpHeaders
+  extra?: Record<string, ExtraLiteral>
 }
 
 export abstract class HttpError extends ModuleError {
@@ -16,6 +19,7 @@ export abstract class HttpError extends ModuleError {
   statusMessage: string
   exposeMessage: boolean
   headers: OutgoingHttpHeaders
+  extra: Record<string, ExtraLiteral>
 
   static {
     HttpError.prototype.name = "HttpError"
@@ -36,12 +40,14 @@ export abstract class HttpError extends ModuleError {
       if (options.statusMessage != null) this.statusMessage = options.statusMessage
       if (options.exposeMessage != null) this.exposeMessage = options.exposeMessage
       if (options.headers != null) this.headers = options.headers
+      if (options.extra != null) this.extra = options.extra
     }
 
     this.statusCode ??= HttpStatus.InternalServerError
     this.statusMessage ??= statusMessages[this.statusCode]
     this.exposeMessage ??= this.statusCode < 500
     this.headers ??= {}
+    this.extra ??= {}
   }
 }
 
