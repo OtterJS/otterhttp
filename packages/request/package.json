@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/request",
-  "version": "3.4.2",
+  "version": "3.4.3",
   "type": "module",
   "description": "request extensions for tinyhttp",
   "homepage": "https://otterhttp.lordfirespeed.dev",
