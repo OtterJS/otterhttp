@@ -56,7 +56,7 @@ const getHostString = (req: HasHeaders & HasIpAddresses, trust: Trust): string |
   return authorityHost ?? defaultHost ?? undefined
 }
 
-export const getHost = (req: HasHeaders & HasSocket, trust: Trust): Host => {
+export const getHost = (req: HasHeaders & HasIpAddresses, trust: Trust): Host => {
   const host = getHostString(req, trust)
   if (!host) throw new Error("Request does not include valid host information")
 
