@@ -186,18 +186,15 @@ describe("Request properties", () => {
         ips: ["127.0.0.1"],
       })
     })
-    if (process.env.GITHUB_ACTION) {
-      // skip ipv6 tests only for github ci/cd
-      it("IPv6 req.ip & req.ips is being parsed properly", async () => {
-        const { fetch } = InitAppAndTest(ipHandler)
+    it("IPv6 req.ip & req.ips is being parsed properly", async () => {
+      const { fetch } = InitAppAndTest(ipHandler)
 
-        const agent = new Agent({ family: 6 }) // ensure IPv6 only
-        await fetch("/", { agent }).expect(200, {
-          ip: "1",
-          ips: ["::1"],
-        })
+      const agent = new Agent({ family: 6 }) // ensure IPv6 only
+      await fetch("/", { agent }).expect(200, {
+        ip: "::1",
+        ips: ["::1"],
       })
-    }
+    })
     it("IPv4 req.ip & req.ips do not trust proxies by default", async () => {
       const { fetch } = InitAppAndTest(ipHandler)
 
