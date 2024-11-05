@@ -125,7 +125,11 @@ importers:
 
   packages/etag: {}
 
-  packages/forwarded: {}
+  packages/forwarded:
+    dependencies:
+      ipaddr.js:
+        specifier: ^2.2.0
+        version: 2.2.0
 
   packages/ip-filter:
     dependencies:

@@ -5,7 +5,7 @@ import ipaddr, { type IPv6, type IPv4 } from "ipaddr.js"
 type Req = Pick<IncomingMessage, "headers" | "socket">
 
 export type TrustParameter = string | number | string[]
-export type TrustFunction = (addr: string | undefined, i: number) => boolean
+export type TrustFunction = (addr: IPv4 | IPv6 | undefined, i: number) => boolean
 export type Trust = TrustFunction | TrustParameter
 
 type Subnet = {
@@ -14,8 +14,8 @@ type Subnet = {
 }
 
 const DIGIT_REGEXP = /^[0-9]+$/
-const isip = ipaddr.isValid
-const parseip = ipaddr.parse
+const isIp = ipaddr.isValid
+const parseIp = ipaddr.parse
 /**
  * Pre-defined IP ranges.
  */
@@ -55,20 +55,21 @@ const trustNone: TrustFunction = () => false
  * @param req
  * @param trust
  */
-function allAddresses(req: Req, trust?: Trust): Array<string | undefined> {
+function allAddresses(req: Req, trust?: Trust): Array<IPv4 | IPv6 | undefined> {
   // get addresses
 
-  const addrs = forwarded(req)
+  const addresses = forwarded(req)
 
-  if (trust == null) return addrs
+  if (trust == null) return addresses
 
   if (typeof trust !== "function") trust = compile(trust)
 
-  for (let i = 0; i < addrs.length - 1; i++) {
-    if (trust(addrs[i], i)) continue
-    addrs.length = i + 1
+  for (let i = 0; i < addresses.length - 1; i++) {
+    if (trust(addresses[i], i)) continue
+    addresses.length = i + 1 // https://stackoverflow.com/a/26568611
+    break
   }
-  return addrs
+  return addresses
 }
 /**
  * Compile argument into trust function.
@@ -128,9 +129,9 @@ export function parseIPNotation(note: string): Subnet {
   const pos = note.lastIndexOf("/")
   const str = pos !== -1 ? note.substring(0, pos) : note
 
-  if (!isip(str)) throw new TypeError(`invalid IP address: ${str}`)
+  if (!isIp(str)) throw new TypeError(`invalid IP address: ${str}`)
 
-  let ip = parseip(str)
+  let ip = parseIp(str)
   const max = ip.kind() === "ipv6" ? 128 : 32
 
   if (pos === -1) {
@@ -142,7 +143,7 @@ export function parseIPNotation(note: string): Subnet {
   let range: number | null = null
 
   if (DIGIT_REGEXP.test(rangeString)) range = Number.parseInt(rangeString, 10)
-  else if (ip.kind() === "ipv4" && isip(rangeString)) range = parseNetmask(rangeString)
+  else if (ip.kind() === "ipv4" && isIp(rangeString)) range = parseNetmask(rangeString)
 
   if (range == null || range <= 0 || range > max) throw new TypeError(`invalid range on address: ${note}`)
   return { ip, range }
@@ -154,7 +155,7 @@ export function parseIPNotation(note: string): Subnet {
  * @private
  */
 function parseNetmask(netmask: string) {
-  const ip = parseip(netmask)
+  const ip = parseIp(netmask)
   return ip.kind() === "ipv4" ? ip.prefixLengthFromSubnetMask() : null
 }
 /**
@@ -164,21 +165,19 @@ function parseNetmask(netmask: string) {
  * @param trust
  * @public
  */
-function proxyAddress(req: Req, trust: Trust): string | undefined {
+function proxyAddress(req: Req, trust: Trust): IPv4 | IPv6 | undefined {
   if (trust == null) throw new TypeError("trust argument cannot be null-ish")
-  const addrs = allAddresses(req, trust)
+  const addresses = allAddresses(req, trust)
 
-  return addrs[addrs.length - 1]
+  return addresses[addresses.length - 1]
 }
 
 /**
  * Compile trust function for multiple subnets.
  */
 function trustMulti(subnets: Subnet[]): TrustFunction {
-  return function trust(addr: string | undefined) {
-    if (addr == null) return false
-    if (!isip(addr)) return false
-    const ip = parseip(addr)
+  return function trust(ip: IPv4 | IPv6 | undefined) {
+    if (ip == null) return false
     let ipconv: IPv4 | IPv6 | null = null
     const kind = ip.kind()
     for (let i = 0; i < subnets.length; i++) {
@@ -205,10 +204,8 @@ function trustMulti(subnets: Subnet[]): TrustFunction {
 function trustSingle(subnet: Subnet): TrustFunction {
   const subnetKind = subnet.ip.kind()
   const subnetIsIPv4 = subnetKind === "ipv4"
-  return function trust(addr: string | undefined) {
-    if (addr == null) return false
-    if (!isip(addr)) return false
-    let ip = parseip(addr)
+  return function trust(ip: IPv4 | IPv6 | undefined) {
+    if (ip == null) return false
     const kind = ip.kind()
     if (kind !== subnetKind) {
       if (subnetIsIPv4 && !(ip as IPv6).isIPv4MappedAddress()) return false
@@ -220,3 +217,4 @@ function trustSingle(subnet: Subnet): TrustFunction {
 }
 
 export { allAddresses, compile, proxyAddress }
+export type { IPv4, IPv6 }

@@ -1,12 +1,13 @@
 import type { IncomingMessage } from "node:http"
+import ipaddr, { type IPv6, type IPv4 } from "ipaddr.js"
 
 /**
  * Get all addresses in the request, using the `X-Forwarded-For` header.
  */
-export function forwarded(req: Pick<IncomingMessage, "headers" | "socket">): Array<string | undefined> {
+export function forwarded(req: Pick<IncomingMessage, "headers" | "socket">): Array<IPv4 | IPv6 | undefined> {
   // simple header parsing
-  const proxyAddresses: (string | undefined)[] = parse((req.headers["x-forwarded-for"] as string) || "")
-  const socketAddr = req.socket.remoteAddress
+  const proxyAddresses: (IPv4 | IPv6 | undefined)[] = parse((req.headers["x-forwarded-for"] as string) || "")
+  const socketAddr = req.socket.remoteAddress != null ? ipaddr.parse(req.socket.remoteAddress) : undefined
 
   // return all addresses
   proxyAddresses.unshift(socketAddr)
@@ -14,9 +15,9 @@ export function forwarded(req: Pick<IncomingMessage, "headers" | "socket">): Arr
 }
 
 /**
- * Parse the X-Forwarded-For header.
+ * Parse the X-Forwarded-For header, returning a {@link string} for each entry.
  */
-export function parse(header: string): string[] {
+export function parseRaw(header: string): string[] {
   let end = header.length
   const list: string[] = []
   let start = header.length
@@ -46,3 +47,13 @@ export function parse(header: string): string[] {
 
   return list
 }
+
+/**
+ * Parse the X-Forwarded-For header, returning an IP address (see `ipaddr.js` {@link IPv4}, {@link IPv6}) for each entry.
+ */
+export function parse(header: string): (IPv4 | IPv6)[] {
+  const raw = parseRaw(header)
+  return raw.map(ipaddr.parse)
+}
+
+export type { IPv4, IPv6 }
