@@ -1,6 +1,6 @@
 {
   "name": "@otterhttp/forwarded",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "type": "module",
   "description": "forwarded rewrite with TypeScript and ESM support",
   "homepage": "https://otterhttp.lordfirespeed.dev",
