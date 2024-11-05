@@ -2,12 +2,12 @@ import { IncomingMessage } from "node:http"
 import type { ParsedUrlQuery } from "node:querystring"
 import { Accepts } from "@otterhttp/accepts"
 import { ContentType } from "@otterhttp/content-type"
-import type { Trust } from "@otterhttp/proxy-address"
+import type { IPv4, IPv6, Trust } from "@otterhttp/proxy-address"
 import type { Middleware } from "@otterhttp/router"
 import { type URLParams, getQueryParams } from "@otterhttp/url"
 import type { Result as RangeParseResult, Options as RangeParsingOptions, Ranges } from "header-range-parser"
 
-import { getIP, getIPs } from "./addresses"
+import { getIPs } from "./addresses"
 import { type Cookie, parseCookieHeader } from "./cookies"
 import { getRequestHeader } from "./get-header"
 import { getHost, getSubdomains } from "./host"
@@ -36,8 +36,8 @@ export class Request<Body = unknown> extends IncomingMessage {
   private declare _hostname: string
   private declare _port: number | undefined
   private declare _subdomains: string[]
-  private declare _ip: string | undefined
-  private declare _ips: (string | undefined)[]
+  private declare _ip: IPv4 | IPv6 | undefined
+  private declare _ips: (IPv4 | IPv6 | undefined)[]
 
   // own members
   private _cookies?: Record<string, Cookie>
@@ -47,13 +47,13 @@ export class Request<Body = unknown> extends IncomingMessage {
   populate({ trust, subdomainOffset }: { trust: Trust; subdomainOffset: number | undefined }) {
     this._acceptsMeta = new Accepts(this)
     this._query = getQueryParams(this.url)
+    this._ips = getIPs(this, trust)
+    this._ip = this._ips[this._ips.length - 1]
     this._protocol = getProtocol(this, trust)
     const host = getHost(this, trust)
     this._hostname = host.hostname
     this._port = host.port
     this._subdomains = getSubdomains(host, subdomainOffset)
-    this._ip = getIP(this, trust)
-    this._ips = getIPs(this, trust)
   }
 
   getHeader<HeaderName extends Lowercase<string>>(header: HeaderName): Headers[HeaderName] {
@@ -109,10 +109,10 @@ export class Request<Body = unknown> extends IncomingMessage {
   get subdomains(): readonly string[] {
     return this._subdomains
   }
-  get ip(): string | undefined {
+  get ip(): IPv4 | IPv6 | undefined {
     return this._ip
   }
-  get ips(): readonly (string | undefined)[] {
+  get ips(): readonly (IPv4 | IPv6 | undefined)[] {
     return this._ips
   }
   get xhr(): boolean {

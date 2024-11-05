@@ -35,6 +35,9 @@ importers:
       husky:
         specifier: 9.0.11
         version: 9.0.11
+      ipaddr.js:
+        specifier: ^2.2.0
+        version: 2.2.0
       jsonwebtoken:
         specifier: 9.0.2
         version: 9.0.2
@@ -125,7 +128,11 @@ importers:
 
   packages/etag: {}
 
-  packages/forwarded: {}
+  packages/forwarded:
+    dependencies:
+      ipaddr.js:
+        specifier: ^2.2.0
+        version: 2.2.0
 
   packages/ip-filter:
     dependencies:

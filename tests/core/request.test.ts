@@ -3,10 +3,10 @@ import { makeFetch } from "supertest-fetch"
 import { assert, afterEach, describe, expect, it, vi } from "vitest"
 
 import { App, type Request, type Response } from "@/packages/app/src"
+import * as reqGetHeader from "@/packages/request/src/get-header"
 import { InitAppAndTest } from "@/test_helpers/initAppAndTest"
-import * as reqGetHeader from "../../packages/request/src/get-header"
 
-vi.mock<typeof reqGetHeader>(import("../../packages/request/src/get-header"), async (importOriginal) => {
+vi.mock<typeof reqGetHeader>(import("@/packages/request/src/get-header"), async (importOriginal) => {
   const module = await importOriginal()
 
   return {
@@ -172,8 +172,8 @@ describe("Request properties", () => {
   describe("Network extensions", () => {
     const ipHandler = (req, res) => {
       res.json({
-        ip: req.ip,
-        ips: req.ips,
+        ip: req.ip.toString(),
+        ips: req.ips.map((ip) => ip.toString()),
       })
     }
 
@@ -183,28 +183,25 @@ describe("Request properties", () => {
       const agent = new Agent({ family: 4 }) // ensure IPv4 only
       await fetch("/", { agent }).expect(200, {
         ip: "127.0.0.1",
-        ips: ["::ffff:127.0.0.1"],
+        ips: ["127.0.0.1"],
       })
     })
-    if (process.env.GITHUB_ACTION) {
-      // skip ipv6 tests only for github ci/cd
-      it("IPv6 req.ip & req.ips is being parsed properly", async () => {
-        const { fetch } = InitAppAndTest(ipHandler)
+    it("IPv6 req.ip & req.ips is being parsed properly", async () => {
+      const { fetch } = InitAppAndTest(ipHandler)
 
-        const agent = new Agent({ family: 6 }) // ensure IPv6 only
-        await fetch("/", { agent }).expect(200, {
-          ip: "1",
-          ips: ["::1"],
-        })
+      const agent = new Agent({ family: 6 }) // ensure IPv6 only
+      await fetch("/", { agent }).expect(200, {
+        ip: "::1",
+        ips: ["::1"],
       })
-    }
+    })
     it("IPv4 req.ip & req.ips do not trust proxies by default", async () => {
       const { fetch } = InitAppAndTest(ipHandler)
 
       const agent = new Agent({ family: 4 }) // ensure IPv4 only
       await fetch("/", { agent, headers: { "x-forwarded-for": "10.0.0.1, 10.0.0.2, 127.0.0.2" } }).expect(200, {
         ip: "127.0.0.1",
-        ips: ["::ffff:127.0.0.1"],
+        ips: ["127.0.0.1"],
       })
     })
     it('IPv4 req.ip & req.ips support trusted proxies with "trust proxy"', async () => {
@@ -214,7 +211,7 @@ describe("Request properties", () => {
       const agent = new Agent({ family: 4 }) // ensure IPv4 only
       await fetch("/", { agent, headers: { "x-forwarded-for": "10.0.0.1, 10.0.0.2, 127.0.0.2" } }).expect(200, {
         ip: "127.0.0.2",
-        ips: ["::ffff:127.0.0.1", "127.0.0.2"],
+        ips: ["127.0.0.1", "127.0.0.2"],
       })
     })
     it("req.protocol is http by default", async () => {
@@ -223,6 +220,53 @@ describe("Request properties", () => {
       })
 
       await fetch("/").expect(200, "protocol: http")
+    })
+    it("req.protocol respects X-Forwarded-Proto when proxy is trusted", async () => {
+      const { fetch, app } = InitAppAndTest((req, res) => {
+        res.send(`protocol: ${req.protocol}`)
+      })
+      app.set("trust proxy", ["loopback"])
+
+      const agentIpv4 = new Agent({ family: 4 }) // ensure IPv4 only
+      await fetch("/", {
+        agent: agentIpv4,
+        headers: new Headers({
+          "x-forwarded-proto": "https",
+          "x-forwarded-for": "127.0.0.1",
+        }),
+      }).expect(200, "protocol: https")
+
+      const agentIpv6 = new Agent({ family: 6 }) // ensure IPv4 only
+      await fetch("/", {
+        agent: agentIpv6,
+        headers: new Headers({
+          "x-forwarded-proto": "https",
+          "x-forwarded-for": "::1",
+        }),
+      }).expect(200, "protocol: https")
+    })
+    it("req.protocol does not respect X-Forwarded-Proto when proxy is untrusted", async () => {
+      const { fetch, app } = InitAppAndTest((req, res) => {
+        res.send(`protocol: ${req.protocol}`)
+      })
+
+      const agentIpv4 = new Agent({ family: 4 }) // ensure IPv4 only
+      await fetch("/", {
+        agent: agentIpv4,
+        headers: new Headers({
+          "x-forwarded-proto": "https",
+          "x-forwarded-for": "127.0.0.1",
+        }),
+      }).expect(200, "protocol: http")
+
+      const agentIpv6 = new Agent({ family: 6 }) // ensure IPv4 only
+      await fetch("/", {
+        agent: agentIpv6,
+        headers: new Headers({
+          "x-forwarded-proto": "https",
+          "x-forwarded-for": "::1",
+        }),
+      }).expect(200, "protocol: http")
     })
     it("req.secure is false by default", async () => {
       const { fetch } = InitAppAndTest((req, res) => {
