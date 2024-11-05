@@ -5,11 +5,12 @@ import type { IncomingMessage } from "node:http"
  */
 export function forwarded(req: Pick<IncomingMessage, "headers" | "socket">): Array<string | undefined> {
   // simple header parsing
-  const proxyAddrs = parse((req.headers["x-forwarded-for"] as string) || "")
+  const proxyAddresses: (string | undefined)[] = parse((req.headers["x-forwarded-for"] as string) || "")
   const socketAddr = req.socket.remoteAddress
 
   // return all addresses
-  return [socketAddr].concat(proxyAddrs)
+  proxyAddresses.unshift(socketAddr)
+  return proxyAddresses
 }
 
 /**
