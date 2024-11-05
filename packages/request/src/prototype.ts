@@ -7,7 +7,7 @@ import type { Middleware } from "@otterhttp/router"
 import { type URLParams, getQueryParams } from "@otterhttp/url"
 import type { Result as RangeParseResult, Options as RangeParsingOptions, Ranges } from "header-range-parser"
 
-import { getIP, getIPs } from "./addresses"
+import { getIPs } from "./addresses"
 import { type Cookie, parseCookieHeader } from "./cookies"
 import { getRequestHeader } from "./get-header"
 import { getHost, getSubdomains } from "./host"
@@ -47,8 +47,8 @@ export class Request<Body = unknown> extends IncomingMessage {
   populate({ trust, subdomainOffset }: { trust: Trust; subdomainOffset: number | undefined }) {
     this._acceptsMeta = new Accepts(this)
     this._query = getQueryParams(this.url)
-    this._ip = getIP(this, trust)
     this._ips = getIPs(this, trust)
+    this._ip = this._ips[this._ips.length - 1]
     this._protocol = getProtocol(this, trust)
     const host = getHost(this, trust)
     this._hostname = host.hostname

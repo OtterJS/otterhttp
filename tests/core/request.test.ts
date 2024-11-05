@@ -224,6 +224,53 @@ describe("Request properties", () => {
 
       await fetch("/").expect(200, "protocol: http")
     })
+    it("req.protocol respects X-Forwarded-Proto when proxy is trusted", async () => {
+      const { fetch, app } = InitAppAndTest((req, res) => {
+        res.send(`protocol: ${req.protocol}`)
+      })
+      app.set("trust proxy", ["loopback"])
+
+      const agentIpv4 = new Agent({ family: 4 }) // ensure IPv4 only
+      await fetch("/", {
+        agent: agentIpv4,
+        headers: new Headers({
+          "x-forwarded-proto": "https",
+          "x-forwarded-for": "127.0.0.1",
+        }),
+      }).expect(200, "protocol: https")
+
+      const agentIpv6 = new Agent({ family: 6 }) // ensure IPv4 only
+      await fetch("/", {
+        agent: agentIpv6,
+        headers: new Headers({
+          "x-forwarded-proto": "https",
+          "x-forwarded-for": "::1",
+        }),
+      }).expect(200, "protocol: https")
+    })
+    it("req.protocol does not respect X-Forwarded-Proto when proxy is untrusted", async () => {
+      const { fetch, app } = InitAppAndTest((req, res) => {
+        res.send(`protocol: ${req.protocol}`)
+      })
+
+      const agentIpv4 = new Agent({ family: 4 }) // ensure IPv4 only
+      await fetch("/", {
+        agent: agentIpv4,
+        headers: new Headers({
+          "x-forwarded-proto": "https",
+          "x-forwarded-for": "127.0.0.1",
+        }),
+      }).expect(200, "protocol: http")
+
+      const agentIpv6 = new Agent({ family: 6 }) // ensure IPv4 only
+      await fetch("/", {
+        agent: agentIpv6,
+        headers: new Headers({
+          "x-forwarded-proto": "https",
+          "x-forwarded-for": "::1",
+        }),
+      }).expect(200, "protocol: http")
+    })
     it("req.secure is false by default", async () => {
       const { fetch } = InitAppAndTest((req, res) => {
         res.send(`secure: ${req.secure}`)
